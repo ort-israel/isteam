@@ -792,6 +792,7 @@ class format_grid_renderer extends format_section_renderer_base {
                 }
 
                 if ($course->coursedisplay != COURSE_DISPLAY_MULTIPAGE) {
+
                     if (($editing) && ($section == 0)) {
                         $this->make_block_icon_topic0_editing($course);
                     }
@@ -878,7 +879,20 @@ class format_grid_renderer extends format_section_renderer_base {
                         $this->make_block_icon_topics_editing($thissection, $contextid, $urlpicedit);
                     } else {
                         if (!$sectiongreyedout) {
-                            echo html_writer::link($singlepageurl.'&section='.$thissection->section, $content, array(
+
+                            
+
+                            // Tsofiya 27/07/2017: Link target should be the first activity of the section, if exists.
+                            // Section url
+                            $targeturl = $singlepageurl.'&section='.$thissection->section;
+                            // Activity url
+                            $sectionmodnumbers = $modinfo->sections[$thissection->section];
+                            $section_firstmodinfo = $modinfo->cms[$sectionmodnumbers[0]];
+                            if (isset($section_firstmodinfo) AND $section_firstmodinfo->uservisible
+                                AND !empty($section_firstmodinfo->url)) {
+                                $targeturl = $section_firstmodinfo->url;
+                            }
+                            echo html_writer::link($targeturl, $content, array(
                                 'id' => 'gridsection-'.$thissection->section,
                                 'class' => 'gridicon_link',
                                 'role' => 'link'));
