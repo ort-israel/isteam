@@ -1,6 +1,3 @@
-@import url("../blocks/configurable_reports/js/datatables/media/css/jquery.dataTables.css");
-@import url("../blocks/configurable_reports/js/codemirror/lib/codemirror.css");
-@import url("../blocks/configurable_reports/js/codemirror/addon/display/fullscreen.css");
 
 .dir-rtl .CodeMirror {
     direction: ltr;
@@ -12,6 +9,39 @@
 #page-blocks-configurable_reports-editreport.dir-rtl textarea,
 #page-blocks-configurable_reports-editreport.dir-rtl .felement.fstatic {text-align: left;direction: ltr;}
 
+/*
+#page-blocks-configurable_reports-editreport.dir-rtl #fitem_id_querysql .ftextarea {
+    float: right;
+    width: 66%;
+    margin: 0;
+}
+*/
+#page-blocks-configurable_reports-editreport.dir-rtl #fitem_id_querysql .ftextarea {
+    float: left;
+    width: 100%;
+    display: block;
+    margin: 0;
+}
+#page-blocks-configurable_reports-editreport.dir-rtl #fitem_id_querysql .fitemtitle {
+    width: 100%;
+    display: block;
+    float: left;
+}
+/*
+@media (min-width: 1110px) and (max-width: 1220px) {
+
+    #page-blocks-configurable_reports-editreport.dir-rtl #fitem_id_querysql .ftextarea {
+        width: 73%;
+    }
+}
+
+@media (min-width: 1220px) and (max-width: 1440px) {
+
+    #page-blocks-configurable_reports-editreport.dir-rtl #fitem_id_querysql .ftextarea {
+        width: 90%;
+    }
+}
+*/
 /* Fix table header padding, to show "Sort" arrows
 */
 #reportslist th.header {padding: 0 20px;}
@@ -20,6 +50,8 @@
 */
 #page-blocks-configurable_reports-managereport .generaltable td.c5 {direction: ltr;}
 
+/* Left align Setting INPUT TEXT boxes
+*/
 /* Left align Setting INPUT TEXT boxes
 */
 #page-admin-setting-blocksettingconfigurable_reports.dir-rtl .settingsform input[type=text],
@@ -47,6 +79,10 @@
 #page-blocks-configurable_reports-viewreport #lastexecutiontime {
     padding: 10px;
     text-align: center;
+}
+
+#page-blocks-configurable_reports-viewreport .generaltable th.header {
+    padding-right: 16px;
 }
 
 /* Convert "Add report" link to a beautiful button
@@ -98,3 +134,22 @@
      position:relative;
      top:1px;
  }
+
+#page-blocks-configurable_reports-viewreport .fullreportbutton {
+    text-align: center;
+}
+
+#page-blocks-configurable_reports-managereport .aboutimg {
+  padding: 0 10px;
+  width: 16px;
+}
+/* #page-blocks-configurable_reports-managereport .reportsummary {display: none;} */
+#page-blocks-configurable_reports-managereport .contexttagsnav,
+#page-blocks-configurable_reports-managereport .tagsnav {
+  text-align:
+  center;font-size: 18px;
+}
+
+#page-blocks-configurable_reports-managereport .contexttagsnav {margin-bottom: 20px;}
+
+.reportinfo {margin-top: 20px;}

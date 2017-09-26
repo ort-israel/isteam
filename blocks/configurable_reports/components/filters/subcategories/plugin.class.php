@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -14,81 +15,83 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Configurable Reports
- * A Moodle block for creating customizable reports
- * @package blocks
- * @author: Juan leyva <http://www.twitter.com/jleyvadelgado>
- * @date: 2009
- */
+/** Configurable Reports
+  * A Moodle block for creating customizable reports
+  * @package blocks
+  * @author: Juan leyva <http://www.twitter.com/jleyvadelgado>
+  * @date: 2009
+  */
 
 require_once($CFG->dirroot.'/blocks/configurable_reports/plugin.class.php');
 
-class plugin_subcategories extends plugin_base {
+class plugin_subcategories extends plugin_base{
 
-    public function init() {
-        $this->form = false;
-        $this->unique = true;
-        $this->fullname = get_string('filtersubcategories', 'block_configurable_reports');
-        $this->reporttypes = array('categories', 'sql');
-    }
+	function init(){
+		$this->form = false;
+		$this->unique = true;
+		$this->fullname = get_string('filtersubcategories','block_configurable_reports');
+		$this->reporttypes = array('categories','sql');
+	}
 
-    public function summary($data) {
-        return get_string('filtersubcategories_summary', 'block_configurable_reports');
-    }
+	function summary($data){
+		return get_string('filtersubcategories_summary','block_configurable_reports');
+	}
 
-    public function execute($finalelements, $data) {
-        $filtersubcategories = optional_param('filter_subcategories', 0, PARAM_INT);
-        if (!$filtersubcategories) {
-            return $finalelements;
-        }
+	function execute($finalelements, $data){
 
-        if ($this->report->type != 'sql') {
-            return array($filtersubcategories);
-        } else {
+		$filter_subcategories = optional_param('filter_subcategories',0,PARAM_INT);
+		if(!$filter_subcategories)
+			return $finalelements;
+
+		if ($this->report->type != 'sql') {
+            return array($filter_subcategories);
+		} else {
+			if (preg_match("/%%FILTER_SUBCATEGORIES:([^%]+)%%/i", $finalelements, $output)) {
+				$replace = ' AND ('.$output[1].' LIKE CONCAT( \'%/\', '.$filter_subcategories.') OR '.$output[1].' LIKE CONCAT( \'%/\', '.$filter_subcategories.', \'/%\') ) ';
+                $finalelements = str_replace('%%FILTER_SUBCATEGORIES:'.$output[1].'%%', $replace, $finalelements);
+			}
+            // Once more... In case we have a different synatx
             if (preg_match("/%%FILTER_SUBCATEGORIES:([^%]+)%%/i", $finalelements, $output)) {
-                $replace = ' AND '.$output[1].' LIKE CONCAT( \'%/\', '.$filtersubcategories.', \'%\' ) ';
-                return str_replace('%%FILTER_SUBCATEGORIES:'.$output[1].'%%', $replace, $finalelements);
+                $replace = ' AND ('.$output[1].' LIKE CONCAT( \'%/\', '.$filter_subcategories.') OR '.$output[1].' LIKE CONCAT( \'%/\', '.$filter_subcategories.', \'/%\') ) ';
+                $finalelements = str_replace('%%FILTER_SUBCATEGORIES:'.$output[1].'%%', $replace, $finalelements);
             }
         }
-        return $finalelements;
-    }
+		return $finalelements;
+	}
 
-    public function print_filter(&$mform) {
-        global $remotedb, $CFG;
+	function print_filter(&$mform){
+		global $remoteDB;
 
-        $filtersubcategories = optional_param('filter_subcategories', 0, PARAM_INT);
+		$filter_subcategories = optional_param('filter_subcategories',0,PARAM_INT);
 
-        $reportclassname = 'report_'.$this->report->type;
-        $reportclass = new $reportclassname($this->report);
+		$reportclassname = 'report_'.$this->report->type;
+		$reportclass = new $reportclassname($this->report);
 
-        $courseoptions = array();
-        $courseoptions[0] = get_string('filter_all', 'block_configurable_reports');
+		if($this->report->type != 'sql'){
+			$components = cr_unserialize($this->report->components);
+			$conditions = $components['conditions'];
 
-        if ($this->report->type != 'sql') {
-            $components = cr_unserialize($this->report->components);
-            $conditions = $components['conditions'];
+			$subcategorieslist = $reportclass->elements_by_conditions($conditions);
+		} else {
+			$subcategorieslist = array_keys($remoteDB->get_records('course_categories', null, 'path'));
+		}
 
-            $subcategorieslist = $reportclass->elements_by_conditions($conditions);
+		$courseoptions = array();
+		$courseoptions[0] = get_string('filter_all', 'block_configurable_reports');
 
-            if (!empty($subcategorieslist)) {
-                list($usql, $params) = $remotedb->get_in_or_equal($subcategorieslist);
-                $subcategories = $remotedb->get_records_select('course_categories', "id $usql", $params);
+		if(!empty($subcategorieslist)){
+			list($usql, $params) = $remoteDB->get_in_or_equal($subcategorieslist);
+			$subcategories = $remoteDB->get_records_select('course_categories', "id $usql", $params, 'path');
 
-                foreach ($subcategories as $c) {
-                    $courseoptions[$c->id] = format_string($c->name);
-                }
-            }
-        } else {
-            require_once($CFG->libdir. '/coursecatlib.php');
-            $subcategorieslist = coursecat::make_categories_list();
+			foreach($subcategories as $c){
+				$courseoptions[$c->id] = str_repeat('&nbsp&nbsp&nbsp', $c->depth).' '.format_string($c->name);
+			}
+		}
 
-            if (!empty($subcategorieslist)) {
-                $courseoptions += $subcategorieslist;
-            }
-        }
+		$mform->addElement('select', 'filter_subcategories', get_string('category'), $courseoptions);
+		$mform->setType('filter_subcategories', PARAM_INT);
 
-        $mform->addElement('select', 'filter_subcategories', get_string('category'), $courseoptions);
-        $mform->setType('filter_subcategories', PARAM_INT);
-    }
+	}
+
 }
+
