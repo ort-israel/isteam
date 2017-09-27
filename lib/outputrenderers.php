@@ -1099,7 +1099,7 @@ class core_renderer extends renderer_base {
         } else {
             $token = $this->unique_main_content_token;
         }
-
+  
         if ($cutpos === false) {
             throw new coding_exception('page layout file ' . $layoutfile . ' does not contain the main content placeholder, please include "<?php echo $OUTPUT->main_content() ?>" in theme layout file.');
         }

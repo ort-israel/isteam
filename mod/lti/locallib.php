@@ -1744,6 +1744,7 @@ function lti_get_type_type_config($id) {
     global $DB;
 
     $basicltitype = $DB->get_record('lti_types', array('id' => $id));
+
     $config = lti_get_type_config($id);
 
     $type = new \stdClass();
