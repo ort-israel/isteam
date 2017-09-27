@@ -63,9 +63,6 @@ echo $OUTPUT->doctype() ?>
 
     <div class="container-fluid">
         <div id="page-content" class="row-fluid">
-            <!-- Tsofiya 21/08/2017: change the order of printing the elements to screen for increasing accessibility -->
-
-
             <div id="<?php echo $regionbsid ?>" class="span9">
                 <div class="row-fluid">
                     <section id="region-main" class="span12 pull-right">
