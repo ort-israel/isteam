@@ -886,16 +886,18 @@ class format_grid_renderer extends format_section_renderer_base {
                             // Section url
                             $targeturl = $singlepageurl.'&section='.$thissection->section;
                             // Activity url
-                            $sectionmodnumbers = $modinfo->sections[$thissection->section];
-                            $section_firstmodinfo = $modinfo->cms[$sectionmodnumbers[0]];
-                            if (isset($section_firstmodinfo) AND $section_firstmodinfo->uservisible
-                                AND !empty($section_firstmodinfo->url)) {
-                                $targeturl = $section_firstmodinfo->url;
+                            if (isset($modinfo->sections[$thissection->section])) {
+                                $sectionmodnumbers = $modinfo->sections[$thissection->section];
+                                $section_firstmodinfo = $modinfo->cms[$sectionmodnumbers[0]];
+                                if (isset($section_firstmodinfo) AND $section_firstmodinfo->uservisible
+                                    AND !empty($section_firstmodinfo->url)) {
+                                    $targeturl = $section_firstmodinfo->url;
+                                }
+                                echo html_writer::link($targeturl, $content, array(
+                                    'id' => 'gridsection-' . $thissection->section,
+                                    'class' => 'gridicon_link',
+                                    'role' => 'link'));
                             }
-                            echo html_writer::link($targeturl, $content, array(
-                                'id' => 'gridsection-'.$thissection->section,
-                                'class' => 'gridicon_link',
-                                'role' => 'link'));
                         } else {
                             // Need an enclosing 'span' for IE.
                             echo html_writer::tag('span', $content);
