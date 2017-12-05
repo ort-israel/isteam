@@ -125,7 +125,6 @@ class block_section_modules_navbar extends block_list {
      */
     public function listActivities($modinfo, $sectionNum) {
         global $PAGE;
-        var_dump($sectionNum);
         foreach ($modinfo->sections[$sectionNum] as $cmid) {
             $cm = $modinfo->cms[$cmid];
             if (!$cm->uservisible) {
