@@ -475,20 +475,22 @@ function section_nav_selection($course, $displaysection = 1) {
     */
     //while ($section <= $course->numsections) {
 
-    $numsections = count($modinfo->sections)-1;
+    $numsections = count($modinfo->sections) - 1;
     while ($section <= $numsections) {
         $thissection = $modinfo->get_section_info($section);
         $showsection = $thissection->uservisible or !$course->hiddensections;
         if (($showsection) && ($section != $displaysection) && ($url = course_get_url($course, $section))) {
             // Get a link to the first activity in each section
-            $sectionmodnumbers = $modinfo->sections[$thissection->section];
-            $section_firstmodinfo = $modinfo->cms[$sectionmodnumbers[0]];
-            if (isset($section_firstmodinfo) AND $section_firstmodinfo->uservisible
-                AND !empty($section_firstmodinfo->url)) {
-                $url = $section_firstmodinfo->url;
+            if (isset($thissection->section) && isset($modinfo->sections[$thissection->section])) {
+                $sectionmodnumbers = $modinfo->sections[$thissection->section];
+                $section_firstmodinfo = $modinfo->cms[$sectionmodnumbers[0]];
+                if (isset($section_firstmodinfo) AND $section_firstmodinfo->uservisible
+                    AND !empty($section_firstmodinfo->url)) {
+                    $url = $section_firstmodinfo->url;
+                }
+                // Get a link to the course's frontpage.
+                $sectionmenu[$url->out(false)] = get_section_name($course, $section);
             }
-            // Get a link to the course's frontpage.
-            $sectionmenu[$url->out(false)] = get_section_name($course, $section);
         }
         $section++;
     }
