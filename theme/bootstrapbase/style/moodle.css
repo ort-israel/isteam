@@ -2389,7 +2389,7 @@
 .mdl-right {
   text-align: right;
 }
-/*rtl:ignore*/
+/*rtl:ignore*/ /* Lea 2017*/
 .text-ltr {
   direction: ltr !important;
   /* stylelint-disable-line declaration-no-important */
@@ -10591,8 +10591,10 @@ a:focus {
   clear: both;
 }
 [class*="span"] {
+	/*rtl:ignore*/  /* Lea 2017 - Add rtl ignores */
   float: left;
   min-height: 1px;
+  /*rtl:ignore*/  /* Lea 2017 - Add rtl ignores */
   margin-left: 20px;
 }
 .container,
@@ -10693,9 +10695,11 @@ a:focus {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
+   /*rtl:begin:ignore*/ /* Lea 2017 - Add rtl ignores */
   float: left;
   margin-left: 2.12765957%;
   *margin-left: 2.07446809%;
+   /*rtl:end:ignore*/ /* Lea 2017 - Add rtl ignores */
 }
 .row-fluid [class*="span"]:first-child {
   margin-left: 0;
@@ -10853,6 +10857,7 @@ a:focus {
 }
 [class*="span"].pull-right,
 .row-fluid [class*="span"].pull-right {
+	/*rtl:ignore*/ /* Lea 2017 - Add rtl ignores */
   float: right;
 }
 .container {
@@ -19574,8 +19579,10 @@ span[data-flexitour="container"][x-placement="right-start"] div[data-role="arrow
     clear: both;
   }
   [class*="span"] {
+	 /*rtl:ignore*/  /* Lea 2017 - Add rtl ignores */
     float: left;
     min-height: 1px;
+	/*rtl:ignore*/  /* Lea 2017 - Add rtl ignores */
     margin-left: 30px;
   }
   .container,
@@ -19676,9 +19683,11 @@ span[data-flexitour="container"][x-placement="right-start"] div[data-role="arrow
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+	/*rtl:begin:ignore*/  /* Lea 2017 - Add rtl ignores */
     float: left;
     margin-left: 2.56410256%;
     *margin-left: 2.51091107%;
+	/*rtl:end:ignore*/  /* Lea 2017 - Add rtl ignores */
   }
   .row-fluid [class*="span"]:first-child {
     margin-left: 0;
@@ -19923,8 +19932,10 @@ span[data-flexitour="container"][x-placement="right-start"] div[data-role="arrow
     clear: both;
   }
   [class*="span"] {
+	  /*rtl:ignore*/  /* Lea 2017 - Add rtl ignores */
     float: left;
     min-height: 1px;
+	/*rtl:ignore*/  /* Lea 2017 - Add rtl ignores */
     margin-left: 20px;
   }
   .container,
@@ -20025,9 +20036,11 @@ span[data-flexitour="container"][x-placement="right-start"] div[data-role="arrow
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    /*rtl:begin:ignore*/	/* Lea 2017 - Add rtl ignores */
     float: left;
     margin-left: 2.76243094%;
     *margin-left: 2.70923945%;
+	 /*rtl:end:ignore*/  /* Lea 2017 - Add rtl ignores */
   }
   .row-fluid [class*="span"]:first-child {
     margin-left: 0;
