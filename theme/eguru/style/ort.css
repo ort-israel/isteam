@@ -605,24 +605,6 @@ div.custom-login-page .loginbox {
 /******************/
 /*** Dashboard ****/
 /******************/
-/* Tsofiya 21/08/2017: Fix switching directions for rtl.
-   Add .dir-rtl because there is something that switch directions for rtl, and with this class directions don't switch
- */
-/* .dir-rtl .row-fluid [class*="span"] {
-    float: left;
-    margin-left: 2.12765957%;
-    margin-right: 0;
-}
-
-.dir-rtl .row-fluid [class*="span"]:first-child {
-    margin-left: 0;
-}
-
-.row-fluid{
-    width: auto;
-} */
-/* End of corrections for pblit */
-
 div.block {
     background-color: #eeeeee;
     border: none;
@@ -1157,6 +1139,7 @@ div.block_section_modules_navbar {
     background-color: #d3d3d3;
     position: relative;
     display: inline-block;
+    /*rtl:ignore*/
     padding: 10px 40px 10px 10px;
 }
 
@@ -1166,6 +1149,7 @@ div.block_section_modules_navbar {
     position: absolute;
     -webkit-transform: rotate(-225deg);
     transform: rotate(-225deg);
+    /*rtl:ignore*/
     right: 20px;
 }
 
@@ -1339,13 +1323,6 @@ div.block_section_modules_navbar {
 
 /* Tsofiay 22/08/2017: corrections for pblit */
 @media only screen and (min-width: 1200px){
-    /* Tsofiya 22/08/2017: Fix switching directions for rtl.
-       Add .dir-rtl because there is something that switch directions for rtl, and with this class directions don't switch
-    */
-    /* .dir-rtl .row-fluid [class*="span"] {
-        margin-left: 2.56410256%;
-    } */
-
     .row{
         margin: 0;
     }
