@@ -812,7 +812,7 @@ header#header .header-menubar {
 }
 
 /*Tsofiya 21/08/2017*/
-.dir-rtl .nav{
+.dir-rtl .nav {
     margin-right: 25px;
 }
 
@@ -871,12 +871,14 @@ body #header .header-menubar .dropdown-menu {
     padding: 0 40px 40px;
     border-right: 1px solid #aaa;
 }
+
 /* Tsofiya 24/08/2017: Fix - tell the browser not renders as the opposite */
 .dir-rtl.path-mod #region-main {
     border-right: 1px solid #aaa;
     border-left: none;
 }
-.row{
+
+.row {
     margin: 0;
 }
 
@@ -884,7 +886,7 @@ body #header .header-menubar .dropdown-menu {
     color: #5c5a59;
 }
 
-.dir-rtl.path-mod-glossary .printicon{
+.dir-rtl.path-mod-glossary .printicon {
     padding: 0 0 0 20px;
 }
 
@@ -1149,7 +1151,6 @@ div.block_section_modules_navbar {
     position: absolute;
     -webkit-transform: rotate(-225deg);
     transform: rotate(-225deg);
-    /*rtl:ignore*/
     right: 20px;
 }
 
@@ -1159,11 +1160,22 @@ div.block_section_modules_navbar {
     width: 38px;
 }
 
+/* --------->>> TABLES <<<-----------*/
+/* Lea 2018 - I don't understand why the text-align defined in bootstrapbase/moodle.css isn't flipped,
+                but it's not, so am explicitly flipping it in rtl */
+
+.dir-rtl table.flexible th,
+.dir-rtl .generaltable th,
+.dir-rtl table.flexible td,
+.dir-rtl .generaltable td {
+    text-align: right;
+}
+
 /*******************/
 /** Media Queries **/
 /*******************/
 @media only screen and (min-width: 500px) {
-    .course-content  #gridiconcontainer ul.gridicons {
+    .course-content #gridiconcontainer ul.gridicons {
         justify-content: space-between;
     }
 
@@ -1322,12 +1334,12 @@ div.block_section_modules_navbar {
 }
 
 /* Tsofiay 22/08/2017: corrections for pblit */
-@media only screen and (min-width: 1200px){
-    .row{
+@media only screen and (min-width: 1200px) {
+    .row {
         margin: 0;
     }
 
-    .row-fluid{
+    .row-fluid {
         width: auto;
     }
 }

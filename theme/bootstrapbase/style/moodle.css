@@ -19248,9 +19248,6 @@ body {
 
     float: right;
 }
-.dir-rtl .block .header .block_action {
-    float: left;
-}
 
 .block .header .block_action > * {
     margin-left: 3px;
