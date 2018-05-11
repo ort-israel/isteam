@@ -261,6 +261,7 @@ class qtype_calculatedmulti extends qtype_calculated {
                 $anstext = $anstext.$str;
             }
             $anstext .= $anstextremaining;
+            $anstext = str_replace(array_keys($replaces), array_values($replaces), $anssubstituted);
             $comment->stranswers[$key] = $anssubstituted.'<br/>'.$anstext;
         }
         return fullclone($comment);
