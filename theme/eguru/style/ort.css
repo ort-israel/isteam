@@ -27,8 +27,7 @@ img.iconsmall {
     height: auto;
     width: auto;
 }
-
-img.icon {
+.unlist img.icon {
     width: 30px;
     height: auto;
 }
@@ -85,6 +84,7 @@ body a:focus {
 
 button, input.form-submit, input[type="button"], input[type="submit"], input[type="reset"] {
     font-size: 18px;
+    line-height: 1;
 }
 
 body h1, body h2, body h3, body h4, body h5, body h6 {
@@ -1157,6 +1157,31 @@ div.block_section_modules_navbar {
     text-align: right;
 }
 
+.gradingtable{
+    margin-bottom: 30px;
+}
+/* --------->>> FORMS <<<-----------*/
+
+.form-item .form-label,
+.mform .fitem div.fitemtitle {
+    /*rtl:begin:ignore*/
+    float: right;
+    /*rtl:end:ignore*/
+}
+.form-item .form-label, .mform .fitem div.fitemtitle,
+.userprofile dl.list dt, .form-horizontal .control-label {
+    width: 260px;
+    /*this fixes the ? button to drop into second line, but causes sometimes the label to be too wide. Rachel 2.2018*/
+}
+
+ /*new forum question:*/
+#page-mod-forum-discuss .discussioncontrols .discussioncontrol {
+    min-height: 50px;
+}
+#page-mod-forum-discuss .discussioncontrols .movediscussion .btn-secondary{
+    margin-bottom: 0;
+}
+
 /*******************/
 /** Media Queries **/
 /*******************/
@@ -1230,9 +1255,11 @@ div.block_section_modules_navbar {
         height: 0;
         top: 0;
         position: absolute;
-        border-left: 70px solid transparent; /*border-right: 70px solid transparent; Tsofiya 21/08/2017: in browser renders as the opposite*/
         border-bottom: 124px solid #252525;
-        left: -70px; /*right: -70px; Tsofiya 21/08/2017: in browser renders as the opposite*/
+        /*rtl:begin:ignore*/
+        border-right: 70px solid transparent;
+        right: -70px;
+        /*rtl:end:ignore*/
     }
 
     /***************/
