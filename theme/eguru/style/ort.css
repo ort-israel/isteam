@@ -15,6 +15,7 @@ select {
 .dir-rtl .radio input[type="radio"],
 .dir-rtl .checkbox input[type="checkbox"] {
     float: none; /* in login page, no need to float */
+    margin: 0; /* align the checkbox with the text fields, and override the negative margin that made overlap the label */
 }
 
 /* correct of form select element in a form, in blog usage block in oublog module */
@@ -439,12 +440,15 @@ ul.schools-list {
     margin: 0;
 }
 
-#footer .social-media .smedia {
+#footer .social-media .smedia,
+#footer .social-media .site-link
+{
     padding: 0;
     line-height: 1;
 }
 
-#footer .social-media .smedia:after {
+#footer .social-media .smedia:after,
+#footer .social-media .site-link:after{
     content: '|';
     color: #fff;
     display: inline-block;
@@ -1043,6 +1047,11 @@ div.course-content ul.gridicons li .image_holder {
 /************/
 /** Blocks **/
 /************/
+
+.dir-rtl .block_settings .block_tree .tree_item.branch {
+    background-position: 100% 10px;
+}
+
 .block_myprofile .header {
     display: none;
 }
@@ -1105,7 +1114,8 @@ div.block_section_modules_navbar {
     width: 38px;
 }
 
-.block.block_section_modules_navbar .unlist li > div.column {
+.block.block_section_modules_navbar .unlist li > div.column,
+.block.block_activity_modules .unlist li > div.column{
     padding: 8px 0;
     display: block;
 }
@@ -1168,6 +1178,12 @@ div.block_section_modules_navbar {
     float: right;
     /*rtl:end:ignore*/
 }
+.dir-rtl .mform fieldset.collapsible legend a.fheader {
+    background-image: url('[[pix:t/collapsed_rtl]]');
+    background-position-x: 100%;
+    padding: 0 20px 0 50px;
+}
+
 .form-item .form-label, .mform .fitem div.fitemtitle,
 .userprofile dl.list dt, .form-horizontal .control-label {
     width: 260px;
@@ -1326,8 +1342,12 @@ div.block_section_modules_navbar {
         display: block;
     }
 
-    .dir-rtl #footer > .social-media > ul > li > a {
+    .dir-rtl #footer > .social-media > ul > li.smedia > a {
         padding-right: 32px;
+    }
+    .dir-rtl #footer > .social-media > ul > li.site-link > a {
+        padding-right: 6px;
+        padding-left: 2px;
     }
 }
 

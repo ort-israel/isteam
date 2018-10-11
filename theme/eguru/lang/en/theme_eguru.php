@@ -23,6 +23,7 @@
  */
 
 $string['about'] = 'About';
+$string['site-regulation'] = 'Site Regulation';
 $string['aboutus'] = 'About Us';
 $string['pluginname'] = 'Eguru';
 $string['address'] = 'Address';

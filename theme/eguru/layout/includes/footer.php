@@ -26,7 +26,7 @@ $footnote = theme_eguru_get_setting('footnote', 'format_text');
 $footnote = theme_eguru_lang($footnote);
 $footerbtitle2 = theme_eguru_get_setting('footerbtitle2', 'format_text');
 $footerbtitle2 = theme_eguru_lang($footerbtitle2);
-$footerbtitle3 = theme_eguru_get_setting('footerbtitle3', 'format_text');
+$footerbtitle3 = theme_eguru_get_setting('footerbtitle3', 'format_text'); // used as site regulation link
 $footerbtitle3 = theme_eguru_lang($footerbtitle3);
 $footerbtitle4 = theme_eguru_get_setting('footerbtitle4', 'format_text');
 $footerbtitle4 = theme_eguru_lang($footerbtitle4);
@@ -36,11 +36,11 @@ $footerbtitle4 = theme_eguru_lang($footerbtitle4);
 
 $fburl = theme_eguru_get_setting('fburl');
 $fburl = trim($fburl);
-$pinurl = theme_eguru_get_setting('pinurl');
+$pinurl = theme_eguru_get_setting('pinurl'); // used as about link
 $pinurl = trim($pinurl);
-$twurl = theme_eguru_get_setting('twurl');
+$twurl = theme_eguru_get_setting('twurl'); // used as instagram link
 $twurl = trim($twurl);
-$gpurl = theme_eguru_get_setting('gpurl');
+$gpurl = theme_eguru_get_setting('gpurl');  // used as youtube link
 $gpurl = trim($gpurl);
 
 $address = theme_eguru_get_setting('address');
@@ -95,18 +95,27 @@ $phoneno = theme_eguru_get_setting('phoneno');
                 endif;
                 ?>
 
-                <?php if (!empty($pinurl)): ?>
-                    <li class="smedia smedia-04">
-                        <a href="<?php echo $pinurl; ?>" target="_blank">
-                                   <span class="media-icon">
-<!--                                   <i class="fa <?php /*echo get_string('mediaicon4', 'theme_eguru'); */ ?>"></i>-->
-                                   </span>
-                                            <span class="media-name"><?php echo get_string('about', 'theme_eguru'); ?></span>
+                <?php if (!empty($footerbtitle3)): ?>
+                    <li class="site-link">
+                        <a href="<?php echo $footerbtitle3; ?>" target="_blank">
+                            <span class="media-name"><?php echo get_string('site-regulation', 'theme_eguru'); ?></span>
                         </a>
                     </li>
-                    <?php
+                <?php
                 endif;
                 ?>
+
+                <?php if (!empty($pinurl)): ?>
+                    <li class="site-link">
+                        <a href="<?php echo $pinurl; ?>" target="_blank">
+                            <span class="media-name"><?php echo get_string('about', 'theme_eguru'); ?></span>
+                        </a>
+                    </li>
+                <?php
+                endif;
+                ?>
+
+
             </ul>
         </div>
 
