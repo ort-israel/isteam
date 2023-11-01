@@ -290,4 +290,3 @@ $string['zerowidthjoiner'] = 'zero width joiner';
 $string['lefttorightmark'] = 'left-to-right mark';
 $string['righttoleftmark'] = 'right-to-left mark';
 $string['softhyphen'] = 'soft hyphen';
-$string['privacy:metadata'] = 'The atto_charmap plugin does not store any personal data.';

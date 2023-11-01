@@ -44,8 +44,9 @@ function tool_task_mtrace_wrapper($message, $eol) {
 $taskname = required_param('task', PARAM_RAW_TRIMMED);
 
 // Basic security checks.
-require_admin();
+require_login();
 $context = context_system::instance();
+require_capability('moodle/site:config', $context);
 
 if (!get_config('tool_task', 'enablerunnow')) {
     print_error('nopermissions', 'error', '', get_string('runnow', 'tool_task'));
@@ -59,14 +60,10 @@ if (!$task) {
 }
 
 // Start output.
-$PAGE->set_url(new moodle_url('/admin/tool/task/schedule_task.php', ['task' => $taskname]));
+$PAGE->set_url(new moodle_url('/admin/tool/task/schedule_task.php'));
 $PAGE->set_context($context);
-$PAGE->set_heading($SITE->fullname);
-$PAGE->set_title($task->get_name());
-
-navigation_node::override_active_url(new moodle_url('/admin/tool/task/scheduledtasks.php'));
+$PAGE->navbar->add(get_string('scheduledtasks', 'tool_task'), new moodle_url('/admin/tool/task/scheduledtasks.php'));
 $PAGE->navbar->add(s($task->get_name()));
-
 echo $OUTPUT->header();
 echo $OUTPUT->heading($task->get_name());
 
@@ -75,10 +72,9 @@ echo $OUTPUT->heading($task->get_name());
 if (!optional_param('confirm', 0, PARAM_INT)) {
     echo $OUTPUT->confirm(get_string('runnow_confirm', 'tool_task', $task->get_name()),
             new single_button(new moodle_url('/admin/tool/task/schedule_task.php',
-                    ['task' => $taskname, 'confirm' => 1, 'sesskey' => sesskey()]),
+            array('task' => $taskname, 'confirm' => 1, 'sesskey' => sesskey())),
             get_string('runnow', 'tool_task')),
-            new single_button(new moodle_url('/admin/tool/task/scheduledtasks.php',
-                    ['lastchanged' => get_class($task)]),
+            new single_button(new moodle_url('/admin/tool/task/scheduledtasks.php'),
             get_string('cancel'), false));
     echo $OUTPUT->footer();
     exit;
@@ -92,16 +88,10 @@ echo html_writer::start_tag('pre');
 $CFG->mtrace_wrapper = 'tool_task_mtrace_wrapper';
 
 // Run the specified task (this will output an error if it doesn't exist).
-\core\task\manager::run_from_cli($task);
-
+cron_run_single_task($task);
 echo html_writer::end_tag('pre');
 
 $output = $PAGE->get_renderer('tool_task');
-
-// Re-run the specified task (this will output an error if it doesn't exist).
-echo $OUTPUT->single_button(new moodle_url('/admin/tool/task/schedule_task.php',
-        array('task' => $taskname, 'confirm' => 1, 'sesskey' => sesskey())),
-        get_string('runagain', 'tool_task'));
-echo $output->link_back(get_class($task));
+echo $output->link_back();
 
 echo $OUTPUT->footer();

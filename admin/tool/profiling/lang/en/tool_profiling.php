@@ -53,4 +53,3 @@ $string['summaryof'] = 'Summary of {$a}';
 $string['viewdetails'] = 'View profiling details';
 $string['viewdiff'] = 'View profiling differences with:';
 $string['viewdiffdetails'] = 'View profiling diff details';
-$string['privacy:metadata'] = 'The Profiling runs plugin does not store any personal data.';

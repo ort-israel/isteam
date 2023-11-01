@@ -24,4 +24,3 @@
  */
 
 $string['pluginname'] = 'File locking';
-$string['privacy:metadata'] = 'The File locking plugin does not store any personal data.';

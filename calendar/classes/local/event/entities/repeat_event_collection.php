@@ -27,6 +27,7 @@ namespace core_calendar\local\event\entities;
 defined('MOODLE_INTERNAL') || die();
 
 use core_calendar\local\event\factories\event_factory_interface;
+use core_calendar\local\event\exceptions\no_repeat_parent_exception;
 
 /**
  * Class representing a collection of repeat events.
@@ -63,27 +64,18 @@ class repeat_event_collection implements event_collection_interface {
     /**
      * Constructor.
      *
-     * @param stdClass                $dbrow    The event dbrow that is being repeated.
+     * @param int                     $parentid ID of the parent event.
+     * @param int                     $repeatid If non-zero this will be used as the parent id.
      * @param event_factory_interface $factory  Event factory.
+     * @throws no_repeat_parent_exception If the parent record can't be loaded.
      */
-    public function __construct($dbrow, event_factory_interface $factory) {
-        $eventid = $dbrow->id;
-        $repeatid = $dbrow->repeatid;
-
-        if (empty($repeatid)) {
-            $this->parentrecord = $dbrow;
-            $this->parentid = $eventid;
-        } else {
-            $this->parentid = $repeatid;
-        }
-
-        if ($eventid === $repeatid) {
-            // This means the record we've been given is the parent
-            // record.
-            $this->parentrecord = $dbrow;
-        }
-
+    public function __construct($parentid, $repeatid, event_factory_interface $factory) {
+        $this->parentid = $repeatid ? $repeatid : $parentid;
         $this->factory = $factory;
+
+        if (!$this->get_parent_record()) {
+            throw new no_repeat_parent_exception(sprintf('No record found for id %d', $parentid));
+        }
     }
 
     public function get_id() {
@@ -117,11 +109,11 @@ class repeat_event_collection implements event_collection_interface {
     protected function get_parent_record() {
         global $DB;
 
-        if (!isset($this->parentrecord)) {
-            $this->parentrecord = $DB->get_record('event', ['id' => $this->parentid]);
+        if (isset($this->parentrecord)) {
+                return $this->parentrecord;
         }
 
-        return $this->parentrecord;
+        return $DB->get_record('event', ['id' => $this->parentid]);
     }
 
     /**
@@ -130,16 +122,12 @@ class repeat_event_collection implements event_collection_interface {
      * @param int $start Start offset.
      * @return \stdClass[]
      */
-    protected function load_event_records($start = 0) {
+    protected function load_event_records($start = 1) {
         global $DB;
-        while ($records = $DB->get_records_select(
+        while ($records = $DB->get_records(
             'event',
-            'id <> :parentid AND repeatid = :repeatid',
-            [
-                'parentid' => $this->parentid,
-                'repeatid' => $this->parentid,
-            ],
-            'id ASC',
+            ['repeatid' => $this->parentid],
+            '',
             '*',
             $start,
             self::DB_QUERY_LIMIT

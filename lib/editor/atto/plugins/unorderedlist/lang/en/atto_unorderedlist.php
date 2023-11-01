@@ -23,4 +23,3 @@
  */
 
 $string['pluginname'] = 'Unordered list';
-$string['privacy:metadata'] = 'The atto_unorderedlist plugin does not store any personal data.';

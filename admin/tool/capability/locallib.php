@@ -53,12 +53,7 @@ function tool_capability_calculate_role_data($capability, array $roles) {
     $sql = 'SELECT DISTINCT con.path, 1
               FROM {context} con
               JOIN {role_capabilities} rc ON rc.contextid = con.id
-             WHERE capability = ? ' .
-            $sqlroletest .
-            // Context path should never be null, but can happen in old database with
-            // bad data (e.g. a course_module where the corresponding course no longer exists).
-            // We need to leave these out of the report to prevent errors.
-            ' AND con.path IS NOT NULL';
+             WHERE capability = ? '.$sqlroletest;
     $relevantpaths = $DB->get_records_sql_menu($sql, $params);
     $requiredcontexts = array($systemcontext->id);
     foreach ($relevantpaths as $path => $notused) {
@@ -93,10 +88,6 @@ function tool_capability_calculate_role_data($capability, array $roles) {
 
     // Put the role capabilities into the context tree.
     foreach ($rolecaps as $rolecap) {
-        if (!isset($contexts[$rolecap->contextid])) {
-            // Skip capabilities in orphaned contexts that are not in the tree.
-            continue;
-        }
         $contexts[$rolecap->contextid]->rolecapabilities[$rolecap->roleid] = $rolecap->permission;
     }
 

@@ -40,7 +40,7 @@ class tool_recyclebin_events_testcase extends advanced_testcase {
      *
      * This is executed before running any test in this file.
      */
-    public function setUp(): void {
+    public function setUp() {
         $this->resetAfterTest();
 
         // We want the category and course bin to be enabled.
@@ -60,8 +60,6 @@ class tool_recyclebin_events_testcase extends advanced_testcase {
         delete_course($course, false);
         $events = $sink->get_events();
         $event = reset($events);
-        // Need the second event here, the first is backup created.
-        $event = next($events);
 
         // Get the item from the recycle bin.
         $rb = new \tool_recyclebin\category_bin($course->category);
@@ -216,18 +214,12 @@ class tool_recyclebin_events_testcase extends advanced_testcase {
         $sink = $this->redirectEvents();
         $rb->restore_item($item);
         $events = $sink->get_events();
-        $eventscount = 0;
+        $event = reset($events);
 
-        foreach ($events as $event) {
-            if ($event instanceof \tooL_recyclebin\event\course_bin_item_restored) {
-                // Check that the event contains the expected values.
-                $this->assertEquals(context_course::instance($course->id), $event->get_context());
-                $this->assertEquals($item->id, $event->objectid);
-                $this->assertEventContextNotUsed($event);
-                $eventscount++;
-            }
-        }
-        // Only one course_bin_item_restored event should be triggered.
-        $this->assertEquals(1, $eventscount);
+        // Check that the event contains the expected values.
+        $this->assertInstanceOf('\tooL_recyclebin\event\course_bin_item_restored', $event);
+        $this->assertEquals(context_course::instance($course->id), $event->get_context());
+        $this->assertEquals($item->id, $event->objectid);
+        $this->assertEventContextNotUsed($event);
     }
 }

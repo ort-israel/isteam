@@ -6,16 +6,15 @@ Feature: Edit activities in main menu block
 
   @javascript
   Scenario: Edit name of acitivity in-place in site main menu block
-    Given the following "activity" exists:
-      | activity | forum                |
-      | course   | Acceptance test site |
-      | name     | My forum name        |
-      | idnumber | forum                |
-    And I log in as "admin"
+    Given I log in as "admin"
     And I am on site homepage
-    And I navigate to "Turn editing on" in current page administration
+    And I navigate to "Turn editing on" node in "Front page settings"
     And I add the "Main menu" block
-    When I set the field "Edit title" in the "My forum name" "block_site_main_menu > Activity" to "New forum name"
+    When I add a "Forum" to section "0" and I fill the form with:
+      | Forum name | My forum name |
+    And I click on "Edit title" "link" in the "My forum name" activity in site main menu block
+    And I set the field "New name for activity My forum name" to "New forum name"
+    And I press key "13" in the field "New name for activity My forum name"
     Then I should not see "My forum name"
     And I should see "New forum name"
     And I follow "New forum name"
@@ -24,11 +23,11 @@ Feature: Edit activities in main menu block
 
   @javascript
   Scenario: Activities in main menu block can be made available but not visible on a course page
-    Given the following config values are set as admin:
-      | allowstealth | 1 |
     And I log in as "admin"
+    And I set the following administration settings values:
+      | allowstealth | 1 |
     And I am on site homepage
-    And I navigate to "Turn editing on" in current page administration
+    And I navigate to "Turn editing on" node in "Front page settings"
     And I add the "Main menu" block
     When I add a "Forum" to section "0" and I fill the form with:
       | Forum name | Visible forum |
@@ -61,7 +60,7 @@ Feature: Edit activities in main menu block
     And the field "Availability" matches value "Make available but not shown on course page"
     And I press "Save and return to course"
     And "My forum name" activity in site main menu block should be available but hidden from course page
-    And I navigate to "Turn editing off" in current page administration
+    And I navigate to "Turn editing off" node in "Front page settings"
     And "My forum name" activity in site main menu block should be available but hidden from course page
     And I log out
     And I should not see "My forum name" in the "Main menu" "block"

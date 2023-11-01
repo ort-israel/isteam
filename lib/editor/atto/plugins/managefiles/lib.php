@@ -55,8 +55,7 @@ function atto_managefiles_params_for_js($elementid, $options, $fpoptions) {
 
     if (!$disabled) {
         $params['usercontext'] = context_user::instance($USER->id)->id;
-        foreach (array('itemid', 'context', 'areamaxbytes', 'maxbytes', 'subdirs', 'return_types',
-                       'removeorphaneddrafts') as $key) {
+        foreach (array('itemid', 'context', 'areamaxbytes', 'maxbytes', 'subdirs', 'return_types') as $key) {
             if (isset($options[$key])) {
                 if ($key === 'context' && is_object($options[$key])) {
                     // Just context id is enough.

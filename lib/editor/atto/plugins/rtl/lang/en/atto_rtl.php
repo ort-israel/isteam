@@ -25,4 +25,3 @@
 $string['pluginname'] = 'RTL/LTR';
 $string['rtl'] = 'Right to left';
 $string['ltr'] = 'Left to right';
-$string['privacy:metadata'] = 'The atto_rtl plugin does not store any personal data.';

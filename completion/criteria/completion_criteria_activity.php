@@ -279,8 +279,7 @@ class completion_criteria_activity extends completion_criteria {
             $details['requirement'][] = get_string('markingyourselfcomplete', 'completion');
         } elseif ($cm->completion == COMPLETION_TRACKING_AUTOMATIC) {
             if ($cm->completionview) {
-                $modulename = core_text::strtolower(get_string('modulename', $this->module));
-                $details['requirement'][] = get_string('viewingactivity', 'completion', $modulename);
+                $details['requirement'][] = get_string('viewingactivity', 'completion', $this->module);
             }
 
             if (!is_null($cm->completiongradeitemnumber)) {
@@ -288,7 +287,7 @@ class completion_criteria_activity extends completion_criteria {
             }
         }
 
-        $details['requirement'] = implode(', ', $details['requirement']);
+        $details['requirement'] = implode($details['requirement'], ', ');
 
         $details['status'] = '';
 

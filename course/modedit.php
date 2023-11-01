@@ -31,7 +31,7 @@ require_once($CFG->libdir.'/completionlib.php');
 require_once($CFG->libdir.'/plagiarismlib.php');
 require_once($CFG->dirroot . '/course/modlib.php');
 
-$add    = optional_param('add', '', PARAM_ALPHANUM);     // Module name.
+$add    = optional_param('add', '', PARAM_ALPHA);     // module name
 $update = optional_param('update', 0, PARAM_INT);
 $return = optional_param('return', 0, PARAM_BOOL);    //return to course/view.php if false or mod/modname/view.php if true
 $type   = optional_param('type', '', PARAM_ALPHANUM); //TODO: hopefully will be removed in 2.0
@@ -59,15 +59,6 @@ if (!empty($add)) {
     // If the course section isn't displayed on the navigation this will fall back to the course which
     // will be the closest match we have.
     navigation_node::override_active_url(course_get_url($course, $section));
-
-    // MDL-69431 Validate that $section (url param) does not exceed the maximum for this course / format.
-    // If too high (e.g. section *id* not number) non-sequential sections inserted in course_sections table.
-    // Then on import, backup fills 'gap' with empty sections (see restore_rebuild_course_cache). Avoid this.
-    $courseformat = course_get_format($course);
-    $maxsections = $courseformat->get_max_sections();
-    if ($section > $maxsections) {
-        print_error('maxsectionslimit', 'moodle', '', $maxsections);
-    }
 
     list($module, $context, $cw, $cm, $data) = prepare_new_moduleinfo_data($course, $add, $section);
     $data->return = 0;
@@ -152,12 +143,7 @@ $mform->set_data($data);
 
 if ($mform->is_cancelled()) {
     if ($return && !empty($cm->id)) {
-        $urlparams = [
-            'id' => $cm->id, // We always need the activity id.
-            'forceview' => 1, // Stop file downloads in resources.
-        ];
-        $activityurl = new moodle_url("/mod/$module->name/view.php", $urlparams);
-        redirect($activityurl);
+        redirect("$CFG->wwwroot/mod/$module->name/view.php?id=$cm->id");
     } else {
         redirect(course_get_url($course, $cw->section, array('sr' => $sectionreturn)));
     }
@@ -171,11 +157,11 @@ if ($mform->is_cancelled()) {
     }
 
     if (isset($fromform->submitbutton)) {
-        $url = new moodle_url("/mod/$module->name/view.php", array('id' => $fromform->coursemodule, 'forceview' => 1));
         if (empty($fromform->showgradingmanagement)) {
-            redirect($url);
+            redirect("$CFG->wwwroot/mod/$module->name/view.php?id=$fromform->coursemodule");
         } else {
-            redirect($fromform->gradingman->get_management_url($url));
+            $returnurl = new moodle_url("/mod/$module->name/view.php", array('id' => $fromform->coursemodule));
+            redirect($fromform->gradingman->get_management_url($returnurl));
         }
     } else {
         redirect(course_get_url($course, $cw->section, array('sr' => $sectionreturn)));

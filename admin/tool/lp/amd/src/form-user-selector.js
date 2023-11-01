@@ -17,6 +17,8 @@
  * User selector module.
  *
  * @module     tool_lp/form-user-selector
+ * @class      form-user-selector
+ * @package    tool_lp
  * @copyright  2015 Frédéric Massart - FMCorz.net
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -77,10 +79,9 @@ define(['jquery', 'core/ajax', 'core/templates'], function($, Ajax, Templates) {
                         i++;
                     });
                     success(results.users);
-                    return;
                 });
 
-            }).catch(failure);
+            }, failure);
         }
 
     };

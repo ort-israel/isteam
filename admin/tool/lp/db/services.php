@@ -131,11 +131,10 @@ $functions = array(
         'capabilities' => '',
         'ajax'         => true,
     ),
-    // This function was originally in this plugin but has been moved to core.
     'tool_lp_search_cohorts' => array(
-        'classname'    => 'core_cohort_external',
+        'classname'    => 'tool_lp\external',
         'methodname'   => 'search_cohorts',
-        'classpath'    => 'cohort/externallib.php',
+        'classpath'    => '',
         'description'  => 'Search for cohorts.',
         'type'         => 'read',
         'capabilities' => 'moodle/cohort:view',

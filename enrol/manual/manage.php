@@ -29,7 +29,6 @@ $enrolid      = required_param('enrolid', PARAM_INT);
 $roleid       = optional_param('roleid', -1, PARAM_INT);
 $extendperiod = optional_param('extendperiod', 0, PARAM_INT);
 $extendbase   = optional_param('extendbase', 0, PARAM_INT);
-$timeend      = optional_param_array('timeend', [], PARAM_INT);
 
 $instance = $DB->get_record('enrol', array('id'=>$enrolid, 'enrol'=>'manual'), '*', MUST_EXIST);
 $course = $DB->get_record('course', array('id'=>$instance->courseid), '*', MUST_EXIST);
@@ -38,6 +37,7 @@ $context = context_course::instance($course->id, MUST_EXIST);
 require_login($course);
 $canenrol = has_capability('enrol/manual:enrol', $context);
 $canunenrol = has_capability('enrol/manual:unenrol', $context);
+$viewfullnames = has_capability('moodle/site:viewfullnames', $context);
 
 // Note: manage capability not used here because it is used for editing
 // of existing enrolments which is not possible here.
@@ -69,13 +69,15 @@ $PAGE->set_url('/enrol/manual/manage.php', array('enrolid'=>$instance->id));
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title($enrol_manual->get_instance_name($instance));
 $PAGE->set_heading($course->fullname);
-navigation_node::override_active_url(new moodle_url('/user/index.php', array('id'=>$course->id)));
+navigation_node::override_active_url(new moodle_url('/enrol/users.php', array('id'=>$course->id)));
 
 // Create the user selector objects.
 $options = array('enrolid' => $enrolid, 'accesscontext' => $context);
 
 $potentialuserselector = new enrol_manual_potential_participant('addselect', $options);
+$potentialuserselector->viewfullnames = $viewfullnames;
 $currentuserselector = new enrol_manual_current_participant('removeselect', $options);
+$currentuserselector->viewfullnames = $viewfullnames;
 
 // Build the list of options for the enrolment period dropdown.
 $unlimitedperiod = get_string('unlimited');
@@ -133,10 +135,7 @@ if ($canenrol && optional_param('add', false, PARAM_BOOL) && confirm_sesskey()) 
                     break;
             }
 
-            if ($timeend) {
-                $timeend = make_timestamp($timeend['year'], $timeend['month'], $timeend['day'], $timeend['hour'],
-                        $timeend['minute']);
-            } else if ($extendperiod <= 0) {
+            if ($extendperiod <= 0) {
                 $timeend = 0;
             } else {
                 $timeend = $timestart + $extendperiod;
@@ -185,9 +184,7 @@ $removeenabled = $canunenrol ? '' : 'disabled="disabled"';
       </td>
       <td id="buttonscell">
           <div id="addcontrols">
-              <input class="btn btn-secondary" name="add" <?php echo $addenabled; ?> id="add" type="submit"
-                     value="<?php echo $OUTPUT->larrow() . '&nbsp;' . get_string('add'); ?>"
-                     title="<?php print_string('add'); ?>" /><br />
+              <input name="add" <?php echo $addenabled; ?> id="add" type="submit" value="<?php echo $OUTPUT->larrow().'&nbsp;'.get_string('add'); ?>" title="<?php print_string('add'); ?>" /><br />
 
               <div class="enroloptions">
 
@@ -204,9 +201,7 @@ $removeenabled = $canunenrol ? '' : 'disabled="disabled"';
           </div>
 
           <div id="removecontrols">
-              <input class="btn btn-secondary" name="remove" id="remove" <?php echo $removeenabled; ?> type="submit"
-                     value="<?php echo get_string('remove') . '&nbsp;' . $OUTPUT->rarrow(); ?>"
-                     title="<?php print_string('remove'); ?>" />
+              <input name="remove" id="remove" <?php echo $removeenabled; ?> type="submit" value="<?php echo get_string('remove').'&nbsp;'.$OUTPUT->rarrow(); ?>" title="<?php print_string('remove'); ?>" />
           </div>
       </td>
       <td id="potentialcell">

@@ -18,22 +18,11 @@
  * structure for the tree from it.
  *
  * @module     block_navigation/ajax_response_renderer
+ * @package    core
  * @copyright  2015 John Okely <john@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define([
-    'jquery',
-    'core/templates',
-    'core/notification',
-    'core/url',
-    'core/aria',
-], function(
-    $,
-    Templates,
-    Notification,
-    Url,
-    Aria
-) {
+define(['jquery', 'core/templates', 'core/notification', 'core/url'], function($, Templates, Notification, Url) {
 
     // Mappings for the different types of nodes coming from the navigation.
     // Copied from lib/navigationlib.php navigation_node constants.
@@ -54,7 +43,7 @@ define([
     function buildDOM(rootElement, nodes) {
         var ul = $('<ul></ul>');
         ul.attr('role', 'group');
-        Aria.hide(ul);
+        ul.attr('aria-hidden', true);
 
         $.each(nodes, function(index, node) {
             if (typeof node !== 'object') {
@@ -67,22 +56,22 @@ define([
             var icon = null;
             var isBranch = (node.expandable || node.haschildren) ? true : false;
 
-            li.attr('role', 'treeitem');
             p.addClass('tree_item');
             p.attr('id', id);
+            p.attr('role', 'treeitem');
             // Negative tab index to allow it to receive focus.
             p.attr('tabindex', '-1');
 
             if (node.requiresajaxloading) {
-                li.attr('data-requires-ajax', true);
-                li.attr('data-node-id', node.id);
-                li.attr('data-node-key', node.key);
-                li.attr('data-node-type', node.type);
+                p.attr('data-requires-ajax', true);
+                p.attr('data-node-id', node.id);
+                p.attr('data-node-key', node.key);
+                p.attr('data-node-type', node.type);
             }
 
             if (isBranch) {
                 li.addClass('collapsed contains_branch');
-                li.attr('aria-expanded', false);
+                p.attr('aria-expanded', false);
                 p.addClass('branch');
             }
 
@@ -140,14 +129,14 @@ define([
             ul.append(li);
 
             if (node.children && node.children.length) {
-                buildDOM(li, node.children);
+                buildDOM(p, node.children);
             } else if (isBranch && !node.requiresajaxloading) {
                 li.removeClass('contains_branch');
                 p.addClass('emptybranch');
             }
         });
 
-        rootElement.append(ul);
+        rootElement.parent().append(ul);
         var id = rootElement.attr('id') + '_group';
         ul.attr('id', id);
         rootElement.attr('aria-owns', id);
@@ -164,10 +153,10 @@ define([
                 var group = element.find('#' + item.attr('aria-owns'));
 
                 item.attr('aria-expanded', true);
-                Aria.unhide(group);
+                group.attr('aria-hidden', false);
             } else {
-                if (element.hasClass('contains_branch')) {
-                    element.removeClass('contains_branch');
+                if (element.parent().hasClass('contains_branch')) {
+                    element.parent().removeClass('contains_branch');
                     element.addClass('emptybranch');
                 }
             }

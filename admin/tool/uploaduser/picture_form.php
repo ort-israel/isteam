@@ -37,7 +37,7 @@ class admin_uploadpicture_form extends moodleform {
 
 
         $options = array();
-        $options['accepted_types'] = array('.zip');
+        $options['accepted_types'] = array('archive');
         $mform->addElement('filepicker', 'userpicturesfile', get_string('file'), 'size="40"', $options);
         $mform->addRule('userpicturesfile', null, 'required');
 

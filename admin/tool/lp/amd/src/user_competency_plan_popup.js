@@ -16,7 +16,7 @@
 /**
  * Module to open user competency plan in popup
  *
- * @module     tool_lp/user_competency_plan_popup
+ * @package    report_competency
  * @copyright  2016 Issam Taboubi <issam.taboubi@umontreal.ca>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -58,6 +58,7 @@ define(['jquery', 'core/notification', 'core/str', 'core/ajax', 'core/templates'
             done: this._contextLoaded.bind(this),
             fail: notification.exception
         }]);
+
         // Log the user competency viewed in plan event.
         requests[0].then(function(result) {
             var eventMethodName = 'core_competency_user_competency_viewed_in_plan';
@@ -65,11 +66,12 @@ define(['jquery', 'core/notification', 'core/str', 'core/ajax', 'core/templates'
             if (result.plan.iscompleted) {
                 eventMethodName = 'core_competency_user_competency_plan_viewed';
             }
-            return ajax.call([{
+            ajax.call([{
                 methodname: eventMethodName,
-                args: {competencyid: competencyId, userid: userId, planid: planId}
-            }])[0];
-        }).catch(notification.exception);
+                args: {competencyid: competencyId, userid: userId, planid: planId},
+                fail: notification.exception
+            }]);
+        });
     };
 
     /**
@@ -116,11 +118,11 @@ define(['jquery', 'core/notification', 'core/str', 'core/ajax', 'core/templates'
         }).fail(notification.exception);
     };
 
-    /** @property {String} The selector for the region with the user competencies */
+    /** @type {String} The selector for the region with the user competencies */
     UserCompetencyPopup.prototype._regionSelector = null;
-    /** @property {String} The selector for the region with a single user competencies */
+    /** @type {String} The selector for the region with a single user competencies */
     UserCompetencyPopup.prototype._userCompetencySelector = null;
-    /** @property {Number} The plan Id */
+    /** @type {Number} The plan Id */
     UserCompetencyPopup.prototype._planId = null;
 
     return /** @alias module:tool_lp/user_competency_plan_popup */ UserCompetencyPopup;

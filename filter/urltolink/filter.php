@@ -73,9 +73,8 @@ class filter_urltolink extends moodle_text_filter {
         //<a href="blah">
         //&lt;a href="blah"&gt;
         //&lt;a href="blah">
-        $filterignoretagsopen  = array('<a\s[^>]+?>', '<span[^>]+?class="nolink"[^>]*?>');
-        $filterignoretagsclose = array('</a>', '</span>');
-        $ignoretags = [];
+        $filterignoretagsopen  = array('<a\s[^>]+?>');
+        $filterignoretagsclose = array('</a>');
         filter_save_ignore_tags($text,$filterignoretagsopen,$filterignoretagsclose,$ignoretags);
 
         // Check if we support unicode modifiers in regular expressions. Cache it.
@@ -175,3 +174,4 @@ function filter_urltolink_img_callback($link) {
     }
     return '<img class="filter_urltolink_image" alt="" src="'.$link[1].'" />';
 }
+

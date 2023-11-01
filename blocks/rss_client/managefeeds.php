@@ -106,7 +106,7 @@ foreach($feeds as $feed) {
     if (!empty($feed->preferredtitle)) {
         $feedtitle = s($feed->preferredtitle);
     } else {
-        $feedtitle = $feed->title;
+        $feedtitle =  s($feed->title);
     }
 
     $viewlink = html_writer::link($CFG->wwwroot .'/blocks/rss_client/viewfeed.php?rssid=' . $feed->id . $extraparams, $feedtitle);

@@ -22,24 +22,21 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use core_enrol\enrol_helper;
-
 defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/formslib.php");
 
 class enrol_user_enrolment_form extends moodleform {
     function definition() {
+        global $CFG, $DB;
+
         $mform = $this->_form;
 
-        $ue = $this->_customdata['ue'];
-        $instancename = $this->_customdata['enrolinstancename'];
-        $modal = !empty($this->_customdata['modal']);
+        $user   = $this->_customdata['user'];
+        $course = $this->_customdata['course'];
+        $ue     = $this->_customdata['ue'];
 
-        $periodmenu = enrol_get_period_list();
-        $duration = enrol_calculate_duration($ue->timestart, $ue->timeend);
-
-        $mform->addElement('static', 'enrolmentmethod', get_string('enrolmentmethod', 'enrol'), $instancename);
+        $mform->addElement('header','general', '');
 
         $options = array(ENROL_USER_ACTIVE    => get_string('participationactive', 'enrol'),
                          ENROL_USER_SUSPENDED => get_string('participationsuspended', 'enrol'));
@@ -48,11 +45,6 @@ class enrol_user_enrolment_form extends moodleform {
         }
 
         $mform->addElement('date_time_selector', 'timestart', get_string('enroltimestart', 'enrol'), array('optional' => true));
-
-        $mform->addElement('select', 'duration', get_string('enrolperiod', 'enrol'), $periodmenu);
-        $mform->setDefault('duration', $duration);
-        $mform->disabledIf('duration', 'timestart[enabled]', 'notchecked', 1);
-        $mform->disabledIf('duration', 'timeend[enabled]', 'checked', 1);
 
         $mform->addElement('date_time_selector', 'timeend', get_string('enroltimeend', 'enrol'), array('optional' => true));
 
@@ -64,10 +56,7 @@ class enrol_user_enrolment_form extends moodleform {
         $mform->addElement('hidden', 'ifilter');
         $mform->setType('ifilter', PARAM_ALPHA);
 
-        // Show action buttons if this is not being rendered as a fragment.
-        if (!$modal) {
-            $this->add_action_buttons();
-        }
+        $this->add_action_buttons();
 
         $this->set_data(array(
             'ue' => $ue->id,
@@ -82,7 +71,8 @@ class enrol_user_enrolment_form extends moodleform {
 
         if (!empty($data['timestart']) and !empty($data['timeend'])) {
             if ($data['timestart'] >= $data['timeend']) {
-                $errors['timeend'] = get_string('enroltimeendinvalid', 'enrol');
+                $errors['timestart'] = get_string('error');
+                $errors['timeend'] = get_string('error');
             }
         }
 

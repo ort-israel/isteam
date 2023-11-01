@@ -67,7 +67,7 @@ implements CAS_Request_RequestInterface
         /*********************************************************
          * initialize the CURL session
         *********************************************************/
-        $ch = $this->initAndConfigure();
+        $ch = $this->_initAndConfigure();
 
         /*********************************************************
          * Perform the query
@@ -97,9 +97,9 @@ implements CAS_Request_RequestInterface
      * This method should NOT be used outside of the CurlRequest or the
      * CurlMultiRequest.
      *
-     * @return resource|false The cURL handle on success, false on failure
+     * @return resource The cURL handle on success, false on failure
      */
-    public function initAndConfigure()
+    private function _initAndConfigure()
     {
         /*********************************************************
          * initialize the CURL session
@@ -187,10 +187,10 @@ implements CAS_Request_RequestInterface
     /**
      * Internal method for capturing the headers from a curl request.
      *
-     * @param resource $ch     handle of curl
+     * @param handle $ch     handle of curl
      * @param string $header header
      *
-     * @return int
+     * @return void
      */
     private function _curlReadHeaders ($ch, $header)
     {

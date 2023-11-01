@@ -80,10 +80,9 @@ abstract class persistent extends moodleform {
      * @param string $target
      * @param mixed $attributes
      * @param bool $editable
-     * @param array $ajaxformdata
      */
     public function __construct($action = null, $customdata = null, $method = 'post', $target = '',
-                                $attributes = null, $editable = true, $ajaxformdata=null) {
+                                $attributes = null, $editable = true) {
         if (empty(static::$persistentclass)) {
             throw new coding_exception('Static property $persistentclass must be set.');
         } else if (!is_subclass_of(static::$persistentclass, 'core\\persistent')) {
@@ -107,7 +106,7 @@ abstract class persistent extends moodleform {
         $this->persistent->from_record($persistendata);
 
         unset($customdata['persistent']);
-        parent::__construct($action, $customdata, $method, $target, $attributes, $editable, $ajaxformdata);
+        parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
 
         // Load the defaults.
         $this->set_data($this->get_default_data());
@@ -268,7 +267,7 @@ abstract class persistent extends moodleform {
     /**
      * Return the persistent object associated with this form instance.
      *
-     * @return \core\persistent
+     * @return core\persistent
      */
     final protected function get_persistent() {
         return $this->persistent;

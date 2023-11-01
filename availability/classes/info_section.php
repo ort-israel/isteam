@@ -62,12 +62,8 @@ class info_section extends info {
 
     protected function set_in_database($availability) {
         global $DB;
-
-        $section = new \stdClass();
-        $section->id = $this->section->id;
-        $section->availability = $availability;
-        $section->timemodified = time();
-        $DB->update_record('course_sections', $section);
+        $DB->set_field('course_sections', 'availability', $availability,
+                array('id' => $this->section->id));
     }
 
     /**

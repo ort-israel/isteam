@@ -76,7 +76,6 @@ interface event_vault_interface {
         array $usersfilter = null,
         array $groupsfilter = null,
         array $coursesfilter = null,
-        array $categoriesfilter = null,
         $withduration = true,
         $ignorehidden = true,
         callable $filter = null
@@ -93,7 +92,6 @@ interface event_vault_interface {
      * @param int             $timesortto   Events with timesort until this value (inclusive)
      * @param event_interface $afterevent   Only return events after this one
      * @param int             $limitnum     Return at most this number of events
-     * @param bool            $lmittononsuspendedevents Limit course events to courses the user is active in (not suspended).
      * @return event_interface
      */
     public function get_action_events_by_timesort(
@@ -101,8 +99,7 @@ interface event_vault_interface {
         $timesortfrom,
         $timesortto,
         event_interface $afterevent,
-        $limitnum,
-        $limittononsuspendedevents
+        $limitnum
     );
 
     /**

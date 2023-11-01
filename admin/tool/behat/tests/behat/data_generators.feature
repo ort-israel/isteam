@@ -143,20 +143,20 @@ Feature: Set up contextual data for tests
     And I log out
     And I log in as "user2"
     And I am on "Course 1" course homepage
-    And "Turn editing on" "button" should exist
+    And "Turn editing on" "link" should exist in current page administration
     And I log out
     And I log in as "user3"
     And I am on "Course 1" course homepage
-    And "Turn editing on" "button" should exist
+    And "Turn editing on" "link" should exist in current page administration
     And I log out
     And I log in as "user4"
     And I am on "Course 1" course homepage
-    And "Turn editing on" "button" should exist
+    And "Turn editing on" "link" should exist in current page administration
     And I log out
     And I log in as "user5"
     And I should see "You are logged in as"
     And I am on "Course 1" course homepage
-    And I should see "You cannot enrol yourself in this course."
+    And I should see "You can not enrol yourself in this course."
 
   Scenario: Add modules
     Given the following "courses" exist:
@@ -221,7 +221,7 @@ Feature: Set up contextual data for tests
     And I should see "Test workshop name"
     And I follow "Test assignment name"
     And I should see "Test assignment description"
-    And I am on "Course 1" course homepage
+    And I follow "C1"
     And I follow "Test assignment name with scale"
     And I follow "Edit settings"
     And the field "Type" matches value "Scale"
@@ -259,9 +259,9 @@ Feature: Set up contextual data for tests
     Then the "groups" select box should contain "Group 1 (1)"
     And the "groups" select box should contain "Group 2 (1)"
     And I set the field "groups" to "Group 1 (1)"
-    And the "members" select box should contain "Student 1 (student1@example.com)"
+    And the "members" select box should contain "Student 1"
     And I set the field "groups" to "Group 2 (1)"
-    And the "members" select box should contain "Student 2 (student2@example.com)"
+    And the "members" select box should contain "Student 2"
 
   Scenario: Add cohorts and cohort members with data generator
     Given the following "categories" exist:
@@ -286,7 +286,7 @@ Feature: Set up contextual data for tests
       | student1 | CHSB   |
       | student1 | CHC    |
     When I log in as "admin"
-    And I navigate to "Users > Accounts > Cohorts" in site administration
+    And I navigate to "Cohorts" node in "Site administration > Users > Accounts"
     Then the following should exist in the "cohorts" table:
       | Name            | Cohort size |
       | System cohort A | 1           |
@@ -312,6 +312,7 @@ Feature: Set up contextual data for tests
       | fullname | course | gradecategory |
       | Grade sub category 2 | C1 | Grade category 1 |
     When I log in as "admin"
+    And I am on course index
     And I am on "Course 1" course homepage
     And I navigate to "View > Grader report" in the course gradebook
     Then I should see "Grade category 1"

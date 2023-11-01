@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,7 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component Topics course format.
+ * Strings for component 'format_topics', language 'en', branch 'MOODLE_20_STABLE'
  *
  * @package   format_topics
  * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
@@ -35,4 +36,3 @@ $string['page-course-view-topics'] = 'Any course main page in topics format';
 $string['page-course-view-topics-x'] = 'Any course page in topics format';
 $string['hidefromothers'] = 'Hide topic';
 $string['showfromothers'] = 'Show topic';
-$string['privacy:metadata'] = 'The Topics format plugin does not store any personal data.';

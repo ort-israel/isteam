@@ -24,4 +24,3 @@
  */
 
 $string['filtername'] = 'Multi-Language Content';
-$string['privacy:metadata'] = 'The Multi-Language Content plugin does not store any personal data.';

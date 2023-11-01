@@ -51,7 +51,7 @@ $string['auth_remove_keep'] = 'Keep internal';
 $string['auth_remove_suspend'] = 'Suspend internal';
 $string['auth_remove_user'] = 'Specify what to do with internal user account during mass synchronisation when user was removed from external source. Only suspended users are automatically restored if they reappear in the external source.';
 $string['auth_remove_user_key'] = 'Removed ext user';
-$string['auth_sync_suspended']  = 'If enabled, the suspended attribute will be used to update the local user account\'s suspension status.';
+$string['auth_sync_suspended']  = 'When enabled, the suspended attribute will be used to update the local user account\'s suspension status.';
 $string['auth_sync_suspended_key'] = 'Synchronise local user suspension status';
 $string['auth_sync_script'] = 'User account synchronisation';
 $string['auth_updatelocal'] = 'Update local';
@@ -64,9 +64,7 @@ $string['auth_updateremote_ldap'] = '<p><b>Note:</b> Updating external LDAP data
 $string['auth_user_create'] = 'Enable user creation';
 $string['auth_user_creation'] = 'New (anonymous) users can create user accounts on the external authentication source and confirmed via email. If you enable this , remember to also configure module-specific options for user creation.';
 $string['auth_usernameexists'] = 'Selected username already exists. Please choose a new one.';
-$string['auth_usernotexist'] = 'Cannot update non-existent user: {$a}';
 $string['auto_add_remote_users'] = 'Auto add remote users';
-$string['cannotmapfield'] = 'The field "{$a->fieldname}" can\'t be mapped because its short name "{$a->shortname}" is too long. To allow it to be mapped, you need to reduce the short name to {$a->charlimit} characters. <a href="{$a->link}">Edit user profile fields</a>';
 $string['createpassword'] = 'Generate password and notify user';
 $string['createpasswordifneeded'] = 'Create password if needed and send via email';
 $string['emailchangecancel'] = 'Cancel email change';
@@ -75,13 +73,15 @@ $string['emailnowexists'] = 'The email address you tried to assign to your profi
 $string['emailupdate'] = 'Email address update';
 $string['emailupdatemessage'] = 'Dear {$a->fullname},
 
-You have requested a change of your email address for your account on {$a->site}. To confirm this change, please go to the following web address:
+You have requested a change of your email address for your user account at {$a->site}. Please open the following URL in your browser in order to confirm this change.
 
-{$a->url}
+If you have any questions please contact support on: {$a->supportemail}
 
-{$a->supportemail}';
+{$a->url}';
 $string['emailupdatesuccess'] = 'Email address of user <em>{$a->fullname}</em> was successfully updated to <em>{$a->email}</em>.';
 $string['emailupdatetitle'] = 'Confirmation of email update at {$a->site}';
+$string['enterthenumbersyouhear'] = 'Enter the numbers you hear';
+$string['enterthewordsabove'] = 'Enter the words above';
 $string['errormaxconsecutiveidentchars'] = 'Passwords must have at most {$a} consecutive identical characters.';
 $string['errorminpassworddigits'] = 'Passwords must have at least {$a} digit(s).';
 $string['errorminpasswordlength'] = 'Passwords must be at least {$a} characters long.';
@@ -98,7 +98,9 @@ $string['forcechangepasswordfirst_help'] = 'Force users to change password on th
 $string['forcechangepassword_help'] = 'Force users to change password on their next login to Moodle.';
 $string['forgottenpassword'] = 'If you enter a URL here, it will be used as the lost password recovery page for this site. This is intended for sites where passwords are handled entirely outside of Moodle. Leave this blank to use the default password recovery.';
 $string['forgottenpasswordurl'] = 'Forgotten password URL';
-$string['getrecaptchaapi'] = 'To use reCAPTCHA you must get an API key from <a href=\'https://www.google.com/recaptcha/admin\'>https://www.google.com/recaptcha/admin</a>';
+$string['getanaudiocaptcha'] = 'Get an audio CAPTCHA';
+$string['getanimagecaptcha'] = 'Get an image CAPTCHA';
+$string['getanothercaptcha'] = 'Get another CAPTCHA';
 $string['guestloginbutton'] = 'Guest login button';
 $string['changepassword'] = 'Change password URL';
 $string['changepasswordhelp'] = 'URL of lost password recovery page, which will be sent to users in an email. Note that this setting will have no effect if a forgotten password URL is set in the authentication common settings.';
@@ -133,19 +135,11 @@ $string['passwordhandling'] = 'Password field handling';
 $string['plaintext'] = 'Plain text';
 $string['pluginnotenabled'] = 'Authentication plugin \'{$a}\' is not enabled.';
 $string['pluginnotinstalled'] = 'Authentication plugin \'{$a}\' is not installed.';
-$string['privacy:metadata:userpref:createpassword'] = 'Indicates that a password should be generated for the user';
-$string['privacy:metadata:userpref:forcepasswordchange'] = 'Indicates whether the user should change their password upon logging in';
-$string['privacy:metadata:userpref:loginfailedcount'] = 'The number of times the user failed to log in';
-$string['privacy:metadata:userpref:loginfailedcountsincesuccess'] = 'The number of times the user failed to login since their last successful login';
-$string['privacy:metadata:userpref:loginfailedlast'] = 'The date when the last failed login attempt was recorded';
-$string['privacy:metadata:userpref:loginlockout'] = 'Whether the user\'s account is locked due to failed login attempts, and the date when the account was locked';
-$string['privacy:metadata:userpref:loginlockoutignored'] = 'Indicates that a user\'s account should never be subject to lockouts';
-$string['privacy:metadata:userpref:loginlockoutsecret'] = 'When locked, the secret the user must use for unlocking their account';
 $string['potentialidps'] = 'Log in using your account on:';
 $string['recaptcha'] = 'reCAPTCHA';
-$string['recaptcha_help'] = 'The CAPTCHA is for preventing abuse from automated programs. Follow the instructions to verify you are a person. This could be a box to check, characters presented in an image you must enter or a set of images to select from.
+$string['recaptcha_help'] = 'The CAPTCHA is for preventing abuse from automated programs. Simply enter the words in the box, in order and separated by a space.
 
-If you are not sure what the images are, you can try getting another CAPTCHA or an audio CAPTCHA.';
+If you are not sure what the words are, you can try getting another CAPTCHA or an audio CAPTCHA.';
 $string['recaptcha_link'] = 'auth/email';
 $string['security_question'] = 'Security question';
 $string['selfregistration'] = 'Self registration';

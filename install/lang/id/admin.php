@@ -1,5 +1,6 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
+
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,7 +13,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Automatically generated strings for Moodle installer
@@ -29,16 +30,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['clianswerno'] = 't';
-$string['cliansweryes'] = 'y';
-$string['cliincorrectvalueerror'] = 'GALAT, nilai yang salah "{$a->value}" untuk opsi "{$a->option}"';
-$string['cliincorrectvalueretry'] = 'Nilai masukan salah, silakan coba lagi';
+$string['clianswerno'] = 'T';
+$string['cliansweryes'] = 'Y';
+$string['cliincorrectvalueerror'] = 'Error, nilai yang salah "{$a->value}" untuk opsi "{$a->option}"';
+$string['cliincorrectvalueretry'] = 'Nilai input salah, silahkan coba lagi';
 $string['clitypevalue'] = 'tipe nilai';
-$string['clitypevaluedefault'] = 'tipe nilai, tekan ENTER untuk menggunakan nilai bawaan ({$a})';
+$string['clitypevaluedefault'] = 'tipe nilai, tekan enter untuk menggunakan nilai default ({$a})';
 $string['cliunknowoption'] = 'Opsi tidak dikenali :
  {$a}
-Silakan gunakan opsi --help';
+Silahkan gunakan opsi --help';
 $string['cliyesnoprompt'] = 'ketik y (Ya) atau t (Tidak)';
-$string['environmentrequireinstall'] = 'harus dipasang dan diaktifkan';
-$string['environmentrequireversion'] = 'versi {$a->needed} diperlukan dan Anda menjalankan {$a->current}';
-$string['upgradekeyset'] = 'Tingkatkan kunci (biarkan kosong untuk tidak mengaturnya)';

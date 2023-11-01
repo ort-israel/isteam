@@ -50,8 +50,7 @@ Feature: Marking guides can be created and edited
   @javascript
   Scenario: Deleting criterion and comment
     # Deleting criterion
-    When I am on "Course 1" course homepage
-    And I go to "Test assignment 1 name" advanced grading definition page
+    When I go to "Test assignment 1 name" advanced grading definition page
     And I click on "Delete criterion" "button" in the "Guide criterion B" "table_row"
     And I press "Yes"
     And I press "Save"
@@ -60,8 +59,7 @@ Feature: Marking guides can be created and edited
     And I should see "WARNING: Your marking guide has a maximum grade of 70 points"
     But I should not see "Guide criterion B"
     # Deleting a frequently used comment
-    When I am on "Course 1" course homepage
-    And I go to "Test assignment 1 name" advanced grading definition page
+    When I go to "Test assignment 1 name" advanced grading definition page
     And I click on "Delete comment" "button" in the "Comment 3" "table_row"
     And I press "Yes"
     And I press "Save"
@@ -85,6 +83,7 @@ Feature: Marking guides can be created and edited
     And I wait "1" seconds
     Then the field "Guide criterion B criterion remark" matches value "Comment \"4\""
     When I press "Save changes"
+    And I press "Ok"
     And I follow "Edit settings"
     And I follow "Test assignment 1 name"
     And I navigate to "View all submissions" in current page administration
@@ -92,7 +91,9 @@ Feature: Marking guides can be created and edited
     Then I should see "80" in the "Student 1" "table_row"
     And I log out
     # Viewing it as a student.
-    And I am on the "Test assignment 1 name" "assign activity" page logged in as student1
+    And I log in as "student1"
+    And I am on "Course 1" course homepage
+    And I follow "Test assignment 1 name"
     And I should see "80" in the ".feedback" "css_element"
     And I should see "Marking guide test description" in the ".feedback" "css_element"
     And I should see "Very good"

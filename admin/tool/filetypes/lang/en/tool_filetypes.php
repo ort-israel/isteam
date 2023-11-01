@@ -67,4 +67,3 @@ $string['source_custom'] = 'Custom';
 $string['source_deleted'] = 'Deleted';
 $string['source_modified'] = 'Modified';
 $string['source_standard'] = 'Standard';
-$string['privacy:metadata'] = 'The File types plugin does not store any personal data.';

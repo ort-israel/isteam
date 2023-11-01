@@ -18,7 +18,7 @@
  *
  * This module is compatible with core/form-autocomplete.
  *
- * @module     tool_lp/frameworks_datasource
+ * @package    tool_lpmigrate
  * @copyright  2016 Frédéric Massart - FMCorz.net
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -35,17 +35,20 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notificat
          * @return {Promise}
          */
         list: function(contextId, options) {
-            var args = {
+            var promise,
+                args = {
                     context: {
                         contextid: contextId
                     }
                 };
 
             $.extend(args, typeof options === 'undefined' ? {} : options);
-            return Ajax.call([{
+            promise = Ajax.call([{
                 methodname: 'core_competency_list_competency_frameworks',
                 args: args
             }])[0];
+
+            return promise.fail(Notification.exception);
         },
 
         /**
@@ -73,7 +76,6 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notificat
          * @param {String} query The query string.
          * @param {Function} callback A callback function receiving an array of results.
          */
-        /* eslint-disable promise/no-callback-in-promise */
         transport: function(selector, query, callback) {
             var el = $(selector),
                 contextId = el.data('contextid'),
@@ -82,10 +84,11 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notificat
             if (!contextId) {
                 throw new Error('The attribute data-contextid is required on ' + selector);
             }
+
             this.list(contextId, {
                 query: query,
                 onlyvisible: onlyVisible,
-            }).then(callback).catch(Notification.exception);
+            }).then(callback);
         }
     };
 

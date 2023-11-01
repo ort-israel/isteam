@@ -63,4 +63,3 @@ $string['themedefault'] = 'Theme default';
 $string['transparent'] = 'Transparent';
 $string['updatetable'] = 'Update table';
 $string['width'] = 'Table width (in %)';
-$string['privacy:metadata'] = 'The atto_table plugin does not store any personal data.';

@@ -62,7 +62,7 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
   Scenario: Self-enrolment disabled
     Given I log in as "student1"
     When I am on "Course 1" course homepage
-    Then I should see "You cannot enrol yourself in this course"
+    Then I should see "You can not enrol yourself in this course"
 
   Scenario: Self-enrolment enabled requiring a group enrolment key
     Given I log in as "teacher1"
@@ -87,63 +87,3 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
     Then I should see "Topic 1"
     And I should not see "Enrolment options"
     And I should not see "Enrol me in this course"
-
-  @javascript
-  Scenario: Edit a self-enrolled user's enrolment from the course participants page
-    Given I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    When I add "Self enrolment" enrolment method with:
-      | Custom instance name | Test student enrolment |
-    And I log out
-    And I log in as "student1"
-    And I am on "Course 1" course homepage
-    And I press "Enrol me"
-    And I should see "You are enrolled in the course"
-    And I log out
-    And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I navigate to course participants
-    When I click on "//a[@data-action='editenrolment']" "xpath_element" in the "student1" "table_row"
-    And I should see "Edit Student 1's enrolment"
-    And I set the field "Status" to "Suspended"
-    And I click on "Save changes" "button"
-    Then I should see "Suspended" in the "student1" "table_row"
-
-  @javascript
-  Scenario: Unenrol a self-enrolled student from the course participants page
-    Given I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    When I add "Self enrolment" enrolment method with:
-      | Custom instance name | Test student enrolment |
-    And I log out
-    And I log in as "student1"
-    And I am on "Course 1" course homepage
-    And I press "Enrol me"
-    And I should see "You are enrolled in the course"
-    And I log out
-    And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I navigate to course participants
-    When I click on "//a[@data-action='unenrol']" "xpath_element" in the "student1" "table_row"
-    And I click on "Unenrol" "button" in the "Unenrol" "dialogue"
-    Then I should not see "Student 1" in the "participants" "table"
-
-  @javascript
-  Scenario: Self unenrol as a self-enrolled student from the course
-    Given the "multilang" filter is "on"
-    And the "multilang" filter applies to "content and headings"
-    And I am on the "C1" "Course" page logged in as "teacher1"
-    When I add "Self enrolment" enrolment method with:
-      | Custom instance name | Test student enrolment |
-    And I am on "Course 1" course homepage
-    And I navigate to "Edit settings" in current page administration
-    And I set the field "Course full name" in the "General" "fieldset" to "<span lang=\"en\" class=\"multilang\">Course</span><span lang=\"it\" class=\"multilang\">Corso</span> 1"
-    And I press "Save and display"
-    And I log out
-    And I am on the "C1" Course page logged in as student1
-    And I press "Enrol me"
-    And I should see "You are enrolled in the course"
-    And I am on the "C1" Course page
-    And I navigate to "Unenrol me from C1" in current page administration
-    And I click on "Continue" "button" in the "Confirm" "dialogue"
-    Then I should see "You are unenrolled from the course \"Course 1\""

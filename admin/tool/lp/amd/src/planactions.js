@@ -17,6 +17,7 @@
  * Plan actions via ajax.
  *
  * @module     tool_lp/planactions
+ * @package    tool_lp
  * @copyright  2015 David Monllao
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -58,15 +59,15 @@ define(['jquery',
         }
     };
 
-    /** @property {String} Ajax method to fetch the page data from. */
+    /** @type {String} Ajax method to fetch the page data from. */
     PlanActions.prototype._contextMethod = null;
-    /** @property {String} Selector to find the node describing the plan. */
+    /** @type {String} Selector to find the node describing the plan. */
     PlanActions.prototype._planNode = null;
-    /** @property {String} Selector mapping to the region to update. Usually similar to wrapper. */
+    /** @type {String} Selector mapping to the region to update. Usually similar to wrapper. */
     PlanActions.prototype._region = null;
-    /** @property {String} Name of the template used to render the region. */
+    /** @type {String} Name of the template used to render the region. */
     PlanActions.prototype._template = null;
-    /** @property {String} Type of page/region we're in. */
+    /** @type {String} Type of page/region we're in. */
     PlanActions.prototype._type = null;
 
     /**
@@ -109,16 +110,15 @@ define(['jquery',
      * Callback to render the region template.
      *
      * @param {Object} context The context for the template.
-     * @return {Promise}
      */
     PlanActions.prototype._renderView = function(context) {
         var self = this;
-        return templates.render(self._template, context)
-            .then(function(newhtml, newjs) {
+        templates.render(self._template, context)
+            .done(function(newhtml, newjs) {
                 $(self._region).replaceWith(newhtml);
                 templates.runTemplateJS(newjs);
-                return;
-            });
+            })
+            .fail(notification.exception);
     };
 
     /**
@@ -129,26 +129,19 @@ define(['jquery',
      * @return {Promise}
      */
     PlanActions.prototype._callAndRefresh = function(calls, planData) {
-        // Because this function causes a refresh, we must track the JS completion from start to finish to prevent
-        // stale reference issues in Behat.
-        var callKey = 'tool_lp/planactions:_callAndRefresh-' + Math.floor(Math.random() * Math.floor(1000));
-        M.util.js_pending(callKey);
-
         var self = this;
+
         calls.push({
             methodname: self._contextMethod,
             args: self._getContextArgs(planData)
         });
 
         // Apply all the promises, and refresh when the last one is resolved.
-        return $.when.apply($, ajax.call(calls))
+        return $.when.apply($.when, ajax.call(calls))
             .then(function() {
-                return self._renderView(arguments[arguments.length - 1]);
+                self._renderView(arguments[arguments.length - 1]);
             })
-            .fail(notification.exception)
-            .always(function() {
-                return M.util.js_complete(callKey);
-            });
+            .fail(notification.exception);
     };
 
     /**
@@ -236,7 +229,7 @@ define(['jquery',
                 notification.confirm(
                     strings[0], // Confirm.
                     strings[1], // Reopen plan X?
-                    strings[2], // Reopen.
+                    strings[2], // reopen.
                     strings[3], // Cancel.
                     function() {
                         self._doReopenPlan(planData);

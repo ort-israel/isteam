@@ -22,9 +22,8 @@
  * @copyright  2011 Petr Skoda {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$string['additionalskiptables'] = 'Additional skip tables';
-$string['additionalskiptables_desc'] = 'A list of tables (separated by commas) which should be skipped when running the database search and replace.';
-$string['cannotfit'] = 'The replacement is longer than the original and shortening is not allowed; cannot continue.';
+
+$string['cannotfit'] = 'The replacement is longer than original and shortening is not allow, cannot continue.';
 $string['disclaimer'] = 'I understand the risks of this operation';
 $string['doit'] = 'Yes, do it!';
 $string['excludedtables'] = 'Several tables are not updated as part of the text replacement. These include configuration, log, events, and session tables.';
@@ -40,4 +39,3 @@ $string['replacewithhelp'] = 'usually new server URL';
 $string['searchwholedb'] = 'Search whole database for';
 $string['searchwholedbhelp'] = 'usually previous server URL';
 $string['shortenoversized'] = 'Shorten result if necessary';
-$string['privacy:metadata'] = 'The DB search and replace plugin does not store any personal data.';

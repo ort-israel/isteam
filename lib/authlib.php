@@ -111,13 +111,6 @@ class auth_plugin_base {
     var $customfields = null;
 
     /**
-     * The tag we want to prepend to any error log messages.
-     *
-     * @var string
-     */
-    protected $errorlogtag = '';
-
-    /**
      * This is the primary method that is used by the authenticate_user_login()
      * function in moodlelib.php.
      *
@@ -626,92 +619,6 @@ class auth_plugin_base {
     }
 
     /**
-     * Update a local user record from an external source.
-     * This is a lighter version of the one in moodlelib -- won't do
-     * expensive ops such as enrolment.
-     *
-     * @param string $username username
-     * @param array $updatekeys fields to update, false updates all fields.
-     * @param bool $triggerevent set false if user_updated event should not be triggered.
-     *             This will not affect user_password_updated event triggering.
-     * @param bool $suspenduser Should the user be suspended?
-     * @return stdClass|bool updated user record or false if there is no new info to update.
-     */
-    protected function update_user_record($username, $updatekeys = false, $triggerevent = false, $suspenduser = false) {
-        global $CFG, $DB;
-
-        require_once($CFG->dirroot.'/user/profile/lib.php');
-
-        // Just in case check text case.
-        $username = trim(core_text::strtolower($username));
-
-        // Get the current user record.
-        $user = $DB->get_record('user', array('username' => $username, 'mnethostid' => $CFG->mnet_localhost_id));
-        if (empty($user)) { // Trouble.
-            error_log($this->errorlogtag . get_string('auth_usernotexist', 'auth', $username));
-            print_error('auth_usernotexist', 'auth', '', $username);
-            die;
-        }
-
-        // Protect the userid from being overwritten.
-        $userid = $user->id;
-
-        $needsupdate = false;
-
-        if ($newinfo = $this->get_userinfo($username)) {
-            $newinfo = truncate_userinfo($newinfo);
-
-            if (empty($updatekeys)) { // All keys? this does not support removing values.
-                $updatekeys = array_keys($newinfo);
-            }
-
-            if (!empty($updatekeys)) {
-                $newuser = new stdClass();
-                $newuser->id = $userid;
-                // The cast to int is a workaround for MDL-53959.
-                $newuser->suspended = (int) $suspenduser;
-                // Load all custom fields.
-                $profilefields = (array) profile_user_record($user->id, false);
-                $newprofilefields = [];
-
-                foreach ($updatekeys as $key) {
-                    if (isset($newinfo[$key])) {
-                        $value = $newinfo[$key];
-                    } else {
-                        $value = '';
-                    }
-
-                    if (!empty($this->config->{'field_updatelocal_' . $key})) {
-                        if (preg_match('/^profile_field_(.*)$/', $key, $match)) {
-                            // Custom field.
-                            $field = $match[1];
-                            $currentvalue = isset($profilefields[$field]) ? $profilefields[$field] : null;
-                            $newprofilefields[$field] = $value;
-                        } else {
-                            // Standard field.
-                            $currentvalue = isset($user->$key) ? $user->$key : null;
-                            $newuser->$key = $value;
-                        }
-
-                        // Only update if it's changed.
-                        if ($currentvalue !== $value) {
-                            $needsupdate = true;
-                        }
-                    }
-                }
-            }
-
-            if ($needsupdate) {
-                user_update_user($newuser, false, $triggerevent);
-                profile_save_custom_fields($newuser->id, $newprofilefields);
-                return $DB->get_record('user', array('id' => $userid, 'deleted' => 0));
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Return the list of enabled identity providers.
      *
      * Each identity provider data contains the keys url, name and iconurl (or
@@ -757,53 +664,6 @@ class auth_plugin_base {
             $data[] = $idp;
         }
         return $data;
-    }
-
-    /**
-     * Returns information on how the specified user can change their password.
-     *
-     * @param stdClass $user A user object
-     * @return string[] An array of strings with keys subject and message
-     */
-    public function get_password_change_info(stdClass $user) : array {
-
-        global $USER;
-
-        $site = get_site();
-        $systemcontext = context_system::instance();
-
-        $data = new stdClass();
-        $data->firstname = $user->firstname;
-        $data->lastname  = $user->lastname;
-        $data->username  = $user->username;
-        $data->sitename  = format_string($site->fullname);
-        $data->admin     = generate_email_signoff();
-
-        // This is a workaround as change_password_url() is designed to allow
-        // use of the $USER global. See MDL-66984.
-        $olduser = $USER;
-        $USER = $user;
-        if ($this->can_change_password() and $this->change_password_url()) {
-            // We have some external url for password changing.
-            $data->link = $this->change_password_url()->out();
-        } else {
-            // No way to change password, sorry.
-            $data->link = '';
-        }
-        $USER = $olduser;
-
-        if (!empty($data->link) and has_capability('moodle/user:changeownpassword', $systemcontext, $user->id)) {
-            $subject = get_string('emailpasswordchangeinfosubject', '', format_string($site->fullname));
-            $message = get_string('emailpasswordchangeinfo', '', $data);
-        } else {
-            $subject = get_string('emailpasswordchangeinfosubject', '', format_string($site->fullname));
-            $message = get_string('emailpasswordchangeinfofail', '', $data);
-        }
-
-        return [
-            'subject' => $subject,
-            'message' => $message
-        ];
     }
 }
 
@@ -875,7 +735,6 @@ function login_attempt_valid($user) {
 /**
  * To be called after failed user login.
  * @param stdClass $user
- * @throws moodle_exception
  */
 function login_attempt_failed($user) {
     global $CFG;
@@ -887,53 +746,30 @@ function login_attempt_failed($user) {
         return;
     }
 
-    // Force user preferences cache reload to ensure the most up-to-date login_failed_count is fetched.
-    // This is perhaps overzealous but is the documented way of reloading the cache, as per the test method
-    // 'test_check_user_preferences_loaded'.
-    unset($user->preference);
+    $count = get_user_preferences('login_failed_count', 0, $user);
+    $last = get_user_preferences('login_failed_last', 0, $user);
+    $sincescuccess = get_user_preferences('login_failed_count_since_success', $count, $user);
+    $sincescuccess = $sincescuccess + 1;
+    set_user_preference('login_failed_count_since_success', $sincescuccess, $user);
 
-    $resource = 'user:' . $user->id;
-    $lockfactory = \core\lock\lock_config::get_lock_factory('core_failed_login_count_lock');
+    if (empty($CFG->lockoutthreshold)) {
+        // No threshold means no lockout.
+        // Always unlock here, there might be some race conditions or leftovers when switching threshold.
+        login_unlock_account($user);
+        return;
+    }
 
-    // Get a new lock for the resource, waiting for it for a maximum of 10 seconds.
-    if ($lock = $lockfactory->get_lock($resource, 10)) {
-        try {
-            $count = get_user_preferences('login_failed_count', 0, $user);
-            $last = get_user_preferences('login_failed_last', 0, $user);
-            $sincescuccess = get_user_preferences('login_failed_count_since_success', $count, $user);
-            $sincescuccess = $sincescuccess + 1;
-            set_user_preference('login_failed_count_since_success', $sincescuccess, $user);
+    if (!empty($CFG->lockoutwindow) and time() - $last > $CFG->lockoutwindow) {
+        $count = 0;
+    }
 
-            if (empty($CFG->lockoutthreshold)) {
-                // No threshold means no lockout.
-                // Always unlock here, there might be some race conditions or leftovers when switching threshold.
-                login_unlock_account($user);
-                $lock->release();
-                return;
-            }
+    $count = $count+1;
 
-            if (!empty($CFG->lockoutwindow) and time() - $last > $CFG->lockoutwindow) {
-                $count = 0;
-            }
+    set_user_preference('login_failed_count', $count, $user);
+    set_user_preference('login_failed_last', time(), $user);
 
-            $count = $count + 1;
-
-            set_user_preference('login_failed_count', $count, $user);
-            set_user_preference('login_failed_last', time(), $user);
-
-            if ($count >= $CFG->lockoutthreshold) {
-                login_lock_account($user);
-            }
-
-            // Release locks when we're done.
-            $lock->release();
-        } catch (Exception $e) {
-            // Always release the lock on a failure.
-            $lock->release();
-        }
-    } else {
-        // We did not get access to the resource in time, give up.
-        throw new moodle_exception('locktimeout');
+    if ($count >= $CFG->lockoutthreshold) {
+        login_lock_account($user);
     }
 }
 
@@ -1050,35 +886,15 @@ function signup_validate_data($data, $files) {
     if (! validate_email($data['email'])) {
         $errors['email'] = get_string('invalidemail');
 
-    } else if (empty($CFG->allowaccountssameemail)) {
-        // Emails in Moodle as case-insensitive and accents-sensitive. Such a combination can lead to very slow queries
-        // on some DBs such as MySQL. So we first get the list of candidate users in a subselect via more effective
-        // accent-insensitive query that can make use of the index and only then we search within that limited subset.
-        $sql = "SELECT 'x'
-                  FROM {user}
-                 WHERE " . $DB->sql_equal('email', ':email1', false, true) . "
-                   AND id IN (SELECT id
-                                FROM {user}
-                               WHERE " . $DB->sql_equal('email', ':email2', false, false) . "
-                                 AND mnethostid = :mnethostid)";
-
-        $params = array(
-            'email1' => $data['email'],
-            'email2' => $data['email'],
-            'mnethostid' => $CFG->mnet_localhost_id,
-        );
-
-        // If there are other user(s) that already have the same email, show an error.
-        if ($DB->record_exists_sql($sql, $params)) {
-            $forgotpasswordurl = new moodle_url('/login/forgot_password.php');
-            $forgotpasswordlink = html_writer::link($forgotpasswordurl, get_string('emailexistshintlink'));
-            $errors['email'] = get_string('emailexists') . ' ' . get_string('emailexistssignuphint', 'moodle', $forgotpasswordlink);
-        }
+    } else if ($DB->record_exists('user', array('email' => $data['email']))) {
+        $errors['email'] = get_string('emailexists') . ' ' .
+                get_string('emailexistssignuphint', 'moodle',
+                        html_writer::link(new moodle_url('/login/forgot_password.php'), get_string('emailexistshintlink')));
     }
     if (empty($data['email2'])) {
         $errors['email2'] = get_string('missingemail');
 
-    } else if (core_text::strtolower($data['email2']) != core_text::strtolower($data['email'])) {
+    } else if ($data['email2'] != $data['email']) {
         $errors['email2'] = get_string('invalidemail');
     }
     if (!isset($errors['email'])) {
@@ -1087,16 +903,8 @@ function signup_validate_data($data, $files) {
         }
     }
 
-    // Construct fake user object to check password policy against required information.
-    $tempuser = new stdClass();
-    $tempuser->id = 1;
-    $tempuser->username = $data['username'];
-    $tempuser->firstname = $data['firstname'];
-    $tempuser->lastname = $data['lastname'];
-    $tempuser->email = $data['email'];
-
     $errmsg = '';
-    if (!check_password_policy($data['password'], $errmsg, $tempuser)) {
+    if (!check_password_policy($data['password'], $errmsg)) {
         $errors['password'] = $errmsg;
     }
 
@@ -1208,22 +1016,16 @@ function display_auth_lock_options($settings, $auth, $userfields, $helptext, $ma
     }
 
     foreach ($userfields as $field) {
+
         // Define the fieldname we display to the  user.
         // this includes special handling for some profile fields.
         $fieldname = $field;
-        $fieldnametoolong = false;
         if ($fieldname === 'lang') {
             $fieldname = get_string('language');
         } else if (!empty($customfields) && in_array($field, $customfields)) {
             // If custom field then pick name from database.
             $fieldshortname = str_replace('profile_field_', '', $fieldname);
             $fieldname = $customfieldname[$fieldshortname]->name;
-            if (core_text::strlen($fieldshortname) > 67) {
-                // If custom profile field name is longer than 67 characters we will not be able to store the setting
-                // such as 'field_updateremote_profile_field_NOTSOSHORTSHORTNAME' in the database because the character
-                // limit for the setting name is 100.
-                $fieldnametoolong = true;
-            }
         } else if ($fieldname == 'url') {
             $fieldname = get_string('webpage');
         } else {
@@ -1231,17 +1033,11 @@ function display_auth_lock_options($settings, $auth, $userfields, $helptext, $ma
         }
 
         // Generate the list of fields / mappings.
-        if ($fieldnametoolong) {
-            // Display a message that the field can not be mapped because it's too long.
-            $url = new moodle_url('/user/profile/index.php');
-            $a = (object)['fieldname' => s($fieldname), 'shortname' => s($field), 'charlimit' => 67, 'link' => $url->out()];
-            $settings->add(new admin_setting_heading($auth.'/field_not_mapped_'.sha1($field), '',
-                get_string('cannotmapfield', 'auth', $a)));
-        } else if ($mapremotefields) {
+        if ($mapremotefields) {
             // We are mapping to a remote field here.
             // Mapping.
             $settings->add(new admin_setting_configtext("auth_{$auth}/field_map_{$field}",
-                    get_string('auth_fieldmapping', 'auth', $fieldname), '', '', PARAM_RAW, 30));
+                    get_string('auth_fieldmapping', 'auth', $fieldname), '', '', PARAM_ALPHANUMEXT, 30));
 
             // Update local.
             $settings->add(new admin_setting_configselect("auth_{$auth}/field_updatelocal_{$field}",

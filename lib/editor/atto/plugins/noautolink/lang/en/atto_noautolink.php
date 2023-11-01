@@ -23,4 +23,3 @@
  */
 
 $string['pluginname'] = 'Prevent auto-link';
-$string['privacy:metadata'] = 'The atto_noautolink plugin does not store any personal data.';

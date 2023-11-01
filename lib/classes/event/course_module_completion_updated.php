@@ -66,13 +66,8 @@ class course_module_completion_updated extends base {
      * @return string
      */
     public function get_description() {
-        if (isset($this->other['overrideby']) && $this->other['overrideby']) {
-            return "The user with id '{$this->userid}' overrode the completion state to '{$this->other['completionstate']}' ".
-                "for the course module with id '{$this->contextinstanceid}' for the user with id '{$this->relateduserid}'.";
-        } else {
-            return "The user with id '{$this->userid}' updated the completion state for the course module with id " .
-                "'{$this->contextinstanceid}' for the user with id '{$this->relateduserid}'.";
-        }
+        return "The user with id '$this->userid' updated the completion state for the course module with id '$this->contextinstanceid' " .
+            "for the user with id '$this->relateduserid'.";
     }
 
     /**
@@ -81,7 +76,7 @@ class course_module_completion_updated extends base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/report/progress/index.php', array('course' => $this->courseid));
+        return new \moodle_url('/report/completion/index.php', array('course' => $this->courseid));
     }
 
     /**
@@ -127,7 +122,6 @@ class course_module_completion_updated extends base {
     public static function get_other_mapping() {
         $othermapped = array();
         $othermapped['relateduserid'] = array('db' => 'user', 'restore' => 'user');
-        $othermapped['overrideby'] = array('db' => 'user', 'restore' => 'user');
 
         return $othermapped;
     }

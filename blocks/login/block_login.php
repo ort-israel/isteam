@@ -42,7 +42,13 @@ class block_login extends block_base {
             return $this->content;
         }
 
-        $wwwroot = $CFG->wwwroot;
+        if (empty($CFG->loginhttps)) {
+            $wwwroot = $CFG->wwwroot;
+        } else {
+            // This actually is not so secure ;-), 'cause we're
+            // in unencrypted connection...
+            $wwwroot = str_replace("http://", "https://", $CFG->wwwroot);
+        }
 
         if (signup_is_enabled()) {
             $signup = $wwwroot . '/login/signup.php';
@@ -66,16 +72,12 @@ class block_login extends block_base {
 
             $this->content->text .= "\n".'<form class="loginform" id="login" method="post" action="'.get_login_url().'">';
 
-            $this->content->text .= '<div class="form-group">';
-            $this->content->text .= '<label for="login_username">'.$strusername.'</label>';
-            $this->content->text .= '<input type="text" name="username" id="login_username" ';
-            $this->content->text .= ' class="form-control" value="'.s($username).'" autocomplete="username"/></div>';
+            $this->content->text .= '<div class="form-group"><label for="login_username">'.$strusername.'</label>';
+            $this->content->text .= '<input type="text" name="username" id="login_username" class="form-control" value="'.s($username).'" /></div>';
 
             $this->content->text .= '<div class="form-group"><label for="login_password">'.get_string('password').'</label>';
 
-            $this->content->text .= '<input type="password" name="password" id="login_password" ';
-            $this->content->text .= ' class="form-control" value="" autocomplete="current-password"/>';
-            $this->content->text .= '</div>';
+            $this->content->text .= '<input type="password" name="password" id="login_password" class="form-control" value="" /></div>';
 
             if (isset($CFG->rememberusername) and $CFG->rememberusername == 2) {
                 $checked = $username ? 'checked="checked"' : '';
@@ -90,7 +92,6 @@ class block_login extends block_base {
             $this->content->text .= '<div class="form-group">';
             $this->content->text .= '<input type="submit" class="btn btn-primary btn-block" value="'.get_string('login').'" />';
             $this->content->text .= '</div>';
-            $this->content->text .= '<input type="hidden" name="logintoken" value="'.s(\core\session\manager::get_login_token()).'" />';
 
             $this->content->text .= "</form>\n";
 
@@ -101,7 +102,7 @@ class block_login extends block_base {
                 $this->content->text .= '<div><a href="'.$forgot.'">'.get_string('forgotaccount').'</a></div>';
             }
 
-            $authsequence = get_enabled_auth_plugins(); // Get all auths, in sequence.
+            $authsequence = get_enabled_auth_plugins(true); // Get all auths, in sequence.
             $potentialidps = array();
             foreach ($authsequence as $authname) {
                 $authplugin = get_auth_plugin($authname);
@@ -114,10 +115,10 @@ class block_login extends block_base {
                 $this->content->text .= '<div class="potentialidplist">';
                 foreach ($potentialidps as $idp) {
                     $this->content->text .= '<div class="potentialidp">';
-                    $this->content->text .= '<a class="btn btn-secondary btn-block" ';
+                    $this->content->text .= '<a class="btn btn-default btn-block" ';
                     $this->content->text .= 'href="' . $idp['url']->out() . '" title="' . s($idp['name']) . '">';
                     if (!empty($idp['iconurl'])) {
-                        $this->content->text .= '<img src="' . s($idp['iconurl']) . '" width="24" height="24" class="mr-1"/>';
+                        $this->content->text .= '<img src="' . s($idp['iconurl']) . '" width="24" height="24" class="m-r-1"/>';
                     }
                     $this->content->text .= s($idp['name']) . '</a></div>';
                 }

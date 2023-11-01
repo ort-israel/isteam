@@ -16,8 +16,6 @@ Feature: Students can use the recent blog entries block to view recent entries o
       | user | course | role |
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
-    And the "multilang" filter is "on"
-    And the "multilang" filter applies to "content and headings"
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     And I add the "Blog menu" block
@@ -29,13 +27,13 @@ Feature: Students can use the recent blog entries block to view recent entries o
     And I am on "Course 1" course homepage
     And I follow "Add an entry about this course"
     When I set the following fields to these values:
-      | Entry title | S1 First Blog <span lang="RU" class="multilang">RUSSIAN</span><span lang="EN" class="multilang">ENGLISH</span> |
+      | Entry title | S1 First Blog |
       | Blog entry body | This is my awesome blog! |
     And I press "Save changes"
-    Then I should see "S1 First Blog ENGLISH"
+    Then I should see "S1 First Blog"
     And I should see "This is my awesome blog!"
-    And I am on "Course 1" course homepage
-    And I should see "S1 First Blog ENGLISH"
+    And I follow "C1"
+    And I should see "S1 First Blog"
     And I follow "S1 First Blog"
     And I should see "This is my awesome blog!"
 
@@ -49,7 +47,7 @@ Feature: Students can use the recent blog entries block to view recent entries o
       | Blog entry body | This is my awesome blog! |
     And I press "Save changes"
     And I wait "1" seconds
-    And I am on "Course 1" course homepage
+    And I follow "C1"
     And I follow "Add an entry about this course"
     # Blog 2 of 5
     And I set the following fields to these values:
@@ -59,7 +57,7 @@ Feature: Students can use the recent blog entries block to view recent entries o
     And I wait "1" seconds
     And I should see "S1 Second Blog"
     And I should see "This is my awesome blog!"
-    And I am on "Course 1" course homepage
+    And I follow "C1"
     And I follow "Add an entry about this course"
     # Blog 3 of 5
     And I set the following fields to these values:
@@ -69,7 +67,7 @@ Feature: Students can use the recent blog entries block to view recent entries o
     And I wait "1" seconds
     And I should see "S1 Third Blog"
     And I should see "This is my awesome blog!"
-    And I am on "Course 1" course homepage
+    And I follow "C1"
     And I follow "Add an entry about this course"
     # Blog 4 of 5
     And I set the following fields to these values:
@@ -79,7 +77,7 @@ Feature: Students can use the recent blog entries block to view recent entries o
     And I wait "1" seconds
     And I should see "S1 Fourth Blog"
     And I should see "This is my awesome blog!"
-    And I am on "Course 1" course homepage
+    And I follow "C1"
     And I follow "Add an entry about this course"
     # Blog 5 of 5
     And I set the following fields to these values:
@@ -88,7 +86,7 @@ Feature: Students can use the recent blog entries block to view recent entries o
     And I press "Save changes"
     And I should see "S1 Fifth Blog"
     And I should see "This is my awesome blog!"
-    When I am on "Course 1" course homepage
+    When I follow "C1"
     And I should not see "S1 First Blog"
     And I should see "S1 Second Blog"
     And I should see "S1 Third Blog"

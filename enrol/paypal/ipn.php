@@ -35,6 +35,7 @@ define('NO_DEBUG_DISPLAY', true);
 // @codingStandardsIgnoreLine This script does not require login.
 require("../../config.php");
 require_once("lib.php");
+require_once($CFG->libdir.'/eventslib.php');
 require_once($CFG->libdir.'/enrollib.php');
 require_once($CFG->libdir . '/filelib.php');
 
@@ -102,7 +103,7 @@ $plugin_instance = $DB->get_record("enrol", array("id" => $data->instanceid, "en
 $plugin = enrol_get_plugin('paypal');
 
 /// Open a connection back to PayPal to validate the data
-$paypaladdr = empty($CFG->usepaypalsandbox) ? 'ipnpb.paypal.com' : 'ipnpb.sandbox.paypal.com';
+$paypaladdr = empty($CFG->usepaypalsandbox) ? 'www.paypal.com' : 'www.sandbox.paypal.com';
 $c = new curl();
 $options = array(
     'returntransfer' => true,
@@ -179,25 +180,19 @@ if (strlen($result) > 0) {
 
         // At this point we only proceed with a status of completed or pending with a reason of echeck
 
-        // Make sure this transaction doesn't exist already.
-        if ($existing = $DB->get_record("enrol_paypal", array("txn_id" => $data->txn_id), "*", IGNORE_MULTIPLE)) {
+
+
+        if ($existing = $DB->get_record("enrol_paypal", array("txn_id"=>$data->txn_id))) {   // Make sure this transaction doesn't exist already
             \enrol_paypal\util::message_paypal_error_to_admin("Transaction $data->txn_id is being repeated!", $data);
             die;
+
         }
 
-        // Check that the receiver email is the one we want it to be.
-        if (isset($data->business)) {
-            $recipient = $data->business;
-        } else if (isset($data->receiver_email)) {
-            $recipient = $data->receiver_email;
-        } else {
-            $recipient = 'empty';
-        }
-
-        if (core_text::strtolower($recipient) !== core_text::strtolower($plugin->get_config('paypalbusiness'))) {
-            \enrol_paypal\util::message_paypal_error_to_admin("Business email is {$recipient} (not ".
+        if (core_text::strtolower($data->business) !== core_text::strtolower($plugin->get_config('paypalbusiness'))) {   // Check that the email is the one we want it to be
+            \enrol_paypal\util::message_paypal_error_to_admin("Business email is {$data->business} (not ".
                     $plugin->get_config('paypalbusiness').")", $data);
             die;
+
         }
 
         if (!$user = $DB->get_record('user', array('id'=>$data->userid))) {   // Check that user exists
