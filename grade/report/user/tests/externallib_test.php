@@ -52,7 +52,7 @@ class gradereport_user_externallib_testcase extends externallib_advanced_testcas
         $course = $this->getDataGenerator()->create_course(array('groupmode' => SEPARATEGROUPS, 'groupmodeforce' => 1));
 
         $studentrole = $DB->get_record('role', array('shortname' => 'student'));
-        $student1 = $this->getDataGenerator()->create_user();
+        $student1 = $this->getDataGenerator()->create_user(array('idnumber' => 'testidnumber'));
         $this->getDataGenerator()->enrol_user($student1->id, $course->id, $studentrole->id);
 
         $student2 = $this->getDataGenerator()->create_user();
@@ -76,8 +76,8 @@ class gradereport_user_externallib_testcase extends externallib_advanced_testcas
         $modcontext = get_coursemodule_from_instance('assign', $assignment->id, $course->id);
         $assignment->cmidnumber = $modcontext->id;
 
-        $student1grade = array('userid' => $student1->id, 'rawgrade' => $s1grade);
-        $student2grade = array('userid' => $student2->id, 'rawgrade' => $s2grade);
+        $student1grade = array('userid' => $student1->id, 'rawgrade' => $s1grade, 'idnumber' => 'testidnumber1');
+        $student2grade = array('userid' => $student2->id, 'rawgrade' => $s2grade, 'idnumber' => 'testidnumber2');
         $studentgrades = array($student1->id => $student1grade, $student2->id => $student2grade);
         assign_grade_item_update($assignment, $studentgrades);
 
@@ -255,6 +255,7 @@ class gradereport_user_externallib_testcase extends externallib_advanced_testcas
         $this->assertEquals('mod', $studentgrades['usergrades'][0]['gradeitems'][0]['itemtype']);
         $this->assertEquals('assign', $studentgrades['usergrades'][0]['gradeitems'][0]['itemmodule']);
         $this->assertEquals($assignment->id, $studentgrades['usergrades'][0]['gradeitems'][0]['iteminstance']);
+        $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][0]['locked']);
         $this->assertEquals($assignment->cmidnumber, $studentgrades['usergrades'][0]['gradeitems'][0]['cmid']);
         $this->assertEquals(0, $studentgrades['usergrades'][0]['gradeitems'][0]['itemnumber']);
         $this->assertEmpty($studentgrades['usergrades'][0]['gradeitems'][0]['outcomeid']);
@@ -269,6 +270,8 @@ class gradereport_user_externallib_testcase extends externallib_advanced_testcas
         $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][0]['gradehiddenbydate']);
         $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][0]['gradeneedsupdate']);
         $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][0]['gradeishidden']);
+        $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][0]['gradeislocked']);
+        $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][0]['gradeisoverridden']);
         $this->assertEquals('B-', $studentgrades['usergrades'][0]['gradeitems'][0]['lettergradeformatted']);
         $this->assertEquals(1, $studentgrades['usergrades'][0]['gradeitems'][0]['rank']);
         $this->assertEquals(2, $studentgrades['usergrades'][0]['gradeitems'][0]['numusers']);
@@ -280,16 +283,34 @@ class gradereport_user_externallib_testcase extends externallib_advanced_testcas
         $this->assertEquals('80.00', $studentgrades['usergrades'][0]['gradeitems'][1]['gradeformatted']);
         $this->assertEquals(0, $studentgrades['usergrades'][0]['gradeitems'][1]['grademin']);
         $this->assertEquals(100, $studentgrades['usergrades'][0]['gradeitems'][1]['grademax']);
+        $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][1]['locked']);
         $this->assertEquals('0&ndash;100', $studentgrades['usergrades'][0]['gradeitems'][1]['rangeformatted']);
         $this->assertEquals('80.00 %', $studentgrades['usergrades'][0]['gradeitems'][1]['percentageformatted']);
         $this->assertEmpty($studentgrades['usergrades'][0]['gradeitems'][1]['feedback']);
         $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][1]['gradehiddenbydate']);
         $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][1]['gradeneedsupdate']);
         $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][1]['gradeishidden']);
+        $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][1]['gradeislocked']);
+        $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][1]['gradeisoverridden']);
         $this->assertEquals('B-', $studentgrades['usergrades'][0]['gradeitems'][1]['lettergradeformatted']);
         $this->assertEquals(1, $studentgrades['usergrades'][0]['gradeitems'][1]['rank']);
         $this->assertEquals(2, $studentgrades['usergrades'][0]['gradeitems'][1]['numusers']);
         $this->assertEquals(70, $studentgrades['usergrades'][0]['gradeitems'][1]['averageformatted']);
+
+        // Now, override and lock a grade.
+        $gradegrade = grade_grade::fetch(['itemid' => $studentgrades['usergrades'][0]['gradeitems'][0]['id'],
+            'userid' => $studentgrades['usergrades'][0]['userid']]);
+        $gradegrade->set_overridden(true);
+        $gradegrade->set_locked(1);
+
+        $studentgrades = gradereport_user_external::get_grade_items($course->id);
+        $studentgrades = external_api::clean_returnvalue(gradereport_user_external::get_grade_items_returns(), $studentgrades);
+        // No warnings returned.
+        $this->assertCount(0, $studentgrades['warnings']);
+
+        // Module grades.
+        $this->assertTrue($studentgrades['usergrades'][0]['gradeitems'][0]['gradeislocked']);
+        $this->assertTrue($studentgrades['usergrades'][0]['gradeitems'][0]['gradeisoverridden']);
     }
 
     /**
@@ -326,10 +347,12 @@ class gradereport_user_externallib_testcase extends externallib_advanced_testcas
 
         $this->assertEquals($course->id, $studentgrades['usergrades'][0]['courseid']);
         $this->assertEquals($student1->id, $studentgrades['usergrades'][0]['userid']);
+        $this->assertEquals($student1->idnumber, $studentgrades['usergrades'][0]['useridnumber']);
         $this->assertEquals($assignment->name, $studentgrades['usergrades'][0]['gradeitems'][0]['itemname']);
         $this->assertEquals('mod', $studentgrades['usergrades'][0]['gradeitems'][0]['itemtype']);
         $this->assertEquals('assign', $studentgrades['usergrades'][0]['gradeitems'][0]['itemmodule']);
         $this->assertEquals($assignment->id, $studentgrades['usergrades'][0]['gradeitems'][0]['iteminstance']);
+        $this->assertNull($studentgrades['usergrades'][0]['gradeitems'][0]['locked']);
         $this->assertEquals($assignment->cmidnumber, $studentgrades['usergrades'][0]['gradeitems'][0]['cmid']);
         $this->assertEquals(0, $studentgrades['usergrades'][0]['gradeitems'][0]['itemnumber']);
         $this->assertEmpty($studentgrades['usergrades'][0]['gradeitems'][0]['outcomeid']);
@@ -344,10 +367,16 @@ class gradereport_user_externallib_testcase extends externallib_advanced_testcas
         $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][0]['gradehiddenbydate']);
         $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][0]['gradeneedsupdate']);
         $this->assertFalse($studentgrades['usergrades'][0]['gradeitems'][0]['gradeishidden']);
+        $this->assertNull($studentgrades['usergrades'][0]['gradeitems'][0]['gradeislocked']);
+        $this->assertNull($studentgrades['usergrades'][0]['gradeitems'][0]['gradeisoverridden']);
         $this->assertEquals('B-', $studentgrades['usergrades'][0]['gradeitems'][0]['lettergradeformatted']);
         $this->assertEquals(1, $studentgrades['usergrades'][0]['gradeitems'][0]['rank']);
         $this->assertEquals(2, $studentgrades['usergrades'][0]['gradeitems'][0]['numusers']);
         $this->assertEquals(70, $studentgrades['usergrades'][0]['gradeitems'][0]['averageformatted']);
+
+        // Check that the idnumber for assignment grades is equal to the cmid.
+        $this->assertEquals((string) $studentgrades['usergrades'][0]['gradeitems'][0]['cmid'],
+            $studentgrades['usergrades'][0]['gradeitems'][0]['idnumber']);
 
         // Hide one grade for the user.
         $gradegrade = new grade_grade(array('userid' => $student1->id,

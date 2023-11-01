@@ -53,6 +53,16 @@ class event implements event_interface {
     protected $description;
 
     /**
+     * @var string $location Location of this event.
+     */
+    protected $location;
+
+    /**
+     * @var proxy_interface $category Category for this event.
+     */
+    protected $category;
+
+    /**
      * @var proxy_interface $course Course for this event.
      */
     protected $course;
@@ -93,6 +103,11 @@ class event implements event_interface {
     protected $visible;
 
     /**
+     * @var string $component
+     */
+    protected $component;
+
+    /**
      * @var proxy_interface $subscription Subscription for this event.
      */
     protected $subscription;
@@ -103,6 +118,7 @@ class event implements event_interface {
      * @param int                        $id             The event's ID in the database.
      * @param string                     $name           The event's name.
      * @param description_interface      $description    The event's description.
+     * @param proxy_interface            $category       The category associated with the event.
      * @param proxy_interface            $course         The course associated with the event.
      * @param proxy_interface            $group          The group associated with the event.
      * @param proxy_interface            $user           The user associated with the event.
@@ -112,24 +128,31 @@ class event implements event_interface {
      * @param times_interface            $times          The times associated with the event.
      * @param bool                       $visible        The event's visibility. True for visible, false for invisible.
      * @param proxy_interface            $subscription   The event's subscription.
+     * @param string                     $location       The event's location.
+     * @param string                     $component      The event's component.
      */
     public function __construct(
         $id,
         $name,
         description_interface $description,
+        proxy_interface $category = null,
         proxy_interface $course = null,
         proxy_interface $group = null,
         proxy_interface $user = null,
-        event_collection_interface $repeats,
+        event_collection_interface $repeats = null,
         proxy_interface $coursemodule = null,
         $type,
         times_interface $times,
         $visible,
-        proxy_interface $subscription = null
+        proxy_interface $subscription = null,
+        $location = null,
+        $component = null
     ) {
         $this->id = $id;
         $this->name = $name;
         $this->description = $description;
+        $this->location = $location;
+        $this->category = $category;
         $this->course = $course;
         $this->group = $group;
         $this->user = $user;
@@ -139,6 +162,7 @@ class event implements event_interface {
         $this->times = $times;
         $this->visible = $visible;
         $this->subscription = $subscription;
+        $this->component = $component;
     }
 
     public function get_id() {
@@ -151,6 +175,14 @@ class event implements event_interface {
 
     public function get_description() {
         return $this->description;
+    }
+
+    public function get_location() {
+        return $this->location;
+    }
+
+    public function get_category() {
+        return $this->category;
     }
 
     public function get_course() {
@@ -187,5 +219,13 @@ class event implements event_interface {
 
     public function is_visible() {
         return $this->visible;
+    }
+
+    /**
+     * Resolved event component (frankenstyle name of activity module or the component)
+     * @return string|null
+     */
+    public function get_component() {
+        return $this->get_course_module() ? 'mod_' . $this->get_course_module()->get('modname') : $this->component;
     }
 }

@@ -18,7 +18,6 @@
  * use the YUI version in AMD code until it is replaced.
  *
  * @module     tool_lp/dialogue
- * @package    tool_lp
  * @copyright  2015 Damyon Wiese <damyon@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -35,6 +34,8 @@ define(['core/yui'], function(Y) {
      * @param {Boolean} wide Specify we want an extra wide dialogue (the size is standard, but wider than the default).
      */
     var dialogue = function(title, content, afterShow, afterHide, wide) {
+        M.util.js_pending('tool_lp/dialogue:dialogue');
+
         this.yuiDialogue = null;
         var parent = this;
 
@@ -59,6 +60,10 @@ define(['core/yui'], function(Y) {
                 width: width
             });
 
+            parent.yuiDialogue.before('visibleChange', function() {
+                M.util.js_pending('tool_lp/dialogue:before:visibleChange');
+            });
+
             parent.yuiDialogue.after('visibleChange', function(e) {
                 if (e.newVal) {
                     // Delay the callback call to the next tick, otherwise it can happen that it is
@@ -67,18 +72,25 @@ define(['core/yui'], function(Y) {
                         Y.soon(function() {
                             afterShow(parent);
                             parent.yuiDialogue.centerDialogue();
+                            M.util.js_complete('tool_lp/dialogue:before:visibleChange');
                         });
+                    } else {
+                        M.util.js_complete('tool_lp/dialogue:before:visibleChange');
                     }
                 } else {
                     if ((typeof afterHide !== 'undefined')) {
                         Y.soon(function() {
                             afterHide(parent);
+                            M.util.js_complete('tool_lp/dialogue:before:visibleChange');
                         });
+                    } else {
+                        M.util.js_complete('tool_lp/dialogue:before:visibleChange');
                     }
                 }
             });
 
             parent.yuiDialogue.show();
+            M.util.js_complete('tool_lp/dialogue:dialogue');
         });
     };
 

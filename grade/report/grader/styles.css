@@ -47,13 +47,6 @@
 }
 
 /**
- * Stripped table.
- */
-.path-grade-report-grader .gradeparent tr:nth-of-type(even) .cell {
-    background-color: #f9f9f9;
-}
-
-/**
  * All the floating divs.
  */
 .path-grade-report-grader .gradeparent .floater {
@@ -76,13 +69,6 @@
 }
 
 /**
- * All the floating cells.
- */
-.path-grade-report-grader .gradeparent .floater .cell {
-    background-color: #f9f9f9;
-}
-
-/**
  * The user cells.
  */
 .path-grade-report-grader .gradeparent .user.cell {
@@ -93,7 +79,6 @@
 }
 
 .path-grade-report-grader .gradeparent .user.cell .userpicture {
-    margin: 0 4px;
     border: none;
     vertical-align: middle;
 }
@@ -152,14 +137,6 @@
     display: inline-block;
 }
 
-.path-grade-report-grader span.gradepass {
-    color: #298721;
-}
-
-.path-grade-report-grader span.gradefail {
-    color: #890d0d;
-}
-
 .path-grade-report-grader .gradeparent tr:nth-child(n) td.overridden:nth-child(n) {
     /* Made very specific to override the default stripped style of the table. */
     background-color: #efd9a4;
@@ -175,11 +152,6 @@
     color: red;
     font-size: 9px;
     float: left;
-}
-
-.path-grade-report .gradeparent .floater .controls.cell,
-.path-grade-report-grader .gradeparent .controls {
-    background-color: #f3ead8;
 }
 
 .path-grade-report-grader .gradeparent .category {

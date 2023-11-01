@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace tool_templatelibrary;
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/externallib.php");
 
@@ -104,7 +105,7 @@ class external extends external_api {
     public static function load_canonical_template_parameters() {
         return new external_function_parameters(
                 array('component' => new external_value(PARAM_COMPONENT, 'component containing the template'),
-                      'template' => new external_value(PARAM_ALPHANUMEXT, 'name of the template'))
+                      'template' => new external_value(PARAM_SAFEPATH, 'name of the template'))
             );
     }
 

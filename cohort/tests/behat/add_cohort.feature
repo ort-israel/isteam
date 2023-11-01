@@ -12,7 +12,7 @@ Feature: Add cohorts of users
       | user3 | Third | User | third@example.com |
       | user4 | Forth | User | forth@example.com |
     And I log in as "admin"
-    And I navigate to "Cohorts" node in "Site administration > Users > Accounts"
+    And I navigate to "Users > Accounts >Cohorts" in site administration
     And I follow "Add new cohort"
     And I set the following fields to these values:
       | Name | Test cohort name |
@@ -21,6 +21,7 @@ Feature: Add cohorts of users
       | Description | Test cohort description |
     And I press "Save changes"
 
+  @javascript
   Scenario: Add a cohort
     When I follow "Cohorts"
     Then I should see "Test cohort name"
@@ -28,6 +29,7 @@ Feature: Add cohorts of users
     And I should see "Test cohort description"
     And I should see "Created manually"
 
+  @javascript
   Scenario: Add users to a cohort selecting them from the system users list
     When I add "First User (first@example.com)" user to "333" cohort members
     And I add "Second User (second@example.com)" user to "333" cohort members
@@ -37,6 +39,7 @@ Feature: Add cohorts of users
     And the "Current users" select box should contain "Second User (second@example.com)"
     And the "Current users" select box should not contain "Forth User (forth@example.com)"
 
+  @javascript
   Scenario: Add users to a cohort using a bulk user action
     When I follow "Accounts"
     And I follow "Bulk user actions"
@@ -59,9 +62,7 @@ Feature: Add cohorts of users
   @javascript
   Scenario: Edit cohort name in-place
     When I follow "Cohorts"
-    And I click on "Edit cohort name" "link" in the "Test cohort name" "table_row"
-    And I set the field "New name for cohort Test cohort name" to "Students cohort"
-    And I press key "13" in the field "New name for cohort Test cohort name"
+    And I set the field "Edit cohort name" to "Students cohort"
     Then I should not see "Test cohort name"
     And I should see "Students cohort"
     And I follow "Cohorts"

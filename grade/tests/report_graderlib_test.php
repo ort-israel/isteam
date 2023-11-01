@@ -17,7 +17,7 @@
 /**
  * Unit tests for grade/report/user/lib.php.
  *
- * @package  core_grade
+ * @package  core_grades
  * @category phpunit
  * @copyright 2012 Andrew Davis
  * @license  http://www.gnu.org/copyleft/gpl.html GNU Public License
@@ -47,7 +47,7 @@ class core_grade_report_graderlib_testcase extends advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
 
         // Create and enrol a student.
-        $student = $this->getDataGenerator()->create_user(array('username' => 'Student Sam'));
+        $student = $this->getDataGenerator()->create_user(array('username' => 'student_sam'));
         $role = $DB->get_record('role', array('shortname' => 'student'), '*', MUST_EXIST);
         $this->getDataGenerator()->enrol_user($student->id, $course->id, $role->id);
 
@@ -274,20 +274,19 @@ class core_grade_report_graderlib_testcase extends advanced_testcase {
 
         // The second row should contain 2 cells - one for the graded quiz and course total.
         $this->assertCount(2, $result[1]->cells);
-        $this->assertContains('NormalQuiz', $result[1]->cells[0]->text);
-        $this->assertContains('Course total', $result[1]->cells[1]->text);
+        $this->assertStringContainsString('NormalQuiz', $result[1]->cells[0]->text);
+        $this->assertStringContainsString('Course total', $result[1]->cells[1]->text);
 
         // User row should contain grade values '-'.
         $this->assertCount(2, $result[2]->cells);
-        $this->assertContains('>-<', $result[2]->cells[0]->text);
-        $this->assertContains('>-<', $result[2]->cells[1]->text);
+        $this->assertStringContainsString('>-<', $result[2]->cells[0]->text);
+        $this->assertStringContainsString('>-<', $result[2]->cells[1]->text);
 
         // Supposing the user cannot view hidden grades, this shouldn't make any difference (due
         // to a bug, it previously did).
         $context = context_course::instance($course->id);
         $managerroleid = $DB->get_field('role', 'id', array('shortname' => 'manager'));
         assign_capability('moodle/grade:viewhidden', CAP_PROHIBIT, $managerroleid, $context->id, true);
-        $context->mark_dirty();
         $this->assertFalse(has_capability('moodle/grade:viewhidden', $context));
 
         // Recreate the report. Confirm it returns successfully still.

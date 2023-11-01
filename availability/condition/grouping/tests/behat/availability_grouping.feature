@@ -92,3 +92,53 @@ Feature: availability_grouping
     # P1 should show but not B2.
     Then I should see "P1" in the "region-main" "region"
     And I should not see "P2" in the "region-main" "region"
+
+  @javascript
+  Scenario: Check grouping access restriction message on course homepage
+    Given the following "groupings" exist:
+      | name        | course | idnumber |
+      | Grouping A  | C1     | GA      |
+    And the following "grouping groups" exist:
+      | grouping  | group |
+      | GA        | GI1   |
+    And the following "activities" exist:
+      | activity  | name        | intro              | course | idnumber | groupmode | grouping |
+      | assign    | Test assign | Assign description | C1     | assign1  | 1         | GA       |
+    And I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I turn editing mode on
+    And I open "Test assign" actions menu
+    And I choose "Edit settings" in the open action menu
+    And I expand all fieldsets
+    And the field "groupingid" matches value "Grouping A"
+    And I press "Add group/grouping access restriction"
+    When I press "Save and return to course"
+    Then I should see "Not available unless: You belong to a group in Grouping A"
+
+  @javascript
+  Scenario: Condition display with filters
+    # Teacher sets up a restriction on group G1, using multilang filter.
+    Given the following "groupings" exist:
+      | name                                                                                          | course | idnumber |
+      | <span lang="en" class="multilang">Gr-One</span><span lang="fr" class="multilang">Gr-Un</span> | C1     | GA       |
+    And the following "activities" exist:
+      | activity  | name        | intro              | course | idnumber | groupmode | grouping |
+      | assign    | Test assign | Assign description | C1     | assign1  | 1         | GA       |
+    And the "multilang" filter is "on"
+    And the "multilang" filter applies to "content and headings"
+    # The activity names filter is enabled because it triggered a bug in older versions.
+    And the "activitynames" filter is "on"
+    And the "activitynames" filter applies to "content and headings"
+    And I am on the "C1" "Course" page logged in as "teacher1"
+    And I turn editing mode on
+    And I open "Test assign" actions menu
+    And I choose "Edit settings" in the open action menu
+    And I expand all fieldsets
+    And I press "Add group/grouping access restriction"
+    And I press "Save and return to course"
+    And I log out
+
+    # Student sees information about no access to group, with group name in correct language.
+    When I am on the "C1" "Course" page logged in as "student1"
+    Then I should see "Not available unless: You belong to a group in Gr-One"
+    And I should not see "Gr-Un"

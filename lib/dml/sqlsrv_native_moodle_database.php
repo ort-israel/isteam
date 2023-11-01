@@ -108,7 +108,7 @@ class sqlsrv_native_moodle_database extends moodle_database {
         return 'mssql';
     }
 
-   /**
+    /**
      * Returns more specific database driver type
      * Note: can be used before connect()
      * @return string db type mysqli, pgsql, oci, mssql, sqlsrv
@@ -117,7 +117,7 @@ class sqlsrv_native_moodle_database extends moodle_database {
         return 'sqlsrv';
     }
 
-   /**
+    /**
      * Returns general database library name
      * Note: can be used before connect()
      * @return string db type pdo, native
@@ -443,7 +443,7 @@ class sqlsrv_native_moodle_database extends moodle_database {
      * @return array of table names in lowercase and without prefix
      */
     public function get_tables($usecache = true) {
-        if ($usecache and count($this->tables) > 0) {
+        if ($usecache and $this->tables !== null) {
             return $this->tables;
         }
         $this->tables = array ();
@@ -534,24 +534,12 @@ class sqlsrv_native_moodle_database extends moodle_database {
     }
 
     /**
-     * Returns detailed information about columns in table. This information is cached internally.
+     * Returns detailed information about columns in table.
+     *
      * @param string $table name
-     * @param bool $usecache
      * @return array array of database_column_info objects indexed with column names
      */
-    public function get_columns($table, $usecache = true) {
-        if ($usecache) {
-            if ($this->temptables->is_temptable($table)) {
-                if ($data = $this->get_temp_tables_cache()->get($table)) {
-                    return $data;
-                }
-            } else {
-                if ($data = $this->get_metacache()->get($table)) {
-                    return $data;
-                }
-            }
-        }
-
+    protected function fetch_columns(string $table): array {
         $structure = array();
 
         if (!$this->temptables->is_temptable($table)) { // normal table, get metadata from own schema
@@ -641,14 +629,6 @@ class sqlsrv_native_moodle_database extends moodle_database {
             $structure[$info->name] = new database_column_info($info);
         }
         $this->free_result($result);
-
-        if ($usecache) {
-            if ($this->temptables->is_temptable($table)) {
-                $this->get_temp_tables_cache()->set($table, $structure);
-            } else {
-                $this->get_metacache()->set($table, $structure);
-            }
-        }
 
         return $structure;
     }
@@ -842,6 +822,30 @@ class sqlsrv_native_moodle_database extends moodle_database {
     }
 
     /**
+     * Whether the given SQL statement has the ORDER BY clause in the main query.
+     *
+     * @param string $sql the SQL statement
+     * @return bool true if the main query has the ORDER BY clause; otherwise, false.
+     */
+    protected static function has_query_order_by(string $sql) {
+        $sqltoupper = strtoupper($sql);
+        // Fail fast if there is no ORDER BY clause in the original query.
+        if (strpos($sqltoupper, 'ORDER BY') === false) {
+            return false;
+        }
+
+        // Search for an ORDER BY clause in the main query, not in any subquery (not always allowed in MSSQL)
+        // or in clauses like OVER with a window function e.g. ROW_NUMBER() OVER (ORDER BY ...) or RANK() OVER (ORDER BY ...):
+        // use PHP PCRE recursive patterns to remove everything found within round brackets.
+        $mainquery = preg_replace('/\(((?>[^()]+)|(?R))*\)/', '()', $sqltoupper);
+        if (strpos($mainquery, 'ORDER BY') !== false) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Get a number of records as a moodle_recordset using a SQL statement.
      *
      * Since this method is a little less readable, use of it should be restricted to
@@ -876,9 +880,9 @@ class sqlsrv_native_moodle_database extends moodle_database {
             } else {
                 $needscrollable = false; // Using supported fetch/offset, no need to scroll anymore.
                 $sql = (substr($sql, -1) === ';') ? substr($sql, 0, -1) : $sql;
-                // We need order by to use FETCH/OFFSET.
+                // We need ORDER BY to use FETCH/OFFSET.
                 // Ordering by first column shouldn't break anything if there was no order in the first place.
-                if (!strpos(strtoupper($sql), "ORDER BY")) {
+                if (!self::has_query_order_by($sql)) {
                     $sql .= " ORDER BY 1";
                 }
 
@@ -1114,7 +1118,7 @@ class sqlsrv_native_moodle_database extends moodle_database {
      * If the return ID isn't required, then this just reports success as true/false.
      * $data is an object containing needed data
      * @param string $table The database table to be inserted into
-     * @param object $data A data object with values for one or more fields in the record
+     * @param object|array $dataobject A data object with values for one or more fields in the record
      * @param bool $returnid Should the id of the newly created record entry be returned? If this option is not requested then true/false is returned.
      * @return bool|int true or new id
      * @throws dml_exception A DML specific exception is thrown for any errors.
@@ -1404,6 +1408,25 @@ class sqlsrv_native_moodle_database extends moodle_database {
         return "$fieldname COLLATE $collation $LIKE $param ESCAPE '$escapechar'";
     }
 
+    /**
+     * Escape common SQL LIKE special characters like '_' or '%', plus '[' & ']' which are also supported in SQL Server
+     *
+     * Note that '^' and '-' also have meaning within a LIKE, but only when enclosed within square brackets. As this syntax
+     * is not supported on all databases and the brackets are always escaped, we don't need special handling of them
+     *
+     * @param string $text
+     * @param string $escapechar
+     * @return string
+     */
+    public function sql_like_escape($text, $escapechar = '\\') {
+        $text = parent::sql_like_escape($text, $escapechar);
+
+        $text = str_replace('[', $escapechar . '[', $text);
+        $text = str_replace(']', $escapechar . ']', $text);
+
+        return $text;
+    }
+
     public function sql_concat() {
         $arr = func_get_args();
 
@@ -1585,5 +1608,27 @@ class sqlsrv_native_moodle_database extends moodle_database {
         $this->query_start('native sqlsrv_rollback', NULL, SQL_QUERY_AUX);
         $result = sqlsrv_rollback($this->sqlsrv);
         $this->query_end($result);
+    }
+
+    /**
+     * Is fulltext search enabled?.
+     *
+     * @return bool
+     */
+    public function is_fulltext_search_supported() {
+        global $CFG;
+
+        $sql = "SELECT FULLTEXTSERVICEPROPERTY('IsFullTextInstalled')";
+        $this->query_start($sql, null, SQL_QUERY_AUX);
+        $result = sqlsrv_query($this->sqlsrv, $sql);
+        $this->query_end($result);
+        if ($result) {
+            if ($row = sqlsrv_fetch_array($result)) {
+                $property = (bool)reset($row);
+            }
+        }
+        $this->free_result($result);
+
+        return !empty($property);
     }
 }

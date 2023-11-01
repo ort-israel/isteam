@@ -75,8 +75,8 @@ class tool_lp_external_testcase extends externallib_advanced_testcase {
     /**
      * Setup function- we will create a course and add an assign instance to it.
      */
-    protected function setUp() {
-        global $DB;
+    protected function setUp(): void {
+        global $DB, $CFG;
 
         $this->resetAfterTest(true);
 
@@ -91,9 +91,7 @@ class tool_lp_external_testcase extends externallib_advanced_testcase {
         $catcontext = context_coursecat::instance($category->id);
 
         // Fetching default authenticated user role.
-        $userroles = get_archetype_roles('user');
-        $this->assertCount(1, $userroles);
-        $authrole = array_pop($userroles);
+        $authrole = $DB->get_record('role', array('id' => $CFG->defaultuserroleid));
 
         // Reset all default authenticated users permissions.
         unassign_capability('moodle/competency:competencygrade', $authrole->id);
@@ -116,7 +114,7 @@ class tool_lp_external_testcase extends externallib_advanced_testcase {
         $this->userrole = create_role('User role', 'lpuserrole', 'learning plan user role description');
 
         assign_capability('moodle/competency:competencymanage', CAP_ALLOW, $this->creatorrole, $syscontext->id);
-        assign_capability('moodle/competency:competencycompetencyconfigure', CAP_ALLOW, $this->creatorrole, $syscontext->id);
+        assign_capability('moodle/competency:coursecompetencyconfigure', CAP_ALLOW, $this->creatorrole, $syscontext->id);
         assign_capability('moodle/competency:planmanage', CAP_ALLOW, $this->creatorrole, $syscontext->id);
         assign_capability('moodle/competency:planmanagedraft', CAP_ALLOW, $this->creatorrole, $syscontext->id);
         assign_capability('moodle/competency:planmanageown', CAP_ALLOW, $this->creatorrole, $syscontext->id);
@@ -461,76 +459,33 @@ class tool_lp_external_testcase extends externallib_advanced_testcase {
         $this->assertEquals('A', $summary->evidence[1]->gradename);
     }
 
-    /**
-     * Search cohorts.
-     */
-    public function test_search_cohorts() {
-        $this->resetAfterTest(true);
+    public function test_data_for_course_competency_page() {
+        $this->setAdminUser();
 
-        $syscontext = array('contextid' => context_system::instance()->id);
-        $catcontext = array('contextid' => context_coursecat::instance($this->category->id)->id);
-        $othercatcontext = array('contextid' => context_coursecat::instance($this->othercategory->id)->id);
+        $dg = $this->getDataGenerator();
+        $lpg = $dg->get_plugin_generator('core_competency');
+        $f1 = $lpg->create_framework();
+        $c1 = $lpg->create_competency(array('competencyframeworkid' => $f1->get('id')));
+        $course1 = $dg->create_course(array('category' => $this->category->id));
+        $cc = api::add_competency_to_course($course1->id, $c1->get('id'));
 
-        $cohort1 = $this->getDataGenerator()->create_cohort(array_merge($syscontext, array('name' => 'Cohortsearch 1')));
-        $cohort2 = $this->getDataGenerator()->create_cohort(array_merge($catcontext, array('name' => 'Cohortsearch 2')));
-        $cohort3 = $this->getDataGenerator()->create_cohort(array_merge($othercatcontext, array('name' => 'Cohortsearch 3')));
+        $evidence = \core_competency\external::grade_competency($this->user->id, $c1->get('id'), 1, true);
+        $evidence = \core_competency\external::grade_competency($this->user->id, $c1->get('id'), 2, true);
 
-        // Check for parameter $includes = 'parents'.
+        $pagegenerator = $this->getDataGenerator()->get_plugin_generator('mod_page');
+        $page = $pagegenerator->create_instance(array('course' => $course1->id));
+        $page2 = $pagegenerator->create_instance(array('course' => $course1->id));
 
-        // A user without permission in the system.
-        $this->setUser($this->user);
-        try {
-            $result = external::search_cohorts("Cohortsearch", $syscontext, 'parents');
-            $this->fail('Invalid permissions in system');
-        } catch (required_capability_exception $e) {
-            // All good.
-        }
+        $cm = get_coursemodule_from_instance('page', $page->id);
+        $cm2 = get_coursemodule_from_instance('page', $page2->id);
+        // Add the competency to the course module.
+        $ccm = api::add_competency_to_course_module($cm, $c1->get('id'));
+        $summary = external::data_for_course_competencies_page($course1->id, 0);
+        $summary2 = external::data_for_course_competencies_page($course1->id, $cm->id);
+        $summary3 = external::data_for_course_competencies_page($course1->id, $cm2->id);
 
-        // A user without permission in a category.
-        $this->setUser($this->catuser);
-        try {
-            $result = external::search_cohorts("Cohortsearch", $catcontext, 'parents');
-            $this->fail('Invalid permissions in category');
-        } catch (required_capability_exception $e) {
-            // All good.
-        }
-
-        // A user with permissions in the system.
-        $this->setUser($this->creator);
-        $result = external::search_cohorts("Cohortsearch", $syscontext, 'parents');
-        $this->assertEquals(1, count($result['cohorts']));
-        $this->assertEquals('Cohortsearch 1', $result['cohorts'][$cohort1->id]->name);
-
-        // A user with permissions in the category.
-        $this->setUser($this->catcreator);
-        $result = external::search_cohorts("Cohortsearch", $catcontext, 'parents');
-        $this->assertEquals(2, count($result['cohorts']));
-        $cohorts = array();
-        foreach ($result['cohorts'] as $cohort) {
-            $cohorts[] = $cohort->name;
-        }
-        $this->assertTrue(in_array('Cohortsearch 1', $cohorts));
-        $this->assertTrue(in_array('Cohortsearch 2', $cohorts));
-
-        // Check for parameter $includes = 'self'.
-        $this->setUser($this->creator);
-        $result = external::search_cohorts("Cohortsearch", $othercatcontext, 'self');
-        $this->assertEquals(1, count($result['cohorts']));
-        $this->assertEquals('Cohortsearch 3', $result['cohorts'][$cohort3->id]->name);
-
-        // Check for parameter $includes = 'all'.
-        $this->setUser($this->creator);
-        $result = external::search_cohorts("Cohortsearch", $syscontext, 'all');
-        $this->assertEquals(3, count($result['cohorts']));
-
-        // Detect invalid parameter $includes.
-        $this->setUser($this->creator);
-        try {
-            $result = external::search_cohorts("Cohortsearch", $syscontext, 'invalid');
-            $this->fail('Invalid parameter includes');
-        } catch (coding_exception $e) {
-            // All good.
-        }
+        $this->assertEquals(count($summary->competencies), 1);
+        $this->assertEquals(count($summary->competencies), count($summary2->competencies));
+        $this->assertEquals(count($summary3->competencies), 0);
     }
-
 }

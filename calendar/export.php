@@ -100,7 +100,7 @@ if ($course !== NULL) {
 $PAGE->set_url($url);
 
 $calendar = new calendar_information(0, 0, 0, $time);
-$calendar->prepare_for_view($course, $courses);
+$calendar->set_sources($course, $courses);
 
 $pagetitle = get_string('export', 'calendar');
 
@@ -138,13 +138,14 @@ $formdata = array(
     // If today it's weekend but tomorrow it isn't, do NOT give the "this week" option.
     'allowthisweek' => !(($weekend & (1 << $now['wday'])) && !($weekend & (1 << (($now['wday'] + 1) % $numberofdaysinweek))))
 );
-$exportform = new core_calendar_export_form(null, $formdata);
+
+// Disable submit protection so that the submit buttons continue working after being pressed.
+$exportform = new core_calendar_export_form($FULLME, $formdata, 'POST', '', ['data-double-submit-protection' => 'off']);
 $calendarurl = '';
 if ($data = $exportform->get_data()) {
-    $password = $DB->get_record('user', array('id' => $USER->id), 'password');
     $params = array();
     $params['userid']      = $USER->id;
-    $params['authtoken']   = sha1($USER->id . (isset($password->password) ? $password->password : '') . $CFG->calendar_exportsalt);
+    $params['authtoken']   = calendar_get_export_token($USER);
     $params['preset_what'] = $data->events['exportevents'];
     $params['preset_time'] = $data->period['timeperiod'];
 

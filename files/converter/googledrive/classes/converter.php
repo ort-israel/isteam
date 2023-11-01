@@ -47,7 +47,8 @@ class converter implements \core_files\converter_interface {
         'xls' => 'application/vnd.google-apps.spreadsheet',
         'xlsx' => 'application/vnd.google-apps.spreadsheet',
         'ppt' => 'application/vnd.google-apps.presentation',
-        'pptx' => 'application/vnd.google-apps.presentation'
+        'pptx' => 'application/vnd.google-apps.presentation',
+        'html' => 'application/vnd.google-apps.document'
     ];
 
     /** @var array $export List of supported export file formats */
@@ -123,7 +124,7 @@ class converter implements \core_files\converter_interface {
         $uploadurl;
         // Google returns a location header with the location for the upload.
         foreach ($headers as $header) {
-            if (strpos($header, 'Location:') === 0) {
+            if (stripos($header, 'Location:') === 0) {
                 $uploadurl = trim(substr($header, strpos($header, ':') + 1));
             }
         }
@@ -265,6 +266,6 @@ class converter implements \core_files\converter_interface {
      * @return  string
      */
     public function get_supported_conversions() {
-        return implode(', ', ['rtf', 'doc', 'xls', 'docx', 'xlsx', 'ppt', 'pptx', 'pdf']);
+        return implode(', ', ['rtf', 'doc', 'xls', 'docx', 'xlsx', 'ppt', 'pptx', 'pdf', 'html']);
     }
 }
