@@ -65,7 +65,6 @@ abstract class base_setting {
 
     protected $name;  // name of the setting
     protected $value; // value of the setting
-    protected $unlockedvalue; // Value to set after the setting is unlocked.
     protected $vtype; // type of value (setting_base::IS_BOOLEAN/setting_base::IS_INTEGER...)
 
     protected $visibility; // visibility of the setting (setting_base::VISIBLE/setting_base::HIDDEN)
@@ -119,7 +118,6 @@ abstract class base_setting {
         $this->value       = $value;
         $this->visibility  = $visibility;
         $this->status      = $status;
-        $this->unlockedvalue = $this->value;
 
         // Generate a default ui
         $this->uisetting = new base_setting_ui($this);
@@ -227,11 +225,6 @@ abstract class base_setting {
         $this->status = $status;
         if ($status !== $oldstatus) { // Status has changed, let's inform dependencies
             $this->inform_dependencies(self::CHANGED_STATUS, $oldstatus);
-
-            if ($status == base_setting::NOT_LOCKED) {
-                // When setting gets unlocked set it to the original value.
-                $this->set_value($this->unlockedvalue);
-            }
         }
     }
 

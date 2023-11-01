@@ -24,4 +24,3 @@
 
 $string['pluginname'] = 'Social activities';
 $string['social_activities:addinstance'] = 'Add a new social activities block';
-$string['privacy:metadata'] = 'The Social activities block only shows data stored in other locations.';

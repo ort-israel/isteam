@@ -40,7 +40,7 @@ class behat_command {
     /**
      * Docs url
      */
-    const DOCS_URL = 'https://docs.moodle.org/dev/Running_acceptance_test';
+    const DOCS_URL = 'http://docs.moodle.org/dev/Acceptance_testing';
 
     /**
      * Ensures the behat dir exists in moodledata
@@ -179,11 +179,7 @@ class behat_command {
         }
 
         // Behat test command.
-        $dirrootconfigpath = $CFG->dirroot . DIRECTORY_SEPARATOR . 'behat.yml';
-        if (file_exists($dirrootconfigpath)) {
-            self::output_msg(get_string('warndirrootconfigfound', 'tool_behat', $dirrootconfigpath));
-        }
-        list($output, $code) = self::run(" --help");
+        list($output, $code) = self::run(' --help');
 
         if ($code != 0) {
 
@@ -220,12 +216,6 @@ class behat_command {
         }
         if (empty($CFG->behat_dataroot) || !is_dir($CFG->behat_dataroot) || !is_writable($CFG->behat_dataroot)) {
             self::output_msg(get_string('errordataroot', 'tool_behat'));
-            return BEHAT_EXITCODE_CONFIG;
-        }
-
-        // If app config is supplied, check the value is correct.
-        if (!empty($CFG->behat_ionic_dirroot) && !file_exists($CFG->behat_ionic_dirroot . '/ionic.config.json')) {
-            self::output_msg(get_string('errorapproot', 'tool_behat'));
             return BEHAT_EXITCODE_CONFIG;
         }
 
@@ -269,7 +259,7 @@ class behat_command {
             // We continue execution after this.
             $clibehaterrorstr = "Ensure you set \$CFG->behat_* vars in config.php " .
                 "and you ran admin/tool/behat/cli/init.php.\n" .
-                "More info in " . self::DOCS_URL;
+                "More info in " . self::DOCS_URL . "#Installation\n\n";
 
             echo 'Error: ' . $msg . "\n\n" . $clibehaterrorstr;
         }

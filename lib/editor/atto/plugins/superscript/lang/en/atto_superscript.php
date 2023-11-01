@@ -23,4 +23,3 @@
  */
 
 $string['pluginname'] = 'Superscript';
-$string['privacy:metadata'] = 'The atto_superscript plugin does not store any personal data.';

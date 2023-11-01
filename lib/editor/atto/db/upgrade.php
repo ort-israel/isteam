@@ -30,82 +30,69 @@ defined('MOODLE_INTERNAL') || die();
  * @return bool
  */
 function xmldb_editor_atto_upgrade($oldversion) {
-    global $CFG;
+    global $CFG, $DB;
 
-    // Automatically generated Moodle v3.5.0 release upgrade line.
-    // Put any upgrade step following this.
+    $dbman = $DB->get_manager();
 
-    // Automatically generated Moodle v3.6.0 release upgrade line.
-    // Put any upgrade step following this.
+    if ($oldversion < 2014081400) {
 
-    // Automatically generated Moodle v3.7.0 release upgrade line.
-    // Put any upgrade step following this.
+        // Define table editor_atto_autosave to be created.
+        $table = new xmldb_table('editor_atto_autosave');
 
-    if ($oldversion < 2019090900) {
-        $toolbar = get_config('editor_atto', 'toolbar');
+        // Adding fields to table editor_atto_autosave.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('elementid', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('contextid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('pagehash', XMLDB_TYPE_CHAR, '64', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('drafttext', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('draftid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('pageinstance', XMLDB_TYPE_CHAR, '64', null, XMLDB_NOTNULL, null, null);
 
-        if (strpos($toolbar, 'h5p') === false) {
-            $glue = "\r\n";
-            if (strpos($toolbar, $glue) === false) {
-                $glue = "\n";
-            }
-            $groups = explode($glue, $toolbar);
-            // Try to put h5p in the files group.
-            foreach ($groups as $i => $group) {
-                $parts = explode('=', $group);
-                if (trim($parts[0]) == 'files') {
-                    $groups[$i] = 'files = ' . trim($parts[1]) . ', h5p';
-                    // Update config variable.
-                    $toolbar = implode($glue, $groups);
-                    set_config('toolbar', $toolbar, 'editor_atto');
-                }
-            }
-        }
-        // Atto editor savepoint reached.
-        upgrade_plugin_savepoint(true, 2019090900, 'editor', 'atto');
-    }
-    // Automatically generated Moodle v3.8.0 release upgrade line.
-    // Put any upgrade step following this.
+        // Adding keys to table editor_atto_autosave.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('autosave_uniq_key', XMLDB_KEY_UNIQUE, array('elementid', 'contextid', 'userid', 'pagehash'));
 
-    if ($oldversion < 2020052100) {
-        // The old default toolbar config for 38 and below.
-        $oldtoolbar = 'collapse = collapse
-style1 = title, bold, italic
-list = unorderedlist, orderedlist
-links = link
-files = image, media, recordrtc, managefiles, h5p
-style2 = underline, strike, subscript, superscript
-align = align
-indent = indent
-insert = equation, charmap, table, clear
-undo = undo
-accessibility = accessibilitychecker, accessibilityhelper
-other = html';
-
-        // Check if the current toolbar config matches the old toolbar config.
-        if (get_config('editor_atto', 'toolbar') === $oldtoolbar) {
-            // If the site is still using the old defaults, upgrade to the new default.
-            $newtoolbar = 'collapse = collapse
-style1 = title, bold, italic
-list = unorderedlist, orderedlist, indent
-links = link
-files = emojipicker, image, media, recordrtc, managefiles, h5p
-style2 = underline, strike, subscript, superscript
-align = align
-insert = equation, charmap, table, clear
-undo = undo
-accessibility = accessibilitychecker, accessibilityhelper
-other = html';
-            set_config('toolbar', $newtoolbar, 'editor_atto');
+        // Conditionally launch create table for editor_atto_autosave.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
         }
 
-        upgrade_plugin_savepoint(true, 2020052100, 'editor', 'atto');
+        // Atto savepoint reached.
+        upgrade_plugin_savepoint(true, 2014081400, 'editor', 'atto');
     }
 
-    // Automatically generated Moodle v3.9.0 release upgrade line.
+    if ($oldversion < 2014081900) {
+
+        // Define field timemodified to be added to editor_atto_autosave.
+        $table = new xmldb_table('editor_atto_autosave');
+        $field = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'pageinstance');
+
+        // Conditionally launch add field timemodified.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Atto savepoint reached.
+        upgrade_plugin_savepoint(true, 2014081900, 'editor', 'atto');
+    }
+
+    // Moodle v2.8.0 release upgrade line.
     // Put any upgrade step following this.
 
-    // Automatically generated Moodle v3.10.0 release upgrade line.
+    // Moodle v2.9.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Moodle v3.0.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Moodle v3.1.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Automatically generated Moodle v3.2.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Automatically generated Moodle v3.3.0 release upgrade line.
     // Put any upgrade step following this.
 
     return true;

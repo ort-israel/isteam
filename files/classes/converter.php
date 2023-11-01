@@ -127,7 +127,7 @@ class converter {
         if ($status === conversion::STATUS_PENDING || $status === conversion::STATUS_FAILED) {
             // The current status is either pending or failed.
             // Attempt to pick up a new converter and convert the document.
-            $from = pathinfo($file->get_filename(), PATHINFO_EXTENSION);
+            $from = \core_filetypes::get_file_extension($file->get_mimetype());
             $converters = $this->get_document_converter_classes($from, $format);
             $currentconverter = $this->get_next_converter($converters, $conversion->get('converter'));
 
@@ -225,9 +225,9 @@ class converter {
             return false;
         }
 
-        $from = pathinfo($file->get_filename(), PATHINFO_EXTENSION);
+        $from = \core_filetypes::get_file_extension($file->get_mimetype());
         if (!$from) {
-            // No file extension could be found. Unable to determine converter.
+            // No mime type could be found. Unable to determine converter.
             return false;
         }
 

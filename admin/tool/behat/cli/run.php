@@ -45,7 +45,7 @@ list($options, $unrecognised) = cli_get_params(
     array(
         'stop-on-failure' => 0,
         'verbose'  => false,
-        'replace'  => '',
+        'replace'  => false,
         'help'     => false,
         'tags'     => '',
         'profile'  => '',
@@ -70,7 +70,7 @@ $help = "
 Behat utilities to run behat tests in parallel
 
 Usage:
-  php run.php [--BEHAT_OPTION=\"value\"] [--feature=\"value\"] [--replace=\"{run}\"] [--fromrun=value --torun=value] [--help]
+  php run.php [--BEHAT_OPTION=\"value\"] [--feature=\"value\"] [--replace] [--fromrun=value --torun=value] [--help]
 
 Options:
 --BEHAT_OPTION     Any combination of behat option specified in http://behat.readthedocs.org/en/v2.5/guides/6.cli.html
@@ -144,10 +144,9 @@ $extraopts = $unrecognised;
 if ($options['profile']) {
     $profile = $options['profile'];
 
-    // If profile passed is not set, then exit (note we skip if the 'replace' option is found within the 'profile' value).
+    // If profile passed is not set, then exit.
     if (!isset($CFG->behat_config[$profile]) && !isset($CFG->behat_profiles[$profile]) &&
-            !($options['replace'] && (strpos($profile, (string) $options['replace']) !== false))) {
-
+        !(isset($options['replace']) && (strpos($options['profile'], $options['replace']) >= 0 ))) {
         echo "Invalid profile passed: " . $profile . PHP_EOL;
         exit(1);
     }

@@ -24,4 +24,3 @@
 
 $string['manageplugins'] = 'Manage restrictions';
 $string['pluginname'] = 'Availability condition management';
-$string['privacy:metadata'] = 'The Availability condition management plugin does not store any personal data.';

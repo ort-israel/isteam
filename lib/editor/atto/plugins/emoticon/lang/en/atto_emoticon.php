@@ -24,4 +24,3 @@
 
 $string['insertemoticon'] = 'Insert emoticon';
 $string['pluginname'] = 'Emoticon';
-$string['privacy:metadata'] = 'The atto_emoticon plugin does not store any personal data.';

@@ -17,6 +17,7 @@
  * Handle selection changes on the competency tree.
  *
  * @module     tool_lp/competencyselect
+ * @package    tool_lp
  * @copyright  2015 Damyon Wiese <damyon@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -135,22 +136,18 @@ define(['core/ajax', 'core/notification', 'core/templates', 'tool_lp/tree', 'too
         /**
          * Initialise the tree.
          *
-         * @param {Number} id The competency framework id.
+         * @param {Number} id The competency id.
          * @param {String} shortname The framework shortname
          * @param {String} search The current search string
          * @param {String} selector The selector for the tree div
          * @param {Boolean} canmanage Can manage the competencies
-         * @param {Number} competencyid The id of the competency to show first
          */
-        init: function(id, shortname, search, selector, canmanage, competencyid) {
+        init: function(id, shortname, search, selector, canmanage) {
             competencyFrameworkId = id;
             competencyFrameworkShortName = shortname;
             competencyFramworkCanManage = canmanage;
             treeSelector = selector;
             loadCompetencies(search).fail(notification.exception);
-            if (competencyid > 0) {
-                currentNodeId = competencyid;
-            }
 
             this.on('selectionchanged', rememberCurrent);
          },

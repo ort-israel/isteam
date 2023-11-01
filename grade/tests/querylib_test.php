@@ -17,7 +17,7 @@
 /**
  * Unit tests for grade quering
  *
- * @package   core_grades
+ * @pacakge   core_grade
  * @category  phpunit
  * @copyright 2011 Petr Skoda {@link http://skodak.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU Public License

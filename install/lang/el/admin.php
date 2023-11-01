@@ -1,5 +1,6 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
+
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,7 +13,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Automatically generated strings for Moodle installer
@@ -31,14 +32,13 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['clianswerno'] = 'ο';
 $string['cliansweryes'] = 'ν';
-$string['cliincorrectvalueerror'] = 'Σφάλμα, λανθασμένη τιμή «{$a->value}» για το «{$a->option}»';
-$string['cliincorrectvalueretry'] = 'Λανθασμένη τιμή. Παρακαλούμε προσπαθήστε ξανά.';
-$string['clitypevalue'] = 'πληκτρολογήστε μια τιμή';
-$string['clitypevaluedefault'] = 'πληκτρολογήστε μια τιμή· πατήστε Enter για να χρησιμοποιήσετε την προεπιλεγμένη τιμή ({$a})';
+$string['cliincorrectvalueerror'] = 'Σφάλμα, λανθασμένη τιμή "{$a->value}" για το "{$a->option}"';
+$string['cliincorrectvalueretry'] = 'Λανθασμένη τιμή, παρακαλώ προσπαθήστε ξανά';
+$string['clitypevalue'] = 'δώσε μία τιμή';
+$string['clitypevaluedefault'] = 'δώσε μία τιμή, πάτησε Enter για να χρησιμοποιήσεις τη προκαθορισμένη τιμή ({$a})';
 $string['cliunknowoption'] = 'Μη αναγνωρίσιμες επιλογές:
- {$a}<br />
-Παρακαλούμε χρησιμοποιήστε την επιλογή --help (βοήθεια)';
-$string['cliyesnoprompt'] = 'πατήστε y (σημαίνει yes=ναι) ή πατήστε n (σημαίνει no=όχι)';
-$string['environmentrequireinstall'] = 'απαιτείται να εγκατασταθεί και να ενεργοποιηθεί';
+{$a}
+Παρακαλώ χρησιμοποιείστε την επιλογή --βοήθεια';
+$string['cliyesnoprompt'] = 'πατώντας ν (σημαίνει ναι) αλλιώς πατώντας ο (σημαίνει όχι)';
+$string['environmentrequireinstall'] = 'απαιτείται να εγκατασταθεί/ ενεργοποιηθεί';
 $string['environmentrequireversion'] = 'απαιτείται η έκδοση {$a->needed} ενώ εσείς έχετε την {$a->current}';
-$string['upgradekeyset'] = 'Κλειδί αναβάθμισης (αφήστε κενό για να μην το ορίσετε)';

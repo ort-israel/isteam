@@ -26,7 +26,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/lib/grade/constants.php');
-require_once($CFG->dirroot . '/course/lib.php');
 
 define('B_ACTIVITYRESULTS_NAME_FORMAT_FULL', 1);
 define('B_ACTIVITYRESULTS_NAME_FORMAT_ID',   2);
@@ -289,12 +288,8 @@ class block_activity_results extends block_base {
                 }
 
                 // Sort groupgrades according to average grade, ascending.
-                uasort($groupgrades, function($a, $b) {
-                    if ($a["average"] == $b["average"]) {
-                        return 0;
-                    }
-                    return ($a["average"] > $b["average"] ? 1 : -1);
-                });
+                uasort($groupgrades, create_function('$a, $b',
+                        'if($a["average"] == $b["average"]) return 0; return ($a["average"] > $b["average"] ? 1 : -1);'));
 
                 // How many groups do we have with graded member submissions to show?
                 $numbest  = empty($this->config->showbest) ? 0 : min($this->config->showbest, count($groupgrades));
@@ -333,7 +328,7 @@ class block_activity_results extends block_base {
                 if ($nameformat == B_ACTIVITYRESULTS_NAME_FORMAT_FULL) {
                     if (has_capability('moodle/course:managegroups', $context)) {
                         $grouplink = $CFG->wwwroot.'/group/overview.php?id='.$courseid.'&amp;group=';
-                    } else if (course_can_view_participants($context)) {
+                    } else if (has_capability('moodle/course:viewparticipants', $context)) {
                         $grouplink = $CFG->wwwroot.'/user/index.php?id='.$courseid.'&amp;group=';
                     } else {
                         $grouplink = '';
@@ -342,13 +337,13 @@ class block_activity_results extends block_base {
 
                 $rank = 0;
                 if (!empty($best)) {
-                    $this->content->text .= '<table class="grades"><caption class="pb-0"><h6>';
+                    $this->content->text .= '<table class="grades"><caption>';
                     if ($numbest == 1) {
                         $this->content->text .= get_string('bestgroupgrade', 'block_activity_results');
                     } else {
                         $this->content->text .= get_string('bestgroupgrades', 'block_activity_results', $numbest);
                     }
-                    $this->content->text .= '</h6></caption><colgroup class="number" />';
+                    $this->content->text .= '</caption><colgroup class="number" />';
                     $this->content->text .= '<colgroup class="name" /><colgroup class="grade" /><tbody>';
                     foreach ($best as $groupid => $averagegrade) {
                         switch ($nameformat) {
@@ -398,13 +393,13 @@ class block_activity_results extends block_base {
                 $rank = 0;
                 if (!empty($worst)) {
                     $worst = array_reverse($worst, true);
-                    $this->content->text .= '<table class="grades"><caption class="pb-0"><h6>';
+                    $this->content->text .= '<table class="grades"><caption>';
                     if ($numworst == 1) {
                         $this->content->text .= get_string('worstgroupgrade', 'block_activity_results');
                     } else {
                         $this->content->text .= get_string('worstgroupgrades', 'block_activity_results', $numworst);
                     }
-                    $this->content->text .= '</h6></caption><colgroup class="number" />';
+                    $this->content->text .= '</caption><colgroup class="number" />';
                     $this->content->text .= '<colgroup class="name" /><colgroup class="grade" /><tbody>';
                     foreach ($worst as $groupid => $averagegrade) {
                         switch ($nameformat) {
@@ -512,10 +507,6 @@ class block_activity_results extends block_base {
                 $fields = implode(',', $fields);
                 $users = $DB->get_records_list('user', 'id', $userids, '', $fields);
 
-                // If configured to view user idnumber, ensure current user can see it.
-                $extrafields = get_extra_user_fields($this->context);
-                $canviewidnumber = (array_search('idnumber', $extrafields) !== false);
-
                 // Ready for output!
                 if ($activity->gradetype == GRADE_TYPE_SCALE) {
                     // We must display the results using scales.
@@ -533,22 +524,18 @@ class block_activity_results extends block_base {
 
                 $rank = 0;
                 if (!empty($best)) {
-                    $this->content->text .= '<table class="grades"><caption class="pb-0"><h6>';
+                    $this->content->text .= '<table class="grades"><caption>';
                     if ($numbest == 1) {
                         $this->content->text .= get_string('bestgrade', 'block_activity_results');
                     } else {
                         $this->content->text .= get_string('bestgrades', 'block_activity_results', $numbest);
                     }
-                    $this->content->text .= '</h6></caption><colgroup class="number" />';
+                    $this->content->text .= '</caption><colgroup class="number" />';
                     $this->content->text .= '<colgroup class="name" /><colgroup class="grade" /><tbody>';
-
                     foreach ($best as $userid => $gradeid) {
                         switch ($nameformat) {
                             case B_ACTIVITYRESULTS_NAME_FORMAT_ID:
-                                $thisname = get_string('user');
-                                if ($canviewidnumber) {
-                                    $thisname .= ' ' . s($users[$userid]->idnumber);
-                                }
+                                $thisname = get_string('user').' '.$users[$userid]->idnumber;
                             break;
                             case B_ACTIVITYRESULTS_NAME_FORMAT_ANON:
                                 $thisname = get_string('user');
@@ -600,21 +587,18 @@ class block_activity_results extends block_base {
                 $rank = 0;
                 if (!empty($worst)) {
                     $worst = array_reverse($worst, true);
-                    $this->content->text .= '<table class="grades"><caption class="pb-0"><h6>';
+                    $this->content->text .= '<table class="grades"><caption>';
                     if ($numbest == 1) {
                         $this->content->text .= get_string('worstgrade', 'block_activity_results');
                     } else {
                         $this->content->text .= get_string('worstgrades', 'block_activity_results', $numworst);
                     }
-                    $this->content->text .= '</h6></caption><colgroup class="number" />';
+                    $this->content->text .= '</caption><colgroup class="number" />';
                     $this->content->text .= '<colgroup class="name" /><colgroup class="grade" /><tbody>';
                     foreach ($worst as $userid => $gradeid) {
                         switch ($nameformat) {
                             case B_ACTIVITYRESULTS_NAME_FORMAT_ID:
-                                $thisname = get_string('user');
-                                if ($canviewidnumber) {
-                                    $thisname .= ' ' . s($users[$userid]->idnumber);
-                                };
+                                $thisname = get_string('user').' '.$users[$userid]->idnumber;
                             break;
                             case B_ACTIVITYRESULTS_NAME_FORMAT_ANON:
                                 $thisname = get_string('user');
@@ -689,17 +673,17 @@ class block_activity_results extends block_base {
     }
 
     /**
-     * Generates the Link to the activity module when displayed outside of the module.
+     * Generates the Link to the activity module when displaed outside of the module
      * @param stdclass $activity
      * @param stdclass $cm
      * @return string
      */
     private function activity_link($activity, $cm) {
 
-        $o = html_writer::start_tag('h5');
+        $o = html_writer::start_tag('h3');
         $o .= html_writer::link(new moodle_url('/mod/'.$activity->itemmodule.'/view.php',
         array('id' => $cm->id)), format_string(($activity->itemname), true, ['context' => context_module::instance($cm->id)]));
-        $o .= html_writer::end_tag('h5');
+        $o .= html_writer::end_tag('h3');
         return $o;
     }
 
@@ -714,22 +698,5 @@ class block_activity_results extends block_base {
         $scale = explode ( ',', $scaletext);
         return $scale;
 
-    }
-
-    /**
-     * Return the plugin config settings for external functions.
-     *
-     * @return stdClass the configs for both the block instance and plugin
-     * @since Moodle 3.8
-     */
-    public function get_config_for_external() {
-        // Return all settings for all users since it is safe (no private keys, etc..).
-        $instanceconfigs = !empty($this->config) ? $this->config : new stdClass();
-        $pluginconfigs = get_config('block_activity_results');
-
-        return (object) [
-            'instance' => $instanceconfigs,
-            'plugin' => $pluginconfigs,
-        ];
     }
 }

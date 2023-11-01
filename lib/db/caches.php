@@ -127,18 +127,6 @@ $definitions = array(
         'staticacceleration' => true,
     ),
 
-    // Cache the course categories where the user has any enrolment and all categories that this user can manage.
-    'calendar_categories' => array(
-        'mode' => cache_store::MODE_SESSION,
-        'simplekeys' => true,
-        'simpledata' => true,
-        'invalidationevents' => array(
-            'changesincoursecat',
-            'changesincategoryenrolment',
-        ),
-        'ttl' => 900,
-    ),
-
     // Cache the capabilities list DB table. See get_all_capabilities in accesslib.
     'capabilities' => array(
         'mode' => cache_store::MODE_APPLICATION,
@@ -269,15 +257,6 @@ $definitions = array(
         'simpledata' => true,
     ),
 
-    // Cache system-wide role definitions.
-    'roledefs' => array(
-        'mode' => cache_store::MODE_APPLICATION,
-        'simplekeys' => true,
-        'simpledata' => true,
-        'staticacceleration' => true,
-        'staticaccelerationsize' => 30,
-    ),
-
     // Caches plugins existing functions by function name and file.
     // Set static acceleration size to 5 to load a few functions.
     'plugin_functions' => array(
@@ -324,15 +303,6 @@ $definitions = array(
         ),
     ),
 
-    // Caches contexts with insights.
-    'contextwithinsights' => array(
-        'mode' => cache_store::MODE_APPLICATION,
-        'simplekeys' => true,
-        'simpledata' => true,
-        'staticacceleration' => true,
-        'staticaccelerationsize' => 1
-    ),
-
     // Caches message processors.
     'message_processors_enabled' => array(
         'mode' => cache_store::MODE_APPLICATION,
@@ -342,10 +312,10 @@ $definitions = array(
         'staticaccelerationsize' => 3
     ),
 
-    // Caches the time of the last message in a conversation.
+    // Caches the time of the last message between two users.
     'message_time_last_message_between_users' => array(
         'mode' => cache_store::MODE_APPLICATION,
-        'simplekeys' => true, // The conversation id is used.
+        'simplekeys' => true, // The id of the sender and recipient is used.
         'simplevalues' => true,
         'datasource' => '\core_message\time_last_message_between_users',
     ),
@@ -366,122 +336,4 @@ $definitions = array(
         'simpledata' => true,
         'staticacceleration' => false,
     ),
-
-    // Caches grouping and group ids of a user.
-    'user_group_groupings' => array(
-        'mode' => cache_store::MODE_APPLICATION,
-        'simplekeys' => true,
-        'simpledata' => true,
-        'staticacceleration' => true,
-    ),
-
-    // This is the user's pre sign-up session cache.
-    // This cache is used to record the user's pre sign-up data such as
-    // age of digital consent (minor) status, accepted policies, etc.
-    'presignup' => array(
-        'mode' => cache_store::MODE_SESSION,
-        'simplekeys' => true,
-        'simpledata' => true,
-        'ttl' => 1800
-    ),
-
-    // Caches the first time we analysed models' analysables.
-    'modelfirstanalyses' => array(
-        'mode' => cache_store::MODE_REQUEST,
-        'simplekeys' => true,
-        'simpledata' => true,
-    ),
-
-    // Cache the list of portfolio instances for the logged in user
-    // in the portfolio_add_button constructor to avoid loading the
-    // same data multiple times.
-    'portfolio_add_button_portfolio_instances' => [
-        'mode' => cache_store::MODE_REQUEST,
-        'simplekeys' => true,
-        'staticacceleration' => true
-    ],
-
-    // Cache the user dates for courses set to relative dates mode.
-    'course_user_dates' => [
-        'mode' => cache_store::MODE_REQUEST,
-        'simplekeys' => true,
-        'simpledata' => true,
-        'staticacceleration' => true
-    ],
-
-    // Information generated during the calculation of indicators.
-    'calculablesinfo' => [
-        'mode' => cache_store::MODE_REQUEST,
-        'simplekeys' => false,
-        'simpledata' => false,
-    ],
-
-    // The list of content items (activities, resources and their subtypes) that can be added to a course for a user.
-    'user_course_content_items' => [
-        'mode' => cache_store::MODE_REQUEST,
-        'simplekeys' => true,
-    ],
-
-    // The list of favourited content items (activities, resources and their subtypes) for a user.
-    'user_favourite_course_content_items' => [
-        'mode' => cache_store::MODE_APPLICATION,
-        'simplekeys' => true,
-    ],
-
-    \core_course\local\service\content_item_service::RECOMMENDATION_CACHE => [
-        'mode' => cache_store::MODE_APPLICATION,
-        'simplekeys' => true,
-    ],
-
-    // Caches contentbank extensions management.
-    'contentbank_enabled_extensions' => [
-        'mode' => cache_store::MODE_APPLICATION,
-        'simplekeys' => true,
-        'simpledata' => true,
-        'staticacceleration' => true,
-    ],
-    'contentbank_context_extensions' => [
-        'mode' => cache_store::MODE_REQUEST,
-        'simplekeys' => true,
-        'simpledata' => true,
-        'staticacceleration' => true,
-    ],
-
-    // Language strings for H5P content-type libraries.
-    // Key "{$libraryname}/{$language}"" contains translations for a given library and language.
-    // Key "$libraryname" has a list of all of the available languages for the library.
-    'h5p_content_type_translations' => [
-        'mode' => cache_store::MODE_APPLICATION,
-        'simpledata' => true,
-    ],
-
-    // File cache for H5P Library files.
-    'h5p_library_files' => [
-        'mode' => cache_store::MODE_APPLICATION,
-        'simplekeys' => true,
-        'canuselocalstore' => true
-    ],
-
-    // Cache the grade letters for faster retrival.
-    'grade_letters' => [
-        'mode'                   => cache_store::MODE_REQUEST,
-        'simplekeys'             => true,
-        'staticacceleration'     => true,
-        'staticaccelerationsize' => 100
-    ],
-
-    // Cache for licenses.
-    'license' => [
-        'mode' => cache_store::MODE_APPLICATION,
-        'simplekeys' => true,
-        'simpledata' => false,
-    ],
-
-    // Cache the grade setting for faster retrieval.
-    'gradesetting' => [
-        'mode'                   => cache_store::MODE_REQUEST,
-        'simplekeys'             => true,
-        'staticacceleration'     => true,
-        'staticaccelerationsize' => 100
-    ],
 );

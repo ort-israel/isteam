@@ -28,4 +28,3 @@ $string['enterurl'] = 'Enter a URL';
 $string['openinnewwindow'] = 'Open in new window';
 $string['pluginname'] = 'Link';
 $string['unlink'] = 'Unlink';
-$string['privacy:metadata'] = 'The atto_link plugin does not store any personal data.';

@@ -1,5 +1,6 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
+
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,7 +13,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Automatically generated strings for Moodle installer
@@ -29,9 +30,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['cannotcreatedboninstall'] = '<p>Nepavyko sukurti duomenų bazės.</p>
-<p>Nurodyta duomenų bazė neegzistuoja ir nurodytas naudotojas neturi leidimo kurti duomenų bazės.</p>
-<p>Svetainės administratorius turėtų patikrinti duomenų bazės konfigūraciją.</p>';
 $string['cannotcreatelangdir'] = 'Negalima sukurti kalbos katalogo';
 $string['cannotcreatetempdir'] = 'Negalima sukurti laikinojo katalogo';
 $string['cannotdownloadcomponents'] = 'Negalima atsisiųsti komponentų';
@@ -41,7 +39,6 @@ $string['cannotsavemd5file'] = 'Negalima įrašyti md5 failo';
 $string['cannotsavezipfile'] = 'Negalima įrašyti ZIP failo';
 $string['cannotunzipfile'] = 'Negalima išskleisti failo';
 $string['componentisuptodate'] = 'Komponentas atnaujintas';
-$string['dmlexceptiononinstall'] = '<p>Įvyko duomenų bazės klaida [{$a->errorcode}].<br />{$a->debuginfo}</p>';
 $string['downloadedfilecheckfailed'] = 'Nepavyko patikrinti atsisiųsto failo';
 $string['invalidmd5'] = 'Kintamojo patikra nepavyko – bandykite dar kartą';
 $string['missingrequiredfield'] = 'Trūksta būtino lauko';

@@ -47,13 +47,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class core_text {
-    /** @var string Byte order mark for UTF-8 */
-    const UTF8_BOM = "\xef\xbb\xbf";
-
-    /**
-     * @var string[] Array of strings representing Unicode non-characters
-     */
-    protected static $noncharacters;
 
     /**
      * Return t3lib helper class, which is used for conversion between charsets
@@ -567,12 +560,8 @@ class core_text {
         static $callback2 = null ;
 
         if (!$callback1 or !$callback2) {
-            $callback1 = function($matches) {
-                return core_text::code2utf8(hexdec($matches[1]));
-            };
-            $callback2 = function($matches) {
-                return core_text::code2utf8($matches[1]);
-            };
+            $callback1 = create_function('$matches', 'return core_text::code2utf8(hexdec($matches[1]));');
+            $callback2 = create_function('$matches', 'return core_text::code2utf8($matches[1]);');
         }
 
         $result = (string)$str;
@@ -611,9 +600,7 @@ class core_text {
 
         if ($dec) {
             if (!$callback) {
-                $callback = function($matches) {
-                    return '&#' . hexdec($matches[1]) . ';';
-                };
+                $callback = create_function('$matches', 'return \'&#\'.(hexdec($matches[1])).\';\';');
             }
             $result = preg_replace_callback('/&#x([0-9a-f]+);/i', $callback, $result);
         }
@@ -628,44 +615,11 @@ class core_text {
      * @return string
      */
     public static function trim_utf8_bom($str) {
-        $bom = self::UTF8_BOM;
+        $bom = "\xef\xbb\xbf";
         if (strpos($str, $bom) === 0) {
             return substr($str, strlen($bom));
         }
         return $str;
-    }
-
-    /**
-     * There are a number of Unicode non-characters including the byte-order mark (which may appear
-     * multiple times in a string) and also other ranges. These can cause problems for some
-     * processing.
-     *
-     * This function removes the characters using string replace, so that the rest of the string
-     * remains unchanged.
-     *
-     * @param string $value Input string
-     * @return string Cleaned string value
-     * @since Moodle 3.5
-     */
-    public static function remove_unicode_non_characters($value) {
-        // Set up list of all Unicode non-characters for fast replacing.
-        if (!self::$noncharacters) {
-            self::$noncharacters = [];
-            // This list of characters is based on the Unicode standard. It includes the last two
-            // characters of each code planes 0-16 inclusive...
-            for ($plane = 0; $plane <= 16; $plane++) {
-                $base = ($plane === 0 ? '' : dechex($plane));
-                self::$noncharacters[] = html_entity_decode('&#x' . $base . 'fffe;');
-                self::$noncharacters[] = html_entity_decode('&#x' . $base . 'ffff;');
-            }
-            // ...And the character range U+FDD0 to U+FDEF.
-            for ($char = 0xfdd0; $char <= 0xfdef; $char++) {
-                self::$noncharacters[] = html_entity_decode('&#x' . dechex($char) . ';');
-            }
-        }
-
-        // Do character replacement.
-        return str_replace(self::$noncharacters, '', $value);
     }
 
     /**
@@ -723,19 +677,19 @@ class core_text {
         if ($utf8char == '') {
             return 0;
         }
-        $ord0 = ord($utf8char[0]);
+        $ord0 = ord($utf8char{0});
         if ($ord0 >= 0 && $ord0 <= 127) {
             return $ord0;
         }
-        $ord1 = ord($utf8char[1]);
+        $ord1 = ord($utf8char{1});
         if ($ord0 >= 192 && $ord0 <= 223) {
             return ($ord0 - 192) * 64 + ($ord1 - 128);
         }
-        $ord2 = ord($utf8char[2]);
+        $ord2 = ord($utf8char{2});
         if ($ord0 >= 224 && $ord0 <= 239) {
             return ($ord0 - 224) * 4096 + ($ord1 - 128) * 64 + ($ord2 - 128);
         }
-        $ord3 = ord($utf8char[3]);
+        $ord3 = ord($utf8char{3});
         if ($ord0 >= 240 && $ord0 <= 247) {
             return ($ord0 - 240) * 262144 + ($ord1 - 128 )* 4096 + ($ord2 - 128) * 64 + ($ord3 - 128);
         }

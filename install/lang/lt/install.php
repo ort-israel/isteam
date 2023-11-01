@@ -1,5 +1,6 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
+
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,7 +13,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Automatically generated strings for Moodle installer
@@ -36,7 +37,6 @@ $string['chooselanguagesub'] = 'Pasirinkite diegimo kalbą. Ši kalba bus naudoj
 $string['clialreadyconfigured'] = 'Failas config.php jau yra, prašau naudoti admin/cli/install_database.php jei norite įrašyti šią svetainę.';
 $string['clialreadyinstalled'] = 'Failas config.php jau yra. Jei norite atnaujinti svetainę, naudokite admin/cli/upgrade.php.';
 $string['cliinstallheader'] = '„Moodle“ {$a} komandų eilutės diegimo programa';
-$string['clitablesexist'] = 'Jau yra duomenų bazės lentelės; CLI diegimas negali tęstis.';
 $string['databasehost'] = 'Duomenų bazės pagrindinis kompiuteris';
 $string['databasename'] = 'Duomenų bazės pavadinimas';
 $string['databasetypehead'] = 'Pasirinkite duomenų bazės tvarkyklę';
@@ -63,9 +63,7 @@ $string['pathsunsecuredataroot'] = 'Šakninio duomenų katalogo kelias nesaugus'
 $string['pathswrongadmindir'] = 'Nėra administratoriaus katalogo';
 $string['phpextension'] = '{$a} PHP plėtinys';
 $string['phpversion'] = 'PHP versija';
-$string['phpversionhelp'] = '<p>„Moodle“ reikalauja, kad PHP versija būtų ne žemesnė 5.6.5 arba 7.1 (7.0.x versijoje yra tam tikrų trūkumų).</p>
-<p>Dabar naudojate versiją {$a}</p>
-<p>Turite atnaujinti PHP versiją arba perkelti į pagrindinį kompiuterį, kuriame veikia naujesnė PHP versija.</p>';
+$string['phpversionhelp'] = '<p>„Moodle“ reikalauja, kad PHP versija būtų bent 4.3.0 arba 5.1.0 (5.0.x versijoje yra daug problemų).</p> <p>Dabar naudojate versiją {$a}</p> <p>Turite atnaujinti PHP versiją arba perkelti į pagrindinį kompiuterį, kuriame veikia naujesnė PHP versija!<br /> (Jei naudojate 5.0.x versiją, taip pat galite paleisti senesnę 4.4.x versiją)</p>';
 $string['welcomep10'] = '{$a->installername} ({$a->installerversion})';
 $string['welcomep20'] = 'Matote šį puslapį, nes į kompiuterį sėkmingai įdiegėte ir paleidote <strong>{$a->packname} {$a->packversion}</strong> paketą. Sveikiname!';
 $string['welcomep30'] = 'Šiame <strong>{$a->installername}</strong> leidime yra taikomosios programos, skirtos aplinkai, kurioje veiks <strong>Moodle</strong>, sukurti:';

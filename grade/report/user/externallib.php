@@ -165,7 +165,6 @@ class gradereport_user_external extends external_api {
                 'courseid'      => $course->id,
                 'userid'        => $user->id,
                 'userfullname'  => fullname($user),
-                'useridnumber'  => $user->idnumber,
                 'maxdepth'      => $report->maxdepth,
             );
             if ($tabledata) {
@@ -192,7 +191,6 @@ class gradereport_user_external extends external_api {
                     'courseid'      => $course->id,
                     'userid'        => $currentuser->id,
                     'userfullname'  => fullname($currentuser),
-                    'useridnumber'  => $currentuser->idnumber,
                     'maxdepth'      => $report->maxdepth,
                 );
                 if ($tabledata) {
@@ -480,8 +478,6 @@ class gradereport_user_external extends external_api {
                             'courseid' => new external_value(PARAM_INT, 'course id'),
                             'userid'   => new external_value(PARAM_INT, 'user id'),
                             'userfullname' => new external_value(PARAM_TEXT, 'user fullname'),
-                            'useridnumber' => new external_value(
-                                core_user::get_property_type('idnumber'), 'user idnumber'),
                             'maxdepth'   => new external_value(PARAM_INT, 'table max depth (needed for printing it)'),
                             'gradeitems' => new external_multiple_structure(
                                 new external_single_structure(
@@ -492,11 +488,9 @@ class gradereport_user_external extends external_api {
                                         'itemmodule' => new external_value(PARAM_PLUGIN, 'Grade item module'),
                                         'iteminstance' => new external_value(PARAM_INT, 'Grade item instance'),
                                         'itemnumber' => new external_value(PARAM_INT, 'Grade item item number'),
-                                        'idnumber' => new external_value(PARAM_TEXT, 'Grade item idnumber'),
                                         'categoryid' => new external_value(PARAM_INT, 'Grade item category id'),
                                         'outcomeid' => new external_value(PARAM_INT, 'Outcome id'),
                                         'scaleid' => new external_value(PARAM_INT, 'Scale id'),
-                                        'locked' => new external_value(PARAM_BOOL, 'Grade item for user locked?', VALUE_OPTIONAL),
                                         'cmid' => new external_value(PARAM_INT, 'Course module id (if type mod)', VALUE_OPTIONAL),
                                         'weightraw' => new external_value(PARAM_FLOAT, 'Weight raw', VALUE_OPTIONAL),
                                         'weightformatted' => new external_value(PARAM_NOTAGS, 'Weight', VALUE_OPTIONAL),
@@ -507,8 +501,6 @@ class gradereport_user_external extends external_api {
                                         'gradehiddenbydate' => new external_value(PARAM_BOOL, 'Grade hidden by date?', VALUE_OPTIONAL),
                                         'gradeneedsupdate' => new external_value(PARAM_BOOL, 'Grade needs update?', VALUE_OPTIONAL),
                                         'gradeishidden' => new external_value(PARAM_BOOL, 'Grade is hidden?', VALUE_OPTIONAL),
-                                        'gradeislocked' => new external_value(PARAM_BOOL, 'Grade is locked?', VALUE_OPTIONAL),
-                                        'gradeisoverridden' => new external_value(PARAM_BOOL, 'Grade overridden?', VALUE_OPTIONAL),
                                         'gradeformatted' => new external_value(PARAM_NOTAGS, 'The grade formatted', VALUE_OPTIONAL),
                                         'grademin' => new external_value(PARAM_FLOAT, 'Grade min', VALUE_OPTIONAL),
                                         'grademax' => new external_value(PARAM_FLOAT, 'Grade max', VALUE_OPTIONAL),
@@ -519,7 +511,7 @@ class gradereport_user_external extends external_api {
                                         'numusers' => new external_value(PARAM_INT, 'Num users in course', VALUE_OPTIONAL),
                                         'averageformatted' => new external_value(PARAM_NOTAGS, 'Grade average', VALUE_OPTIONAL),
                                         'feedback' => new external_value(PARAM_RAW, 'Grade feedback', VALUE_OPTIONAL),
-                                        'feedbackformat' => new external_format_value('feedback', VALUE_OPTIONAL),
+                                        'feedbackformat' => new external_format_value('feedback'),
                                     ), 'Grade items'
                                 )
                             )

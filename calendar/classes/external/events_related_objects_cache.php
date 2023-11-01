@@ -54,19 +54,14 @@ class events_related_objects_cache {
     protected $courses = null;
 
     /**
-     * @var array $groups The related groups.
+     * @var array $events The related groups.
      */
     protected $groups = null;
 
     /**
-     * @var array $coursemodules The related course modules.
+     * @var array $events The related course modules.
      */
     protected $coursemodules = [];
-
-    /**
-     * @var array $moduleinstances The related module instances.
-     */
-    protected $moduleinstances = null;
 
     /**
      * Constructor.
@@ -114,15 +109,12 @@ class events_related_objects_cache {
     public function get_context(event_interface $event) {
         global $USER;
 
-        $categoryid = $event->get_category() ? $event->get_category()->get('id') : null;
         $courseid = $event->get_course() ? $event->get_course()->get('id') : null;
         $groupid = $event->get_group() ? $event->get_group()->get('id') : null;
         $userid = $event->get_user() ? $event->get_user()->get('id') : null;
         $moduleid = $event->get_course_module() ? $event->get_course_module()->get('id') : null;
 
-        if (!empty($categoryid)) {
-            return \context_coursecat::instance($categoryid);
-        } else if (!empty($courseid)) {
+        if (!empty($courseid)) {
             return \context_course::instance($event->get_course()->get('id'));
         } else if (!empty($groupid)) {
             $group = $this->get_group($event);
@@ -179,33 +171,6 @@ class events_related_objects_cache {
     }
 
     /**
-     * Get the related module instance for a given event.
-     *
-     * @param event_interface $event The event object.
-     * @return stdClass|null
-     */
-    public function get_module_instance(event_interface $event) {
-        if (!$event->get_course_module()) {
-            return null;
-        }
-
-        if (is_null($this->moduleinstances)) {
-            $this->load_module_instances();
-        }
-
-        $id = $event->get_course_module()->get('instance');
-        $name = $event->get_course_module()->get('modname');
-
-        if (isset($this->moduleinstances[$name])) {
-            if (isset($this->moduleinstances[$name][$id])) {
-                return $this->moduleinstances[$name][$id];
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * Load the list of all of the distinct courses required for the
      * list of provided events and save the result in memory.
      */
@@ -255,36 +220,5 @@ class events_related_objects_cache {
         $sql = "SELECT * FROM {groups} WHERE id {$idsql}";
 
         $this->groups = $DB->get_records_sql($sql, $params);
-    }
-
-    /**
-     * Load the list of all of the distinct module instances required for the
-     * list of provided events and save the result in memory.
-     */
-    protected function load_module_instances() {
-        global $DB;
-
-        $this->moduleinstances = [];
-        $modulestoload = [];
-        foreach ($this->events as $event) {
-            if ($module = $event->get_course_module()) {
-                $id = $module->get('instance');
-                $name = $module->get('modname');
-
-                $ids = isset($modulestoload[$name]) ? $modulestoload[$name] : [];
-                $ids[$id] = true;
-                $modulestoload[$name] = $ids;
-            }
-        }
-
-        if (empty($modulestoload)) {
-            return;
-        }
-
-        foreach ($modulestoload as $modulename => $ids) {
-            list($idsql, $params) = $DB->get_in_or_equal(array_keys($ids));
-            $sql = "SELECT * FROM {" . $modulename . "} WHERE id {$idsql}";
-            $this->moduleinstances[$modulename] = $DB->get_records_sql($sql, $params);
-        }
     }
 }

@@ -25,4 +25,3 @@
 $string['pluginname'] = 'Indent';
 $string['indent'] = "Indent";
 $string['outdent'] = "Outdent";
-$string['privacy:metadata'] = 'The atto_indent plugin does not store any personal data.';

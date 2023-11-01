@@ -17,7 +17,7 @@
 /**
  * Unit tests for grade/report/lib.php.
  *
- * @package  core_grades
+ * @pacakge  core_grade
  * @category phpunit
  * @author   Andrew Davis
  * @license  http://www.gnu.org/copyleft/gpl.html GNU Public License

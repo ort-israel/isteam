@@ -30,7 +30,6 @@ use core_calendar\local\event\entities\event;
 use core_calendar\local\event\entities\repeat_event_collection;
 use core_calendar\local\event\exceptions\invalid_callback_exception;
 use core_calendar\local\event\proxies\cm_info_proxy;
-use core_calendar\local\event\proxies\coursecat_proxy;
 use core_calendar\local\event\proxies\std_proxy;
 use core_calendar\local\event\value_objects\event_description;
 use core_calendar\local\event\value_objects\event_times;
@@ -127,20 +126,14 @@ abstract class event_abstract_factory implements event_factory_interface {
             return null;
         }
 
-        $category = null;
         $course = null;
         $group = null;
         $user = null;
         $module = null;
         $subscription = null;
-        $component = null;
 
         if ($dbrow->modulename && $dbrow->instance) {
             $module = new cm_info_proxy($dbrow->modulename, $dbrow->instance, $dbrow->courseid);
-        }
-
-        if ($dbrow->categoryid) {
-            $category = new coursecat_proxy($dbrow->categoryid);
         }
 
         $course = new std_proxy($dbrow->courseid, function($id) {
@@ -166,38 +159,24 @@ abstract class event_abstract_factory implements event_factory_interface {
             });
         }
 
-        if (!empty($dbrow->repeatid)) {
-            $repeatcollection = new repeat_event_collection($dbrow, $this);
-        } else {
-            $repeatcollection = null;
-        }
-
-        if (!empty($dbrow->component)) {
-            $component = $dbrow->component;
-        }
-
         $event = new event(
             $dbrow->id,
             $dbrow->name,
             new event_description($dbrow->description, $dbrow->format),
-            $category,
             $course,
             $group,
             $user,
-            $repeatcollection,
+            new repeat_event_collection($dbrow->id, $dbrow->repeatid, $this),
             $module,
             $dbrow->eventtype,
             new event_times(
                 (new \DateTimeImmutable())->setTimestamp($dbrow->timestart),
                 (new \DateTimeImmutable())->setTimestamp($dbrow->timestart + $dbrow->timeduration),
                 (new \DateTimeImmutable())->setTimestamp($dbrow->timesort ? $dbrow->timesort : $dbrow->timestart),
-                (new \DateTimeImmutable())->setTimestamp($dbrow->timemodified),
-                (new \DateTimeImmutable())->setTimestamp(usergetmidnight($dbrow->timesort))
+                (new \DateTimeImmutable())->setTimestamp($dbrow->timemodified)
             ),
             !empty($dbrow->visible),
-            $subscription,
-            $dbrow->location,
-            $component
+            $subscription
         );
 
         $isactionevent = !empty($dbrow->type) && $dbrow->type == CALENDAR_EVENT_TYPE_ACTION;

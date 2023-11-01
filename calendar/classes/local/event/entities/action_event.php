@@ -51,11 +51,6 @@ class action_event implements action_event_interface {
     protected $action;
 
     /**
-     * @var proxy_interface $category Category for this event.
-     */
-    protected $category;
-
-    /**
      * Constructor.
      *
      * @param event_interface  $event  The event to delegate to.
@@ -76,14 +71,6 @@ class action_event implements action_event_interface {
 
     public function get_description() {
         return $this->event->get_description();
-    }
-
-    public function get_location() {
-        return $this->event->get_location();
-    }
-
-    public function get_category() {
-        return $this->event->get_category();
     }
 
     public function get_course() {
@@ -124,13 +111,5 @@ class action_event implements action_event_interface {
 
     public function get_action() {
         return $this->action;
-    }
-
-    /**
-     * Event component
-     * @return string
-     */
-    public function get_component() {
-        return $this->event->get_component();
     }
 }

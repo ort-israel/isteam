@@ -29,6 +29,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/group/lib.php');
+require_once($CFG->dirroot.'/lib/coursecatlib.php');
 
 /**
  * IMS Enterprise file enrolment plugin.
@@ -851,6 +852,20 @@ class enrol_imsenterprise_plugin extends enrol_plugin {
     }
 
     /**
+     * Called whenever anybody tries (from the normal interface) to remove a group
+     * member which is registered as being created by this component. (Not called
+     * when deleting an entire group or course at once.)
+     * @param int $itemid Item ID that was stored in the group_members entry
+     * @param int $groupid Group ID
+     * @param int $userid User ID being removed from group
+     * @return bool True if the remove is permitted, false to give an error
+     */
+    public function enrol_imsenterprise_allow_group_member_remove($itemid, $groupid, $userid) {
+        return false;
+    }
+
+
+    /**
      * Get the default category id (often known as 'Miscellaneous'),
      * statically cached to avoid multiple DB lookups on big imports.
      *
@@ -858,9 +873,10 @@ class enrol_imsenterprise_plugin extends enrol_plugin {
      */
     private function get_default_category_id() {
         global $CFG;
+        require_once($CFG->libdir.'/coursecatlib.php');
 
         if ($this->defaultcategoryid === null) {
-            $category = core_course_category::get_default();
+            $category = coursecat::get_default();
             $this->defaultcategoryid = $category->id;
         }
 
@@ -941,7 +957,7 @@ class enrol_imsenterprise_plugin extends enrol_plugin {
                     $newcat->visible = 0;
                     $newcat->parent = $parentid;
                     $newcat->idnumber = $categoryidnumber;
-                    $newcat = core_course_category::create($newcat);
+                    $newcat = coursecat::create($newcat);
                     $catid = $newcat->id;
                     $this->log_line("Created new (hidden) category '$fullnestedcatname'");
                 } else {
@@ -977,17 +993,4 @@ class enrol_imsenterprise_plugin extends enrol_plugin {
         $context = context_course::instance($instance->courseid);
         return has_capability('enrol/imsenterprise:config', $context);
     }
-}
-
-/**
- * Called whenever anybody tries (from the normal interface) to remove a group
- * member which is registered as being created by this component. (Not called
- * when deleting an entire group or course at once.)
- * @param int $itemid Item ID that was stored in the group_members entry
- * @param int $groupid Group ID
- * @param int $userid User ID being removed from group
- * @return bool True if the remove is permitted, false to give an error
- */
-function enrol_imsenterprise_allow_group_member_remove($itemid, $groupid, $userid) {
-    return false;
 }

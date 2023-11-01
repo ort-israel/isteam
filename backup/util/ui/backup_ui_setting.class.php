@@ -146,18 +146,11 @@ class base_setting_ui {
      * @throws base_setting_ui_exception when the label is not valid.
      * @param string $label
      */
-    public function set_label(string $label): void {
-        // Let's avoid empty/whitespace-only labels, so the html clean (that makes trim()) doesn't fail.
-        if (trim($label) === '') {
-            $label = '&nbsp;'; // Will be converted to non-breaking utf-8 char 0xc2a0 by PARAM_CLEANHTML.
-        }
-
-        $label = clean_param($label, PARAM_CLEANHTML);
-
-        if ($label === '') {
+    public function set_label($label) {
+        $label = (string)$label;
+        if ($label === '' || $label !== clean_param($label, PARAM_TEXT)) {
             throw new base_setting_ui_exception('setting_invalid_ui_label');
         }
-
         $this->label = $label;
     }
 
@@ -314,12 +307,10 @@ abstract class backup_setting_ui extends base_setting_ui {
      * 2. The setting is locked but only by settings that are of the same level (same page)
      *
      * Condition 2 is really why we have this function
-     * @param int $level Optional, if provided only depedency_settings below or equal to this level are considered,
-     *          when checking if the ui_setting is changeable. Although dependencies might cause a lock on this setting,
-     *          they could be changeable in the same view.
+     *
      * @return bool
      */
-    public function is_changeable($level = null) {
+    public function is_changeable() {
         if ($this->setting->get_status() === backup_setting::NOT_LOCKED) {
             // Its not locked so its chanegable.
             return true;
@@ -328,9 +319,6 @@ abstract class backup_setting_ui extends base_setting_ui {
             return false;
         } else if ($this->setting->has_dependencies_on_settings()) {
             foreach ($this->setting->get_settings_depended_on() as $dependency) {
-                if ($level && $dependency->get_setting()->get_level() >= $level) {
-                    continue;
-                }
                 if ($dependency->is_locked() && $dependency->get_setting()->get_level() !== $this->setting->get_level()) {
                     // Its not changeable because one or more dependancies arn't changeable.
                     return false;
@@ -367,8 +355,7 @@ class backup_setting_ui_text extends backup_setting_ui {
      */
     public function get_element_properties(base_task $task = null, renderer_base $output = null) {
         $icon = $this->get_icon();
-        $context = context_course::instance($task->get_courseid());
-        $label = format_string($this->get_label($task), true, array('context' => $context));
+        $label = $this->get_label($task);
         if (!empty($icon)) {
             $label .= $output->render($icon);
         }
@@ -431,8 +418,7 @@ class backup_setting_ui_checkbox extends backup_setting_ui {
     public function get_element_properties(base_task $task = null, renderer_base $output = null) {
         // Name, label, text, attributes.
         $icon = $this->get_icon();
-        $context = context_course::instance($task->get_courseid());
-        $label = format_string($this->get_label($task), true, array('context' => $context));
+        $label = $this->get_label($task);
         if (!empty($icon)) {
             $label .= $output->render($icon);
         }
@@ -470,16 +456,13 @@ class backup_setting_ui_checkbox extends backup_setting_ui {
 
     /**
      * Returns true if the setting is changeable
-     * @param int $level Optional, if provided only depedency_settings below or equal to this level are considered,
-     *          when checking if the ui_setting is changeable. Although dependencies might cause a lock on this setting,
-     *          they could be changeable in the same view.
      * @return bool
      */
-    public function is_changeable($level = null) {
+    public function is_changeable() {
         if ($this->changeable === false) {
             return false;
         } else {
-            return parent::is_changeable($level);
+            return parent::is_changeable();
         }
     }
 
@@ -542,8 +525,7 @@ class backup_setting_ui_radio extends backup_setting_ui {
      */
     public function get_element_properties(base_task $task = null, renderer_base $output = null) {
         $icon = $this->get_icon();
-        $context = context_course::instance($task->get_courseid());
-        $label = format_string($this->get_label($task), true, array('context' => $context));
+        $label = $this->get_label($task);
         if (!empty($icon)) {
             $label .= $output->render($icon);
         }
@@ -620,8 +602,7 @@ class backup_setting_ui_select extends backup_setting_ui {
      */
     public function get_element_properties(base_task $task = null, renderer_base $output = null) {
         $icon = $this->get_icon();
-        $context = context_course::instance($task->get_courseid());
-        $label = format_string($this->get_label($task), true, array('context' => $context));
+        $label = $this->get_label($task);
         if (!empty($icon)) {
             $label .= $output->render($icon);
         }
@@ -654,16 +635,13 @@ class backup_setting_ui_select extends backup_setting_ui {
     /**
      * Returns true if the setting is changeable, false otherwise
      *
-     * @param int $level Optional, if provided only depedency_settings below or equal to this level are considered,
-     *          when checking if the ui_setting is changeable. Although dependencies might cause a lock on this setting,
-     *          they could be changeable in the same view.
      * @return bool
      */
-    public function is_changeable($level = null) {
+    public function is_changeable() {
         if (count($this->values) == 1) {
             return false;
         } else {
-            return parent::is_changeable($level);
+            return parent::is_changeable();
         }
     }
 
@@ -758,11 +736,8 @@ class backup_setting_ui_defaultcustom extends backup_setting_ui_text {
         if ($value === false) {
             $value = $this->attributes['defaultvalue'];
         }
-        if (!empty($value)) {
-            if ($this->attributes['type'] === 'date_selector' ||
-                    $this->attributes['type'] === 'date_time_selector') {
-                return userdate($value);
-            }
+        if (!empty($value) && $this->attributes['type'] === 'date_selector') {
+            return userdate($value);
         }
         return $value;
     }

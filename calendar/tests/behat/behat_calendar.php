@@ -63,41 +63,17 @@ class behat_calendar extends behat_base {
         $eventname = $data->getRow(1);
         $eventname = $eventname[1];
 
-        $this->execute("behat_general::wait_until_the_page_is_ready");
+        // Click to create new event.
+        $this->execute("behat_general::i_click_on", array(get_string('newevent', 'calendar'), "button"));
 
-        if ($this->running_javascript()) {
-            // Click to create new event.
-            $this->execute("behat_general::i_click_on", array(get_string('newevent', 'calendar'), "button"));
+        // Set form fields.
+        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $data);
 
-            // Set form fields.
-            $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $data);
+        // Save event.
+        $this->execute("behat_forms::press_button", get_string('savechanges'));
 
-            // Save event.
-            $this->execute("behat_forms::press_button", get_string('save'));
-        }
-    }
-
-    /**
-     * Click a specific day in the calendar.
-     *
-     * @Given /^I click day "(?P<dayofmonth>\d+)" of this month in the calendar$/
-     * @param int $day The day of the current month
-     */
-    public function i_click_day_of_this_month_in_calendar($day) {
-        $summarytitle = userdate(time(), get_string('strftimemonthyear'));
-        // The current month table.
-        $currentmonth = "table[descendant::*[self::caption[contains(concat(' ', normalize-space(.), ' '), ' {$summarytitle} ')]]]";
-
-        // Strings for the class cell match.
-        $cellclasses  = "contains(concat(' ', normalize-space(@class), ' '), ' day ')";
-        $daycontains  = "text()[contains(concat(' ', normalize-space(.), ' '), ' {$day} ')]";
-        $daycell      = "td[{$cellclasses}]";
-        $dayofmonth   = "a[{$daycontains}]";
-
-        $xpath = '//' . $currentmonth . '/descendant::' . $daycell . '/' . $dayofmonth;
-        $this->execute("behat_general::wait_until_the_page_is_ready");
-        $this->execute("behat_general::i_click_on", array($xpath, "xpath_element"));
-        $this->execute("behat_general::wait_until_the_page_is_ready");
+        // Check if event is created. Being last step, don't need to wait or check for exceptions.
+        $this->execute("behat_general::assert_page_contains_text", $eventname);
 
     }
 
@@ -108,9 +84,9 @@ class behat_calendar extends behat_base {
      * @param int $day The day of the current month
      */
     public function i_hover_over_day_of_this_month_in_calendar($day) {
-        $summarytitle = userdate(time(), get_string('strftimemonthyear'));
+        $summarytitle = get_string('calendarheading', 'calendar', userdate(time(), get_string('strftimemonthyear')));
         // The current month table.
-        $currentmonth = "table[descendant::*[self::caption[contains(concat(' ', normalize-space(.), ' '), ' {$summarytitle} ')]]]";
+        $currentmonth = "table[contains(concat(' ', normalize-space(@summary), ' '), ' {$summarytitle} ')]";
 
         // Strings for the class cell match.
         $cellclasses  = "contains(concat(' ', normalize-space(@class), ' '), ' day ')";
@@ -119,8 +95,8 @@ class behat_calendar extends behat_base {
         $dayofmonth   = "a[{$daycontains}]";
 
         $xpath = '//' . $currentmonth . '/descendant::' . $daycell . '/' . $dayofmonth;
-        $this->execute("behat_general::wait_until_the_page_is_ready");
-        $this->execute("behat_general::i_hover", [$xpath, "xpath_element"]);
+        $this->execute("behat_general::i_hover", array($xpath, "xpath_element"));
+
     }
 
     /**
@@ -144,19 +120,7 @@ class behat_calendar extends behat_base {
      */
     public function i_view_the_calendar_for($month, $year) {
         $time = make_timestamp($year, $month, 1);
-        $this->execute('behat_general::i_visit', ['/calendar/view.php?view=month&course=1&time='.$time]);
+        $this->getSession()->visit($this->locate_path('/calendar/view.php?view=month&course=1&time='.$time));
 
-    }
-
-    /**
-     * Navigate to site calendar.
-     *
-     * @Given /^I am viewing site calendar$/
-     * @throws coding_exception
-     * @return void
-     */
-    public function i_am_viewing_site_calendar() {
-        $url = new moodle_url('/calendar/view.php', ['view' => 'month']);
-        $this->execute('behat_general::i_visit', [$url]);
     }
 }

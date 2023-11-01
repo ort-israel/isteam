@@ -35,4 +35,3 @@ $string['remotesubscriber_help'] = 'Select \'All hosts\' to open this course for
 $string['remotesubscribersall'] = 'All hosts';
 $string['roleforremoteusers'] = 'Role for their users';
 $string['roleforremoteusers_help'] = 'What role will the remote users from the selected host get.';
-$string['privacy:metadata'] = 'The MNet remote enrolments plugin does not store any personal data.';

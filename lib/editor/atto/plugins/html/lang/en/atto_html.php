@@ -23,4 +23,3 @@
  */
 
 $string['pluginname'] = 'HTML';
-$string['privacy:metadata'] = 'The atto_html plugin does not store any personal data.';

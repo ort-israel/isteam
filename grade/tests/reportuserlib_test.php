@@ -17,7 +17,7 @@
 /**
  * Unit tests for grade/report/user/lib.php.
  *
- * @package  core_grades
+ * @package  core_grade
  * @category phpunit
  * @copyright 2012 Andrew Davis
  * @license  http://www.gnu.org/copyleft/gpl.html GNU Public License
@@ -56,11 +56,11 @@ class core_grade_reportuserlib_testcase extends advanced_testcase {
         $coursecontext = context_course::instance($course->id);
 
         // Create and enrol test users.
-        $student = $this->getDataGenerator()->create_user(array('username' => 'student_sam'));
+        $student = $this->getDataGenerator()->create_user(array('username' => 'Student Sam'));
         $role = $DB->get_record('role', array('shortname' => 'student'), '*', MUST_EXIST);
         $this->getDataGenerator()->enrol_user($student->id, $course->id, $role->id);
 
-        $teacher = $this->getDataGenerator()->create_user(array('username' => 'teacher_t'));
+        $teacher = $this->getDataGenerator()->create_user(array('username' => 'Teacher T'));
         $role = $DB->get_record('role', array('shortname' => 'editingteacher'), '*', MUST_EXIST);
         $this->getDataGenerator()->enrol_user($teacher->id, $course->id, $role->id);
 

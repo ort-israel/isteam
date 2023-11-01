@@ -1,5 +1,6 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
+
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,7 +13,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Automatically generated strings for Moodle installer
@@ -34,7 +35,7 @@ $string['cliansweryes'] = 'y';
 $string['cliincorrectvalueerror'] = '錯誤，將“{$a->option}”的值設為“{$a->value}”是不正確的';
 $string['cliincorrectvalueretry'] = '不正確值，請重試';
 $string['clitypevalue'] = '輸入值';
-$string['clitypevaluedefault'] = '輸入值，按Enter 可使用預設值（{$a}）';
+$string['clitypevaluedefault'] = '輸入值，按 Enter 可使用預設值（{$a}）';
 $string['cliunknowoption'] = '無法辨識的選項：
 {$a}
 請使用 --help 選項。';

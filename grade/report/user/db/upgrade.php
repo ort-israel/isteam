@@ -27,24 +27,31 @@
  * @return bool result
  */
 function xmldb_gradereport_user_upgrade($oldversion) {
-    global $CFG;
 
-    // Automatically generated Moodle v3.5.0 release upgrade line.
+    if ($oldversion < 2014101500) {
+        // Need to always show weight and contribution to course total.
+        set_config('grade_report_user_showweight', 1);
+
+        // User savepoint reached.
+        upgrade_plugin_savepoint(true, 2014101500, 'gradereport', 'user');
+    }
+
+    // Moodle v2.8.0 release upgrade line.
     // Put any upgrade step following this.
 
-    // Automatically generated Moodle v3.6.0 release upgrade line.
+    // Moodle v2.9.0 release upgrade line.
     // Put any upgrade step following this.
 
-    // Automatically generated Moodle v3.7.0 release upgrade line.
+    // Moodle v3.0.0 release upgrade line.
     // Put any upgrade step following this.
 
-    // Automatically generated Moodle v3.8.0 release upgrade line.
+    // Moodle v3.1.0 release upgrade line.
     // Put any upgrade step following this.
 
-    // Automatically generated Moodle v3.9.0 release upgrade line.
+    // Automatically generated Moodle v3.2.0 release upgrade line.
     // Put any upgrade step following this.
 
-    // Automatically generated Moodle v3.10.0 release upgrade line.
+    // Automatically generated Moodle v3.3.0 release upgrade line.
     // Put any upgrade step following this.
 
     return true;

@@ -4,114 +4,15 @@ Feature: Award badges
   As an admin
   I need to add criteria to badges in the system
 
-  Background:
-    Given the following "courses" exist:
-      | fullname | shortname | format | enablecompletion |
-      | Course 1 | C1        | topics | 1                |
-    And the following "users" exist:
-      | username | firstname | lastname | email                |
-      | teacher1 | Teacher   | 1        | teacher1@example.com |
-      | student1 | Student   | 1        | student1@example.com |
-      | student2 | Student   | 2        | student2@example.com |
-    And the following "course enrolments" exist:
-      | user     | course | role           |
-      | teacher1 | C1     | editingteacher |
-      | student1 | C1     | student        |
-      | student2 | C1     | student        |
-    And the following "activity" exists:
-      | activity                            | assign                  |
-      | course                              | C1                      |
-      | section                             | 1                       |
-      | name                                | Test assignment name    |
-      | intro                               | Submit your online text |
-      | completion                          | 1                       |
-      | assignsubmission_onlinetext_enabled | 1                       |
-
-  @javascript
-  Scenario: Award badge on other badges as criteria
-    Given I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    # Create course badge 1.
-    And I navigate to "Badges > Add a new badge" in current page administration
-    And I follow "Add a new badge"
-    And I set the following fields to these values:
-      | Name | Course Badge 1 |
-      | Description | Course badge 1 description |
-    And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
-    And I press "Create badge"
-    And I set the field "type" to "Manual issue by role"
-    And I expand all fieldsets
-    # Set to ANY of the roles awards badge.
-    And I set the field "Teacher" to "1"
-    And I set the field "Any of the selected roles awards the badge" to "1"
-    And I press "Save"
-    And I press "Enable access"
-    And I press "Continue"
-    # Badge #2
-    And I am on "Course 1" course homepage
-    And I navigate to "Badges > Add a new badge" in current page administration
-    And I follow "Add a new badge"
-    And I set the following fields to these values:
-      | Name | Course Badge 2 |
-      | Description | Course badge 2 description |
-    And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
-    And I press "Create badge"
-    # Set "course badge 1" as criteria
-    And I set the field "type" to "Awarded badges"
-    And I set the field "id_badge_badges" to "Course Badge 1"
-    And I press "Save"
-    And I press "Enable access"
-    And I press "Continue"
-    And I follow "Manage badges"
-    And I follow "Course Badge 1"
-    And I follow "Recipients (0)"
-    And I press "Award badge"
-    # Award course badge 1 to student 1.
-    And I set the field "potentialrecipients[]" to "Student 1 (student1@example.com)"
-    When I press "Award badge"
-    And I follow "Course Badge 1"
-    And I follow "Recipients (1)"
-    Then I should see "Recipients (1)"
-    And I log out
-    # Student 1 should have both badges.
-    And I log in as "student1"
-    And I follow "Profile" in the user menu
-    When I click on "Course 1" "link" in the "region-main" "region"
-    Then I should see "Course Badge 1"
-    And I should see "Course Badge 2"
-    # Student 1 should have both badges also in the Badges navigation section.
-    When I follow "Badges"
-    Then I should see "Course Badge 1"
-    And I should see "Course Badge 2"
-    And I should not see "Manage badges"
-    And I should not see "Add a new badge"
-    And I log out
-    # Teacher 1 should have access to manage/create badges in the Badges navigation section.
-    When I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "Badges"
-    Then I should see "Course Badge 1"
-    And I should see "Course Badge 2"
-    And I should see "Manage badges"
-    And I should see "Add a new badge"
-    # Teacher 1 should NOT have access to manage/create site badges in the Site badges section.
-    When I am on homepage
-    And I press "Customise this page"
-   # TODO MDL-57120 site "Badges" link not accessible without navigation block.
-    And I add the "Navigation" block if not present
-    And I click on "Site pages" "list_item" in the "Navigation" "block"
-    And I click on "Site badges" "link" in the "Navigation" "block"
-    Then I should see "There are no badges available."
-    And I should not see "Manage badges"
-    And I should not see "Add a new badge"
-
   @javascript
   Scenario: Award profile badge
     Given I log in as "admin"
-    And I navigate to "Badges > Add a new badge" in site administration
+    And I navigate to "Add a new badge" node in "Site administration > Badges"
     And I set the following fields to these values:
       | Name | Profile Badge |
       | Description | Test badge description |
+      | issuername | Test Badge Site |
+      | issuercontact | testuser@example.com |
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     And I press "Create badge"
     And I set the field "type" to "Profile completion"
@@ -139,11 +40,16 @@ Feature: Award badges
 
   @javascript
   Scenario: Award site badge
-    Given I log in as "admin"
-    And I navigate to "Badges > Add a new badge" in site administration
+    Given the following "users" exist:
+      | username | firstname | lastname | email |
+      | teacher | teacher | 1 | teacher1@example.com |
+      | student | student | 1 | student1@example.com |
+    And I log in as "admin"
+    And I navigate to "Add a new badge" node in "Site administration > Badges"
     And I set the following fields to these values:
       | Name | Site Badge |
       | Description | Site badge description |
+      | issuername | Tester of site badge |
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     And I press "Create badge"
     And I set the field "type" to "Manual issue by role"
@@ -153,26 +59,40 @@ Feature: Award badges
     And I press "Continue"
     And I follow "Recipients (0)"
     And I press "Award badge"
-    And I set the field "potentialrecipients[]" to "Teacher 1 (teacher1@example.com)"
+    And I set the field "potentialrecipients[]" to "teacher 1 (teacher1@example.com)"
     And I press "Award badge"
-    And I set the field "potentialrecipients[]" to "Student 1 (student1@example.com)"
+    And I set the field "potentialrecipients[]" to "student 1 (student1@example.com)"
     And I press "Award badge"
     When I follow "Site Badge"
     Then I should see "Recipients (2)"
     And I log out
-    And I log in as "student1"
+    And I log in as "student"
     And I follow "Profile" in the user menu
     Then I should see "Site Badge"
 
   @javascript
   Scenario: Award course badge
-    Given I log in as "teacher1"
+    Given the following "users" exist:
+      | username | firstname | lastname | email |
+      | teacher1 | Teacher | 1 | teacher1@example.com |
+      | student1 | Student | 1 | student1@example.com |
+      | student2 | Student | 2 | student2@example.com |
+    And the following "courses" exist:
+      | fullname | shortname | category | groupmode |
+      | Course 1 | C1 | 0 | 1 |
+    And the following "course enrolments" exist:
+      | user | course | role |
+      | teacher1 | C1 | editingteacher |
+      | student1 | C1 | student |
+      | student2 | C1 | student |
+    And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I navigate to "Badges > Add a new badge" in current page administration
+    And I navigate to "Add a new badge" node in "Course administration > Badges"
     And I follow "Add a new badge"
     And I set the following fields to these values:
       | Name | Course Badge |
       | Description | Course badge description |
+      | issuername | Tester of course badge |
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     And I press "Create badge"
     And I set the field "type" to "Manual issue by role"
@@ -193,19 +113,38 @@ Feature: Award badges
     And I follow "Profile" in the user menu
     And I click on "Course 1" "link" in the "region-main" "region"
     And I should see "Course Badge"
-    And I click on "Course Badge" "link"
-    And "Course 1" "text" should appear after "Badge details" "text"
-    And "Kurs 1" "text" should not exist
 
   @javascript
   Scenario: Award badge on activity completion
-    Given I log in as "teacher1"
+    Given the following "courses" exist:
+      | fullname | shortname | category |
+      | Course 1 | C1 | 0 |
+    And the following "users" exist:
+      | username | firstname | lastname | email |
+      | teacher1 | Teacher | Frist | teacher1@example.com |
+      | student1 | Student | First | student1@example.com |
+    And the following "course enrolments" exist:
+      | user | course | role |
+      | teacher1 | C1 | editingteacher |
+      | student1 | C1 | student |
+    And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I navigate to "Badges > Add a new badge" in current page administration
+    And I navigate to "Edit settings" node in "Course administration"
+    And I set the following fields to these values:
+      | Enable completion tracking | Yes |
+    And I press "Save and display"
+    And I turn editing mode on
+    And I add a "Assignment" to section "1" and I fill the form with:
+      | Assignment name | Test assignment name |
+      | Description | Submit your online text |
+      | id_completion | 1                     |
+    And I am on "Course 1" course homepage
+    And I navigate to "Add a new badge" node in "Course administration > Badges"
     And I follow "Add a new badge"
     And I set the following fields to these values:
       | Name | Course Badge |
       | Description | Course badge description |
+      | issuername | Tester of course badge |
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     And I press "Create badge"
     And I set the field "type" to "Activity completion"
@@ -226,19 +165,41 @@ Feature: Award badges
 
   @javascript
   Scenario: Award badge on course completion
-    Given I log in as "teacher1"
+    Given the following "courses" exist:
+      | fullname | shortname | category |
+      | Course 1 | C1 | 0 |
+    And the following "users" exist:
+      | username | firstname | lastname | email |
+      | teacher1 | Teacher | Frist | teacher1@example.com |
+      | student1 | Student | First | student1@example.com |
+    And the following "course enrolments" exist:
+      | user | course | role |
+      | teacher1 | C1 | editingteacher |
+      | student1 | C1 | student |
+    And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I navigate to "Course completion" in current page administration
+    And I navigate to "Edit settings" node in "Course administration"
+    And I set the following fields to these values:
+      | Enable completion tracking | Yes |
+    And I press "Save and display"
+    And I turn editing mode on
+    And I add a "Assignment" to section "1" and I fill the form with:
+      | Assignment name | Test assignment name |
+      | Description | Submit your online text |
+      | assignsubmission_onlinetext_enabled | 1 |
+      | id_completion | 1                     |
+    And I navigate to "Course completion" node in "Course administration"
     And I set the field "id_overall_aggregation" to "2"
     And I click on "Condition: Activity completion" "link"
     And I set the field "Assignment - Test assignment name" to "1"
     And I press "Save changes"
     And I am on "Course 1" course homepage
-    And I navigate to "Badges > Add a new badge" in current page administration
+    And I navigate to "Add a new badge" node in "Course administration > Badges"
     And I follow "Add a new badge"
     And I set the following fields to these values:
       | Name | Course Badge |
       | Description | Course badge description |
+      | issuername | Tester of course badge |
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     And I press "Create badge"
     And I set the field "type" to "Course completion"
@@ -267,14 +228,28 @@ Feature: Award badges
 
   @javascript
   Scenario: All of the selected roles can award badges
-    Given I log in as "teacher1"
+    Given the following "users" exist:
+      | username | firstname | lastname | email |
+      | teacher1 | Teacher | 1 | teacher1@example.com |
+      | student1 | Student | 1 | student1@example.com |
+      | student2 | Student | 2 | student2@example.com |
+    And the following "courses" exist:
+      | fullname | shortname | category | groupmode |
+      | Course 1 | C1 | 0 | 1 |
+    And the following "course enrolments" exist:
+      | user | course | role |
+      | teacher1 | C1 | editingteacher |
+      | student1 | C1 | student |
+      | student2 | C1 | student |
+    And I log in as "teacher1"
     And I am on "Course 1" course homepage
     # Create course badge 1.
-    And I navigate to "Badges > Add a new badge" in current page administration
+    And I navigate to "Add a new badge" node in "Course administration > Badges"
     And I follow "Add a new badge"
     And I set the following fields to these values:
       | Name | Course Badge 1 |
       | Description | Course badge description |
+      | issuername | Tester of course badge |
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     And I press "Create badge"
     And I set the field "type" to "Manual issue by role"
@@ -294,12 +269,12 @@ Feature: Award badges
     And I follow "Recipients (1)"
     Then I should see "Recipients (1)"
     # Add course badge 2.
-    And I am on "Course 1" course homepage
-    And I navigate to "Badges > Add a new badge" in current page administration
+    And I navigate to "Add a new badge" node in "Course administration > Badges"
     And I follow "Add a new badge"
     And I set the following fields to these values:
       | Name | Course Badge 2 |
       | Description | Course badge description |
+      | issuername | Tester of course badge |
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     And I press "Create badge"
     And I set the field "type" to "Manual issue by role"
@@ -336,13 +311,27 @@ Feature: Award badges
 
   @javascript
   Scenario: Revoke badge
-    Given I log in as "teacher1"
+    Given the following "users" exist:
+      | username | firstname | lastname | email |
+      | teacher1 | Teacher | 1 | teacher1@example.com |
+      | student1 | Student | 1 | student1@example.com |
+      | student2 | Student | 2 | student2@example.com |
+    And the following "courses" exist:
+      | fullname | shortname | category | groupmode |
+      | Course 1 | C1 | 0 | 1 |
+    And the following "course enrolments" exist:
+      | user | course | role |
+      | teacher1 | C1 | editingteacher |
+      | student1 | C1 | student |
+      | student2 | C1 | student |
+    And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I navigate to "Badges > Add a new badge" in current page administration
+    And I navigate to "Add a new badge" node in "Course administration > Badges"
     And I follow "Add a new badge"
     And I set the following fields to these values:
       | Name | Course Badge |
       | Description | Course badge description |
+      | issuername | Tester of course badge |
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     And I press "Create badge"
     And I set the field "type" to "Manual issue by role"

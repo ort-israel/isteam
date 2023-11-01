@@ -32,7 +32,6 @@ use core_calendar\local\event\entities\action_event;
 use core_calendar\local\event\entities\event;
 use core_calendar\local\event\entities\repeat_event_collection;
 use core_calendar\local\event\proxies\std_proxy;
-use core_calendar\local\event\proxies\coursecat_proxy;
 use core_calendar\local\event\proxies\cm_info_proxy;
 use core_calendar\local\event\value_objects\action;
 use core_calendar\local\event\value_objects\event_description;
@@ -48,7 +47,7 @@ use core_calendar\local\event\factories\event_factory_interface;
 function create_event($properties) {
     $record = new \stdClass();
     $record->name = 'event name';
-    $record->eventtype = 'site';
+    $record->eventtype = 'global';
     $record->repeat = 0;
     $record->repeats = 0;
     $record->timestart = time();
@@ -56,7 +55,6 @@ function create_event($properties) {
     $record->timesort = 0;
     $record->type = CALENDAR_EVENT_TYPE_STANDARD;
     $record->courseid = 0;
-    $record->categoryid = 0;
 
     foreach ($properties as $name => $value) {
         $record->$name = $value;
@@ -64,102 +62,6 @@ function create_event($properties) {
 
     $event = new \calendar_event($record);
     return $event->create($record);
-}
-
-/**
- * Helper function to create a x number of events for each event type.
- *
- * @param int $quantity The quantity of events to be created.
- * @return array List of created events.
- */
-function create_standard_events(int $quantity): array {
-    $types = ['site', 'category', 'course', 'group', 'user'];
-
-    $events = [];
-    foreach ($types as $eventtype) {
-        // Create five events of each event type.
-        for ($i = 0; $i < $quantity; $i++) {
-            $events[] = create_event(['eventtype' => $eventtype]);
-        }
-    }
-
-    return $events;
-}
-
-/**
- * Helper function to create an action event.
- *
- * @param array $data The event data.
- * @return bool|calendar_event
- */
-function create_action_event(array $data) {
-    global $CFG;
-
-    require_once($CFG->dirroot . '/calendar/lib.php');
-
-    if (!isset($data['modulename']) || !isset($data['instance'])) {
-        throw new coding_exception('Module and instance should be specified when creating an action event.');
-    }
-
-    $isuseroverride = isset($data->priority) && $data->priority == CALENDAR_EVENT_USER_OVERRIDE_PRIORITY;
-    if ($isuseroverride) {
-        if (!in_array($data['modulename'], ['assign', 'lesson', 'quiz'])) {
-            throw new coding_exception('Only assign, lesson and quiz modules supports overrides');
-        }
-    }
-
-    $event = array_merge($data, [
-        'eventtype' => isset($data['eventtype']) ? $data['eventtype'] : 'open',
-        'courseid' => isset($data['courseid']) ? $data['courseid'] : 0,
-        'instance' => $data['instance'],
-        'modulename' => $data['modulename'],
-        'type' => CALENDAR_EVENT_TYPE_ACTION,
-    ]);
-
-    return create_event($event);
-}
-
-/**
- * Helper function to create an user override calendar event.
- *
- * @param string $modulename The modulename.
- * @param int $instanceid The instance id.
- * @param int $userid The user id.
- * @return calendar_event|false
- */
-function create_user_override_event(string $modulename, int $instanceid, int $userid) {
-    if (!isset($userid)) {
-        throw new coding_exception('Must specify userid when creating a user override.');
-    }
-
-    return create_action_event([
-        'modulename' => $modulename,
-        'instance' => $instanceid,
-        'userid' => $userid,
-        'priority' => CALENDAR_EVENT_USER_OVERRIDE_PRIORITY,
-    ]);
-}
-
-/**
- * Helper function to create an group override calendar event.
- *
- * @param string $modulename The modulename.
- * @param int $instanceid The instance id.
- * @param int $courseid The course id.
- * @param int $groupid The group id.
- * @return calendar_event|false
- */
-function create_group_override_event(string $modulename, int $instanceid, int $courseid, int $groupid) {
-    if (!isset($groupid)) {
-        throw new coding_exception('Must specify groupid when creating a group override.');
-    }
-
-    return create_action_event([
-        'groupid' => $groupid,
-        'courseid' => $courseid,
-        'modulename' => $modulename,
-        'instance' => $instanceid,
-    ]);
 }
 
 /**
@@ -206,7 +108,6 @@ class action_event_test_factory implements event_factory_interface {
             $record->id,
             $record->name,
             new event_description($record->description, $record->format),
-            new coursecat_proxy($record->categoryid),
             new std_proxy($record->courseid, function($id) {
                 $course = new \stdClass();
                 $course->id = $id;
@@ -222,20 +123,17 @@ class action_event_test_factory implements event_factory_interface {
                 $user->id = $id;
                 return $user;
             }),
-            !empty($record->repeatid) ? new repeat_event_collection($record, $this) : null,
+            new repeat_event_collection($record->id, null, $this),
             $module,
             $record->eventtype,
             new event_times(
                 (new \DateTimeImmutable())->setTimestamp($record->timestart),
                 (new \DateTimeImmutable())->setTimestamp($record->timestart + $record->timeduration),
                 (new \DateTimeImmutable())->setTimestamp($record->timesort ? $record->timesort : $record->timestart),
-                (new \DateTimeImmutable())->setTimestamp($record->timemodified),
-                (new \DateTimeImmutable())->setTimestamp(usergetmidnight($record->timesort))
+                (new \DateTimeImmutable())->setTimestamp($record->timemodified)
             ),
             !empty($record->visible),
-            $subscription,
-            $record->location,
-            !empty($record->component) ? $record->component : null
+            $subscription
         );
 
         $action = new action(

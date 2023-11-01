@@ -17,6 +17,7 @@
  * User competency workflow.
  *
  * @module     tool_lp/user_competency_workflow
+ * @package    tool_lp
  * @copyright  2015 Frédéric Massart - FMCorz.net
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,13 +32,15 @@ define(['jquery',
 
     /**
      * UserCompetencyWorkflow class.
+     *
+     * @param {String} selector The node containing the buttons to switch mode.
      */
     var UserCompetencyWorkflow = function() {
         EventBase.prototype.constructor.apply(this, []);
     };
     UserCompetencyWorkflow.prototype = Object.create(EventBase.prototype);
 
-    /** @property {String} The selector to find the user competency data. */
+    /** @type {String} The selector to find the user competency data. */
     UserCompetencyWorkflow.prototype._nodeSelector = '[data-node="user-competency"]';
 
     /**
@@ -58,7 +61,7 @@ define(['jquery',
         Ajax.call([call])[0].then(function() {
             this._trigger('review-request-cancelled', data);
             this._trigger('status-changed', data);
-        }.bind(this)).catch(function() {
+        }.bind(this), function() {
             this._trigger('error-occured', data);
         }.bind(this));
     };
@@ -103,7 +106,7 @@ define(['jquery',
         Ajax.call([call])[0].then(function() {
             this._trigger('review-requested', data);
             this._trigger('status-changed', data);
-        }.bind(this)).catch(function() {
+        }.bind(this), function() {
             this._trigger('error-occured', data);
         }.bind(this));
     };
@@ -144,10 +147,11 @@ define(['jquery',
                 competencyid: data.competencyid
             }
         };
+
         Ajax.call([call])[0].then(function() {
             this._trigger('review-started', data);
             this._trigger('status-changed', data);
-        }.bind(this)).catch(function() {
+        }.bind(this), function() {
             this._trigger('error-occured', data);
         }.bind(this));
     };
@@ -192,7 +196,7 @@ define(['jquery',
         Ajax.call([call])[0].then(function() {
             this._trigger('review-stopped', data);
             this._trigger('status-changed', data);
-        }.bind(this)).catch(function() {
+        }.bind(this), function() {
             this._trigger('error-occured', data);
         }.bind(this));
     };

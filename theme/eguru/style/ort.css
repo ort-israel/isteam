@@ -1,0 +1,1378 @@
+/***************************/
+/** Override parent theme **/
+/***************************/
+/* to fix oublog in the fake block usage, and the entire known universe*/
+select {
+    width: auto;
+}
+
+/* --------->>> FIX LOGIN CHECKBOX <<<-----------*/
+.dir-rtl .radio,
+.dir-rtl .checkbox {
+    padding-right: 20px;
+}
+
+.dir-rtl .radio input[type="radio"],
+.dir-rtl .checkbox input[type="checkbox"] {
+    float: none; /* in login page, no need to float */
+    margin: 0; /* align the checkbox with the text fields, and override the negative margin that made overlap the label */
+}
+
+/* correct of form select element in a form, in blog usage block in oublog module */
+.dir-rtl .mform .fitem .felement {
+    margin-right: 0;
+}
+
+/* in blocks page, the lock and view icons get a height & width that are too small */
+img.iconsmall {
+    height: auto;
+    width: auto;
+}
+.unlist img.icon {
+    width: 30px;
+    height: auto;
+}
+
+.file-picker .fp-list .fp-repo-icon {
+    /* Because everything now is border-box, and the icons have a width and a height,
+    the padding reduces the actual size of the image. So change padding to margin. */
+    padding: 0;
+    margin: 0 7px 0 5px;
+}
+
+/******************/
+/** Theme Design **/
+/******************/
+
+/**********************/
+/** General Settings **/
+/**********************/
+.container-fluid {
+    max-width: 1280px;
+}
+
+*,
+*:before,
+*:after { /* apply a natural box layout model to all elements; see http://www.paulirish.com/2012/box-sizing-border-box-ftw/ */
+    -webkit-box-sizing: border-box; /* Not needed for modern webkit but still used by Blackberry Browser 7.0; see http://caniuse.com/#search=box-sizing */
+    -moz-box-sizing: border-box; /* Still needed for Firefox 28; see http://caniuse.com/#search=box-sizing */
+    box-sizing: border-box;
+}
+
+.editing *,
+.editing *:before,
+.editing *:after { /* while editing leave the box-model the way it was */
+    -webkit-box-sizing: content-box; /* Not needed for modern webkit but still used by Blackberry Browser 7.0; see http://caniuse.com/#search=box-sizing */
+    -moz-box-sizing: content-box; /* Still needed for Firefox 28; see http://caniuse.com/#search=box-sizing */
+    box-sizing: content-box;
+}
+body,
+input {
+    font-family: 'Assistant', Arial, Helvetica, sans-serif;
+    font-size: 18px;
+}
+
+body {
+    background: url([[pix:theme|cs05/pattern_in]]) 0 0 repeat transparent;
+}
+
+body a,
+body a:hover,
+body a:focus {
+    color: #ed008c;
+    /*text-decoration: underline;*/
+}
+
+button, input.form-submit, input[type="button"], input[type="submit"], input[type="reset"] {
+    font-size: 18px;
+    line-height: 1;
+}
+
+body h1, body h2, body h3, body h4, body h5, body h6 {
+    color: #d13074;
+}
+
+h2 {
+    font-size: 35px;
+    font-weight: bold;
+}
+
+body .alert-danger,
+.alert-error {
+    color: #d13074;
+    background-color: #f5d0e1;
+    border-color: #f3c1da;
+    border-radius: 5px;
+}
+
+/************/
+/** Header **/
+/************/
+.pagelayout-login #header {
+    border-bottom: 50px solid #009edb;
+}
+
+.header-main .container-fluid {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 0;
+    max-width: 100%;
+}
+
+#header .header-logo,
+.dir-rtl #header .header-logo,
+.header-other-logos,
+.dir-rtl .header-other-logos {
+    float: none;
+    flex: 0 1 100%;
+    -webkit-flex: 0 1 100%;
+}
+
+body:not(.pagelayout-frontpage) #header .header-main { /* overrides color-scheme css*/
+    background-color: #fff;
+}
+
+body:not(.pagelayout-frontpage) #header [class*="header-"] {
+    text-align: center;
+}
+
+body:not(.pagelayout-frontpage) .header-other-logos {
+    background-color: #252525;
+    width: 45%;
+    position: relative;
+    padding-top: 20px;
+}
+
+/***************/
+/** Home page **/
+/***************/
+body.pagelayout-frontpage,
+body.pagelayout-login {
+    background: url([[pix:theme|home/pattern]]) 0 0 repeat transparent;
+}
+
+/* --------->>> HEADER <<<-----------*/
+.pagelayout-frontpage #page-header {
+    margin-bottom: 0;
+}
+
+.pagelayout-frontpage #header {
+    position: absolute;
+    top: 0;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    margin-top: 40px;
+}
+
+.pagelayout-frontpage #header .header-main,
+.pagelayout-frontpage #header .header-menubar {
+    background-color: transparent;
+    padding: 0;
+}
+
+.pagelayout-frontpage .header-logo,
+.pagelayout-frontpage .header-other-logos {
+    text-align: center;
+}
+
+.pagelayout-frontpage .header-logo {
+    background-color: #fff;
+}
+
+.pagelayout-frontpage .header-other-logos {
+    line-height: 124px; /* line-height is the height value, and that centers vertically */
+}
+
+.other-logos {
+    height: auto;
+    width: auto;
+}
+
+/* --------->>> CAROUSEL <<<-----------*/
+
+.homepage-carousel {
+    margin: 0 0 30px 0;
+}
+
+.homepage-carousel .carousel-inner > .item .carousel-content {
+    background-color: transparent;
+    padding: 0;
+    max-width: 435px;
+}
+
+.homepage-carousel .carousel-inner > .item .carousel-content h2 {
+    color: #ffffff;;
+    line-height: 1.2;
+    font-size: 33px;
+}
+
+.homepage-carousel .carousel-inner > .item .carousel-content {
+    z-index: 1; /* to get over the :after with the color overlay*/
+    top: 180px;
+}
+
+.dir-rtl .homepage-carousel .carousel-inner > .item .carousel-content {
+    right: 90px;
+}
+
+.dir-ltr .homepage-carousel .carousel-inner > .item .carousel-content {
+    left: 90px;
+}
+
+.homepage-carousel .carousel-inner > .item .carousel-content .carousel-btn {
+    display: none;
+
+}
+
+/* --------->>> CAROUSEL CONTROLS <<<-----------*/
+
+.homepage-carousel a.carousel-control {
+    background-color: #c1187a; /* override color scheme */
+    border: none;
+    display: inline;
+}
+
+/* --------->>> LOGIN AREA <<<-----------*/
+
+.pagelayout-frontpage .custom-menu {
+    position: absolute;
+    left: 0;
+    top: 630px; /*slider height: 745; element height: 100; border-height: 15. If slider height changes, so should the position of top */
+    border-bottom: 15px solid #009edb;
+    width: 100%;
+}
+
+.pagelayout-frontpage .custom-menu > ul {
+    list-style: none;
+    margin: 0;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.pagelayout-frontpage .custom-menu.anonymous-user .custom-menu-item {
+    padding: 40px 50px;
+}
+
+.pagelayout-frontpage .custom-menu.identified-user .custom-menu-item {
+    padding: 24px 50px 23px;
+}
+
+.pagelayout-frontpage .custom-menu .custom-menu-item::before,
+.pagelayout-frontpage .custom-menu .custom-menu-item::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 0;
+    top: 0;
+    position: absolute;
+}
+
+.pagelayout-frontpage .custom-menu .custom-menu-item::before {
+    border-right: 45px solid transparent;
+    border-bottom: 100px solid #009edb;
+    right: -45px;
+}
+
+.pagelayout-frontpage .custom-menu .login-item::after {
+    border-left: 45px solid transparent;
+    border-top: 100px solid #009edb;
+    left: -45px;
+}
+
+.pagelayout-frontpage .custom-menu .login-item {
+    position: relative;
+    background-color: #009edb;
+    font-size: 36px;
+}
+
+.pagelayout-frontpage .custom-menu.anonymous-user .guest-course-item {
+    background-color: rgba(195, 2, 116, 0.7);
+    padding-left: 200px;
+    font-size: 20px;
+}
+
+.pagelayout-frontpage .custom-menu .custom-menu-item,
+.pagelayout-frontpage .custom-menu .custom-menu-item a,
+.pagelayout-frontpage .usermenu .login {
+    color: #fff;
+}
+
+.pagelayout-frontpage .custom-menu .custom-menu-item a {
+    text-decoration: underline;
+    display: block;
+}
+
+.pagelayout-frontpage .usermenu .login {
+    font-size: 18px;
+}
+
+.pagelayout-frontpage .usermenu .login a {
+    font-size: 35px;
+}
+
+/* --------->>> MIDDLE WRAPPER <<<-----------*/
+
+/*.pagelayout-frontpage .container-fluid {
+    margin-bottom: 30px;
+}*/
+
+.pagelayout-frontpage .row-fluid .span9 {
+    width: 100%;
+}
+
+.section .activity.modtype_label.label {
+    padding: 0;
+}
+
+/* --------->>> SCHOOLS BLOCK <<<-----------*/
+
+ul.schools-list {
+    list-style: none;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+.school-item {
+    background-color: #fff;
+    text-align: center;
+    font-size: 20px;
+    margin-bottom: 40px;
+    display: inline-block; /*needed for lower resolutions, for top margin of title to stay inside li*/
+}
+
+/*the first 3 items' image is in the lower part, and the last 3 items' image is in the upper part: */
+.school-item:nth-child(1):after,
+.school-item:nth-child(2):after,
+.school-item:nth-child(3):after,
+.school-item:nth-child(4):before,
+.school-item:nth-child(5):before,
+.school-item:nth-child(6):before {
+    content: "";
+    display: block;
+    width: 100%;
+    background: url([[pix:theme|home/homepage_sprite]]) 0 0 no-repeat transparent;
+    background-size: 100% auto;
+    padding-bottom: 55%;
+}
+
+.school-item:nth-child(2):after {
+    background-position: 0 19.8%;
+}
+
+.school-item:nth-child(3):after {
+    background-position: 0 39.8%;
+}
+
+.school-item:nth-child(4):before {
+    background-position: 0 60%;
+}
+
+.school-item:nth-child(5):before {
+    background-position: 0 80%;
+}
+
+.school-item:nth-child(6):before {
+    background-position: 0 99.5%;
+}
+
+.school-item a {
+    color: #5c5a59;
+}
+
+.school-item > a {
+    margin: 0 45px 30px;
+    display: inline-block;
+}
+
+.school-item-title {
+    font-weight: bold;
+    font-size: 30px;
+    margin: 30px 45px 20px;
+}
+
+/* --------->>> BOTTOM LABEL <<<-----------*/
+
+.pagelayout-frontpage .container-fluid .container-fluid {
+    padding: 0;
+}
+
+.pagelayout-frontpage {
+
+}
+
+#module-148 .row-fluid {
+    padding: 25px;
+}
+
+#module-148 p {
+    font-size: 20px;
+}
+
+#module-148 .col-md-8 {
+    text-align: center;
+}
+
+#module-148 iframe {
+    max-width: 100%;
+}
+
+/***************/
+/*** Footer ****/
+/***************/
+
+#footer {
+    display: block;
+    text-align: center;
+    background-color: #000;
+    padding: 20px 0;
+}
+
+#footer .social-media {
+    padding: 0;
+}
+
+#footer .social-media ul.smedia-list {
+    display: flex;
+    flex-direction: row-reverse;
+    padding: 0;
+    margin: 0;
+}
+
+#footer .social-media .smedia,
+#footer .social-media .site-link
+{
+    padding: 0;
+    line-height: 1;
+}
+
+#footer .social-media .smedia:after,
+#footer .social-media .site-link:after{
+    content: '|';
+    color: #fff;
+    display: inline-block;
+}
+
+#footer .social-media > ul > li > a {
+    line-height: 1;
+}
+
+#footer .social-media > ul > li > a > .media-icon {
+    background-color: transparent;
+    height: auto;
+}
+
+body #footer .social-media > ul > li > a:hover .media-icon,
+body #footer .social-media > ul > li > a:focus .media-icon {
+    background-color: transparent;
+}
+
+/*#footer .social-media > ul > .smedia:not(.smedia-04) > .media-name {
+    display: none;
+}*/
+#footer .social-media > ul > .smedia-04 > a .media-name {
+    display: inline;
+}
+
+.credits {
+    color: #fff;
+    font-size: 16px;
+}
+
+.dir-rtl .credits {
+    margin-right: 10px;
+}
+
+.credits a {
+    color: #fff;
+}
+
+.fa-facebook-f:before, .fa-facebook:before {
+    content: "\f09a"
+}
+
+/*********************/
+/** Login Form Page **/
+/*********************/
+
+div.custom-login-page .loginbox {
+    background-color: transparent; /* overrride color scheme */
+    box-shadow: none;
+    border: none;
+}
+
+.custom-login-page .loginbox h3,
+.custom-login-page .loginbox .formwrap .form-fields label,
+.custom-login-page .loginbox .formwrap .support-fields > label.checkbox,
+.custom-login-page .loginbox .formwrap .support-fields > a,
+.custom-login-page .loginbox .formwrap .support-fields > a:hover,
+.custom-login-page .loginbox .formwrap .support-fields > a:focus {
+    color: #000;;
+    font-size: 18px;
+}
+
+.dir-ltr .custom-login-page .loginbox h3,
+.dir-ltr .support-fields {
+    margin-left: 85px;
+}
+
+.dir-rtl .custom-login-page .loginbox h3,
+.dir-rtl .support-fields,
+.dir-rtl .custom-login-page .loginbox .formwrap .form-action {
+    margin-right: 85px; /* margin is the size of label width + form-fields margin */
+}
+
+.dir-rtl .support-fields .checkbox {
+    padding: 0;
+    float: none;
+}
+
+.dir-rtl .custom-login-page .loginbox .formwrap .form-fields {
+    float: none;
+    display: flex;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.custom-login-page .loginbox .formwrap .form-fields label {
+    width: 75px;
+}
+
+.dir-ltr .custom-login-page .loginbox .formwrap .form-fields label {
+    margin-right: 10px;
+}
+
+.dir-rtl .custom-login-page .loginbox .formwrap .form-fields label {
+    margin-left: 10px;
+}
+
+/* ------>>> FORGOT PASSWORD, AND REMEMBER USERNAME <<<-------*/
+.support-fields {
+    text-align: right;
+
+}
+
+/* --------->>> SUBMIT BUTTON <<<-----------*/
+
+.custom-login-page .loginbox .formwrap .form-action,
+.dir-rtl .custom-login-page .loginbox .formwrap .form-action {
+    float: none;
+}
+
+.custom-login-page #loginbtn1 {
+    background-color: #009edb;
+    border-radius: 0;
+    color: #fff;
+    font-size: 36px;
+    padding-left: 40px; /* leave room for :after */
+}
+
+.custom-login-page #loginbtn1:hover,
+.custom-login-page #loginbtn1:focus,
+.custom-login-page #loginbtn1:active {
+    background-color: #c53c88;
+}
+
+.custom-login-page .form-action {
+    /* definitions for :after */
+    position: relative;
+    display: inline-block;
+}
+
+.custom-login-page .form-action:after {
+    content: "◤";
+    color: #fff;
+    display: block;
+    position: absolute;
+    left: 15px;
+    top: 34%;
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+    font-size: 24px;
+}
+
+/******************/
+/*** Dashboard ****/
+/******************/
+div.block {
+    background-color: #eeeeee;
+    border: none;
+}
+
+div.block .header {
+    background-color: transparent;
+    border-color: #818181;
+    border: none;
+    border-bottom: 1px solid #aaa;
+}
+
+div.block .header h2 {
+    color: #5c5a59;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* --------->>> REGION-MAIN <<<-----------*/
+
+body:not(.editing) #region-main .block {
+    background-color: transparent;
+}
+
+body:not(.editing) #region-main .block .header {
+    display: none;
+}
+
+/* --------->>> BLOCK NAVIGATION <<<-----------*/
+/*Tsofiya 21/08/2017: fixes to block css*/
+
+.dir-rtl .block_navigation .block_tree ul {
+    margin: 0 16px 0 0;
+}
+
+.block .block_tree p.hasicon { /*needed for all blocks*/
+    text-indent: 0px;
+    padding-left: 0px;
+    white-space: nowrap;
+}
+
+.block_navigation .block_tree .tree_item.hasicon .item-content-wrap {
+    display: inline-block;
+    white-space: normal;
+}
+
+/* --------->>> BLOCK COURSE OVERVIEW <<<-----------*/
+
+.block_course_overview .content {
+    padding: 0;
+    margin: 0;
+}
+
+body:not(.editing) .block_course_overview .coursebox {
+    border: none;
+}
+
+.block_course_overview .coursebox {
+    padding: 0;
+    margin: 0;
+    max-width: 50%;
+}
+
+.block_course_overview .coursebox.isteam-course {
+    max-width: 100%;
+}
+
+.block_course_overview .course_title {
+    background-color: #cdcdcd;
+    border-radius: 5px 5px 0 0;
+}
+
+.block_course_overview .isteam-course .course_title {
+    background-color: #818181;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.block_course_overview .content h2.title {
+    padding: 20px 0;
+    margin: 0;
+    font-size: 31px;
+    float: none;
+    text-align: center;
+}
+
+.dir-rtl .block_course_overview .content h2.title {
+    float: none;
+}
+
+.block_course_overview .content h2.title {
+    text-align: right;
+    padding-right: 30px;
+}
+
+.block_course_overview .course_title a {
+    color: #5c5c5c;
+}
+
+.block_course_overview .isteam-course .course_title a {
+    color: #fff;
+}
+
+.courseimage img {
+    width: 100%;
+}
+
+.block_course_overview .activity_overview {
+    color: #ed008c;
+    margin: 10px 0;
+}
+
+/* --------->>> CALENDAR <<<-----------*/
+div.block .minicalendar td.day.today, div.block .minicalendar td.day:hover {
+    background-color: #ed008c;
+}
+
+/* ----->>> GROUP COMPLETION STATUS <<<-----*/
+.arc {
+    stroke-width: 3;
+}
+
+.radial-svg {
+    width: 100px;
+    height: 100px;
+}
+
+/*.background {
+    transform: scale(1, -1);
+}
+
+.background:hover {
+    animation: scaleheight 1s ease-in-out infinite alternate;
+}
+
+@keyframes scaleheight {
+    0% {
+        fill: red;
+    }
+    100% {
+        fill: blue;
+        font-size: 300px;
+    }
+}*/
+
+/****************************/
+/** Inner pages components **/
+/****************************/
+
+/* --------->>> JUMP-TO MENU <<<-----------*/
+
+.dir-rtl .jumpmenu {
+    text-align: left;
+}
+
+.dir-rtl .jumpmenu.select {
+    text-align: right;
+}
+
+/* hide from student:
+* blocks region in front page
+* navigation and settings blocks  */
+
+.role-student .path-course .block-region,
+.role-student .block_navigation,
+.role-student .block_settings {
+    display: none;
+}
+
+/* hide navigation block from teacher: */
+.role-teacher .block_navigation {
+    display: none;
+}
+
+/* user menu bar - user menu and language menu */
+header#header .header-menubar {
+    background-color: #009edb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dir-rtl .usermenu,
+.dir-ltr .usermenu {
+    float: none;
+}
+
+.usermenu .moodle-actionmenu {
+    margin: 0;
+}
+
+.dir-rtl .moodle-actionmenu.show[data-enhanced] .menu.align-tr-br {
+    left: auto;
+    right: 0;
+}
+
+.nav > li > a:hover, .nav > li > a:focus {
+    background-color: transparent;
+}
+
+.nav {
+    margin-bottom: 0;
+}
+
+/*Tsofiya 21/08/2017*/
+.dir-rtl .nav {
+    margin-right: 25px;
+}
+
+.langmenu a,
+.langmenu a:hover,
+.langmenu a:focus {
+    color: #fff;
+}
+
+.nav .dropdown-toggle .caret {
+    border-top-color: #fff;
+    border-bottom-color: #fff;
+}
+
+body .usermenu .moodle-actionmenu:hover .toggle-display,
+body .usermenu .moodle-actionmenu:focus .toggle-display,
+body.jsenabled .usermenu .moodle-actionmenu.show,
+body .moodle-actionmenu.show[data-enhanced] .menu a:hover,
+body .moodle-actionmenu.show[data-enhanced] .menu a:focus,
+body.jsenabled .usermenu .moodle-actionmenu.show .menu a:hover,
+body #header .header-menubar .dropdown-menu > li > a:hover,
+body #header .header-menubar .dropdown-menu > li > a:focus,
+body #header .header-menubar .dropdown-submenu:hover > a,
+body #header .header-menubar .dropdown-submenu:focus > a {
+    background-color: #009edb;
+}
+
+body .moodle-actionmenu.show[data-enhanced] .menu,
+body #header .header-menubar .dropdown-menu {
+    background-color: #818181;
+}
+
+.moodle-actionmenu > ul {
+    text-align: left;
+}
+
+.dir-rtl .moodle-actionmenu.show[data-enhanced] .menu.align-tr-br {
+    right: auto;
+    left: 0;
+}
+
+.usermenu .moodle-actionmenu .toggle-display .userbutton .avatars img,
+.userloggedinas .usermenu .userbutton .avatars .avatar img {
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px #fff;
+}
+
+.jsenabled .moodle-actionmenu[data-enhance] .toggle-display.textmenu .caret {
+    border-top-color: #fff;
+}
+
+/***********************/
+/** Activities screen **/
+/***********************/
+.path-mod #region-main {
+    padding: 0 40px 40px;
+    border-right: 1px solid #aaa;
+}
+
+/* Tsofiya 24/08/2017: Fix - tell the browser not renders as the opposite */
+.dir-rtl.path-mod #region-main {
+    border-right: 1px solid #aaa;
+    border-left: none;
+}
+
+.row {
+    margin: 0;
+}
+
+.path-mod h2 {
+    color: #5c5a59;
+}
+
+.dir-rtl.path-mod-glossary .printicon {
+    padding: 0 0 0 20px;
+}
+
+/* in module oublog, set the fake block usage title*/
+.oublog_statsview_title h2 {
+    background-color: #edd3ed;
+    padding: 0 0.5em;
+    line-height: 1.5;
+}
+
+/* --------->>> CONNECTED USERS BLOCK <<<-----------*/
+
+.dir-rtl .block .content .userpicture {
+    margin: 0 0 0 6px;
+}
+
+/* --------->>> GLOSSARY <<<-----------*/
+
+#page-mod-glossary-view .glossarycontrol {
+    float: none;
+}
+
+.path-mod-glossary table.boxaligncenter {
+    width: 100%;
+}
+
+.path-mod-glossary table.boxaligncenter .glossarysearchbox {
+    text-align: right;
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.dir-rtl .glossarysearchbox input[type="checkbox"] {
+    margin-right: 0;
+    order: 3; /* needs order because the search box and submit are getting order */
+}
+
+.glossaryaddentry input[type="submit"] {
+    background-color: #ca4292;
+    color: #fff;
+    margin: 0;
+}
+
+.glossarydisplay .nav-tabs {
+    margin-right: 0;
+}
+
+#page-mod-glossary-view table.glossarycategoryheader,
+#page-mod-glossary-import table.glossaryimportexport {
+    margin-right: 0;
+    margin-left: 0;
+}
+
+.path-mod-glossary .glossarypost {
+    width: 100%;
+}
+
+.glossarypost .concept {
+    display: inline-block;
+}
+
+.dir-rtl .glossarypost .concept {
+    margin-left: 10px;
+    padding-left: 10px;
+}
+
+.dir-ltr .glossarypost .concept {
+    margin-right: 10px;
+    padding-right: 10px;
+}
+
+.dir-rtl .glossarypost .author {
+    border-right: 1px solid #aaa;
+    padding-right: 20px;
+}
+
+.dir-ltr .glossarypost .author {
+    border-left: 1px solid #aaa;
+    padding-left: 20px;
+}
+
+.dir-rtl .fullwithauthor .left {
+    display: none;
+}
+
+.dir-rtl.path-mod-glossary .glossarypost .entrylowersection .aliases {
+    text-align: right;
+}
+
+.dir-rtl.path-mod-glossary .glossarypost .entrylowersection .aliases label {
+    display: inline-block;
+}
+
+.dir-rtl.path-mod-glossary .glossarypost .entrylowersection .aliases select {
+    height: auto;
+}
+
+/************************/
+/** Main Course Screen **/
+/************************/
+/* Tsofiya 22/08/2017: This definition is added because the area of the course content should get full width.
+   The definition is copied from moodle.css of bootstrap theme in http://isteam-dev.ort.org.il .
+   For some reason it doesn't exist in moodle.css of bootstrap in our installation.
+*/
+.content-only #region-main.span9,
+.empty-region-side-post #region-bs-main-and-pre.span9,
+.empty-region-side-pre #region-bs-main-and-post.span9,
+.empty-region-side-post #region-bs-main-and-post.span9 #region-main.span8,
+.jsenabled.docked-region-side-post #region-bs-main-and-pre.span9,
+.jsenabled.docked-region-side-post #region-bs-main-and-post.span9 #region-main.span8,
+.jsenabled.docked-region-side-pre #region-bs-main-and-post.span9 {
+    width: 100%;
+}
+
+#gridiconcontainer ul.gridicons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#gridiconcontainer ul.gridicons li {
+    display: block;
+    padding: 0;
+    flex: 0 1 315px;
+    margin-bottom: 40px;
+}
+
+div.course-content ul.gridicons li.currentselected {
+    background-color: transparent;
+}
+
+div.course-content ul.gridicons li a,
+.course-content ul.gridicons li.currentselected #gridsectionname-1.icon_content {
+    color: #5c5a59;
+}
+
+div.course-content ul.gridicons li div.icon_content {
+    color: #5c5a59;
+    background-color: #cdcdcd;
+    font-size: 30px;
+    padding: 25px 0;
+    width: auto;
+    height: auto;
+}
+
+div.course-content ul.gridicons li .image_holder {
+    width: auto;
+}
+
+.gtopics-0 {
+    /* hide topic 0, is not needed */
+    display: none;
+}
+
+/********************/
+/** Profile screen **/
+/********************/
+.node_category h3 {
+    color: #5c5a59;
+    font-weight: bold;
+}
+
+.node_category li {
+    line-height: 1.5;
+}
+
+/************/
+/** Blocks **/
+/************/
+
+.dir-rtl .block_settings .block_tree .tree_item.branch {
+    background-position: 100% 10px;
+}
+
+.block_myprofile .header {
+    display: none;
+}
+
+.block_myprofile .content {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 15px;
+}
+
+.myprofileitem.fullname {
+    order: 1;
+    padding-bottom: 17px;
+    border-bottom: 1px solid;
+    margin-bottom: 20px;
+}
+
+.myprofileitem.picture {
+    order: 2;
+    text-align: center;
+}
+
+.myprofileitem.email {
+    order: 3;
+    text-align: center;
+}
+
+.myprofileitem.email a {
+    color: #5c5a59;
+}
+
+.myprofileitem.city {
+    display: none;
+}
+
+/* ------>>> SECTION MODULES NAVBAR <<<-----*/
+
+div.block_section_modules_navbar {
+    background-color: transparent;
+}
+
+.block_section_modules_navbar .header {
+    display: none;
+}
+
+.block_section_modules_navbar .content {
+    padding: 5px 0;
+}
+
+.block_section_modules_navbar .unlist {
+    font-size: 20px;
+    margin: 0;
+}
+
+.block_section_modules_navbar .unlist a {
+    color: #5c5a59;
+}
+
+.block_section_modules_navbar .unlist .icon {
+    width: 38px;
+}
+
+.block.block_section_modules_navbar .unlist li > div.column,
+.block.block_activity_modules .unlist li > div.column{
+    padding: 8px 0;
+    display: block;
+}
+
+.dir-rtl .block_section_modules_navbar .unlist li > div.column {
+    text-align: right;
+}
+
+.block_section_modules_navbar a.current {
+    background-color: #cc4494;
+    display: block;
+    font-size: 20px;
+    line-height: 32px;
+    color: #fff;
+}
+
+.block_section_modules_navbar .back-to-section {
+    text-decoration: underline;
+    background-color: #d3d3d3;
+    position: relative;
+    display: inline-block;
+    /*rtl:ignore*/
+    padding: 10px 40px 10px 10px;
+}
+
+.block_section_modules_navbar .back-to-section:before {
+    content: "◤";
+    display: block;
+    position: absolute;
+    -webkit-transform: rotate(-225deg);
+    transform: rotate(-225deg);
+    right: 20px;
+}
+
+/* --------->>> SHARING CART BLOCK <<<-----------*/
+
+.activity img.activityicon {
+    width: 38px;
+}
+
+/* --------->>> TABLES <<<-----------*/
+/* Lea 2018 - I don't understand why the text-align defined in bootstrapbase/moodle.css isn't flipped,
+                but it's not, so am explicitly flipping it in rtl */
+
+.dir-rtl table.flexible th,
+.dir-rtl .generaltable th,
+.dir-rtl table.flexible td,
+.dir-rtl .generaltable td {
+    text-align: right;
+}
+
+.gradingtable{
+    margin-bottom: 30px;
+}
+/* --------->>> FORMS <<<-----------*/
+
+.form-item .form-label,
+.mform .fitem div.fitemtitle {
+    /*rtl:begin:ignore*/
+    float: right;
+    /*rtl:end:ignore*/
+}
+.dir-rtl .mform fieldset.collapsible legend a.fheader {
+    background-image: url('[[pix:t/collapsed_rtl]]');
+    background-position-x: 100%;
+    padding: 0 20px 0 50px;
+}
+
+.form-item .form-label, .mform .fitem div.fitemtitle,
+.userprofile dl.list dt, .form-horizontal .control-label {
+    width: 260px;
+    /*this fixes the ? button to drop into second line, but causes sometimes the label to be too wide. Rachel 2.2018*/
+}
+
+ /*new forum question:*/
+#page-mod-forum-discuss .discussioncontrols .discussioncontrol {
+    min-height: 50px;
+}
+#page-mod-forum-discuss .discussioncontrols .movediscussion .btn-secondary{
+    margin-bottom: 0;
+}
+
+/*******************/
+/** Media Queries **/
+/*******************/
+@media only screen and (min-width: 500px) {
+    .course-content #gridiconcontainer ul.gridicons {
+        justify-content: space-between;
+    }
+
+    #gridiconcontainer ul.gridicons li {
+        flex: 0 1 45%;
+    }
+}
+
+@media only screen and (min-width: 600px) {
+    /***************/
+    /** Home page **/
+    /***************/
+    /* --------->>> SCHOOLS BLOCK <<<-----------*/
+    .schools-list {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-content: space-between;
+        align-items: stretch;
+    }
+
+    .school-item {
+        flex: 0 1 45%;
+    }
+
+    /***************/
+    /** Dashboard **/
+    /***************/
+    /*.block_course_overview .course_list {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .block_course_overview .coursebox.isteam-course {
+        flex-basis: 67%;
+    }
+
+    .block_course_overview .coursebox {
+        flex-basis: 30%;
+    }*/
+
+}
+
+@media only screen and (min-width: 768px) {
+    /************/
+    /** Header **/
+    /************/
+    #header .header-logo,
+    .dir-rtl #header .header-logo,
+    .header-other-logos,
+    .dir-rtl .header-other-logos {
+        flex: 0 1 50%;
+        -webkit-flex: 0 1 50%;
+    }
+
+    .pagelayout-frontpage .header-other-logos {
+        text-align: right;
+        padding-right: 150px;
+    }
+
+    body:not(.pagelayout-frontpage) .header-other-logos::before {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 0;
+        top: 0;
+        position: absolute;
+        border-bottom: 124px solid #252525;
+        /*rtl:begin:ignore*/
+        border-right: 70px solid transparent;
+        right: -70px;
+        /*rtl:end:ignore*/
+    }
+
+    /***************/
+    /** Home page **/
+    /***************/
+    /* --------->>> HEADER <<<-----------*/
+    .pagelayout-frontpage .header-logo {
+        background-color: transparent;
+    }
+
+    .header-logo {
+        width: 50%;
+    }
+
+    /* --------->>> CAROUSEL <<<-----------*/
+    .homepage-carousel .carousel-inner,
+    .homepage-carousel .carousel-inner > .item,
+        /*.homepage-carousel .carousel-inner > .item .item-inner-wrap,*/
+    .homepage-carousel .carousel-inner:after {
+        height: 745px;
+    }
+
+    /* .homepage-carousel .carousel-inner > .item.active {
+         position: relative;
+     }*/
+    .homepage-carousel .carousel-inner:after {
+        content: "";
+        display: block;
+        width: 60%;
+        position: absolute;
+        top: 0;
+        left: -20%;
+        right: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+        -webkit-transform: skewX(155deg);
+        transform: skewX(155deg);
+        background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) 40px, #fff 40px, #fff 170px, rgba(0, 0, 0, 0.3) 170px, rgba(0, 0, 0, 0.3) 100%);
+    }
+
+    .dir-rtl .homepage-carousel .carousel-inner:after {
+        -webkit-transform: skewX(35deg);
+        transform: skewX(35deg);
+        right: -20%;
+    }
+
+    /*********************/
+    /** Login Form Page **/
+    /*********************/
+    .custom-login-page .loginbox {
+        max-width: 410px;
+    }
+
+    /************/
+    /** Footer **/
+    /************/
+    #footer {
+        display: flex;
+        justify-content: center;
+    }
+
+    #footer .social-media ul > .smedia:not(.smedia-04) .media-name {
+        text-indent: -9999px;
+        overflow: hidden;
+        display: block;
+    }
+
+    .dir-rtl #footer > .social-media > ul > li.smedia > a {
+        padding-right: 32px;
+    }
+    .dir-rtl #footer > .social-media > ul > li.site-link > a {
+        padding-right: 6px;
+        padding-left: 2px;
+    }
+}
+
+@media only screen and (min-width: 960px) {
+
+    /***************/
+    /** Home page **/
+    /***************/
+    /* --------->>> SCHOOLS BLOCK <<<-----------*/
+    .school-item {
+        flex: 0 1 30%;
+    }
+
+    #gridiconcontainer ul.gridicons li {
+        flex: 0 1 30%;
+    }
+}
+
+/* Tsofiay 22/08/2017: corrections for pblit */
+@media only screen and (min-width: 1200px) {
+    .row {
+        margin: 0;
+    }
+
+    .row-fluid {
+        width: auto;
+    }
+}

@@ -6,16 +6,14 @@ Feature: View gradebook when scales are used
 
   Background:
     Given I log in as "admin"
-    And the "multilang" filter is "on"
-    And the "multilang" filter applies to "content and headings"
     And I set the following administration settings values:
       | grade_report_showranges    | 1 |
       | grade_aggregations_visible | Mean of grades,Weighted mean of grades,Simple weighted mean of grades,Mean of grades (with extra credits),Median of grades,Lowest grade,Highest grade,Mode of grades,Natural |
-    And I navigate to "Grades > Scales" in site administration
+    And I navigate to "Scales" node in "Site administration > Grades"
     And I press "Add a new scale"
     And I set the following fields to these values:
-      | Name  | <span lang="en" class="multilang">EN</span><span lang="fr" class="multilang">FR</span> Letterscale |
-      | Scale | F,D,C,B,A                                                                                          |
+      | Name  | Letterscale |
+      | Scale | F,D,C,B,A   |
     And I press "Save changes"
     And I log out
     And the following "courses" exist:
@@ -43,27 +41,35 @@ Feature: View gradebook when scales are used
     And the following "activities" exist:
       | activity | course | idnumber | name                | intro             | gradecategory  |
       | assign   | C1     | a1       | Test assignment one | Submit something! | Sub category 1 |
-    And I am on the "Test assignment one" "assign activity editing" page logged in as teacher1
+    And I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I follow "Test assignment one"
+    And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "grade[modgrade_type]" to "Scale"
-    And I set the field "grade[modgrade_scale]" to "EN Letterscale"
+    And I set the field "grade[modgrade_scale]" to "Letterscale"
     And I press "Save and display"
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the field "Grade" to "A"
     And I press "Save changes"
+    And I press "Ok"
     And I click on "[data-action=next-user]" "css_element"
     And I set the field "Grade" to "B"
     And I press "Save changes"
+    And I press "Ok"
     And I click on "[data-action=next-user]" "css_element"
     And I set the field "Grade" to "C"
     And I press "Save changes"
+    And I press "Ok"
     And I click on "[data-action=next-user]" "css_element"
     And I set the field "Grade" to "D"
     And I press "Save changes"
+    And I press "Ok"
     And I click on "[data-action=next-user]" "css_element"
     And I set the field "Grade" to "F"
     And I press "Save changes"
+    And I press "Ok"
     And I am on "Course 1" course homepage
     And I navigate to "Setup > Course grade settings" in the course gradebook
     And I set the field "Show weightings" to "Show"

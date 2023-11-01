@@ -17,7 +17,7 @@
 /**
  * Unit tests for grade/import/lib.php.
  *
- * @package   core_grades
+ * @package   core_grade
  * @category  phpunit
  * @copyright 2015 Adrian Greeve <adrian@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU Public License
@@ -194,11 +194,15 @@ class core_grade_import_lib_test extends advanced_testcase {
             'itemid' => $gradeitem->id
         ));
 
+        $url = $CFG->wwwroot . '/grade/index.php';
+        $expectedresponse = "++ Grade import success ++
+<div class=\"continuebutton\"><form method=\"get\" action=\"$url\"><div><input type=\"submit\" value=\"Continue\" /><input type=\"hidden\" name=\"id\" value=\"$course->id\" /></div></form></div>";
+
         ob_start();
         $status = grade_import_commit($course->id, $importcode);
         $output = ob_get_contents();
         ob_end_clean();
         $this->assertTrue($status);
-        $this->assertStringContainsString("++ Grade import success ++", $output);
+        $this->assertEquals($expectedresponse, $output);
     }
 }

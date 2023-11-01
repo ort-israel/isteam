@@ -23,4 +23,3 @@
  */
 
 $string['pluginname'] = 'Subscript';
-$string['privacy:metadata'] = 'The atto_subscript plugin does not store any personal data.';

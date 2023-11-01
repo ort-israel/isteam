@@ -42,7 +42,7 @@ class restore_structure_parser_processor_test extends advanced_testcase {
     /**
      * Initial set up.
      */
-    public function setUp(): void {
+    public function setUp() {
         parent::setUp();
 
         $this->resetAfterTest(true);
@@ -106,11 +106,6 @@ class restore_structure_parser_processor_test extends advanced_testcase {
                 "<a href='$@FILEPHP@$$@SLASH@$1.jpg$@FORCEDOWNLOAD@$'>Image</a>",
                 "<a href='http://test.test/file.php?file=%2F1%2F1.jpg&amp;forcedownload=1'>Image</a>",
                 false
-            ),
-            array(
-                "<iframe src='$@H5PEMBED@$?url=testurl'></iframe>",
-                "<iframe src='http://test.test/h5p/embed.php?url=testurl'></iframe>",
-                true
             ),
         );
     }

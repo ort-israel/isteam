@@ -1,5 +1,6 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
+
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,7 +13,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Automatically generated strings for Moodle installer
@@ -37,6 +38,6 @@ $string['clitypevalue'] = 'тип значення';
 $string['clitypevaluedefault'] = 'тип значення, натисніть Enter для використання типового значення ({$a})';
 $string['cliunknowoption'] = 'Невизначені опції: {$a}. Будь ласка, використайте опцію --help.';
 $string['cliyesnoprompt'] = 'натисніть y (означає так) або n (означає ні)';
-$string['environmentrequireinstall'] = 'вимагається для встановлення та включення';
+$string['environmentrequireinstall'] = 'повинен бути встановлений і включений';
 $string['environmentrequireversion'] = 'потрібна версія {$a->needed}, ви запускаєте {$a->current}';
 $string['upgradekeyset'] = 'Оновлення ключа (залишіть порожнім, якщо не встановлено)';

@@ -94,12 +94,11 @@ class cohort_role_assignments_table extends table_sql {
             'idnumber' => $data->cohortidnumber,
             'description' => $data->cohortdescription,
             'visible' => $data->cohortvisible,
-            'name' => $data->cohortname,
-            'theme' => $data->cohorttheme
+            'name' => $data->cohortname
         );
         $context = context_helper::instance_by_id($data->cohortcontextid);
 
-        $exporter = new \core_cohort\external\cohort_summary_exporter($record, array('context' => $context));
+        $exporter = new \tool_lp\external\cohort_summary_exporter($record, array('context' => $context));
         $cohort = $exporter->export($OUTPUT);
 
         $html = $OUTPUT->render_from_template('tool_cohortroles/cohort-in-list', $cohort);
@@ -170,7 +169,7 @@ class cohort_role_assignments_table extends table_sql {
     protected function get_sql_and_params($count = false) {
         $fields = 'uca.id, uca.cohortid, uca.userid, uca.roleid, ';
         $fields .= 'c.name as cohortname, c.idnumber as cohortidnumber, c.contextid as cohortcontextid, ';
-        $fields .= 'c.visible as cohortvisible, c.description as cohortdescription, c.theme as cohorttheme, ';
+        $fields .= 'c.visible as cohortvisible, c.description as cohortdescription, ';
 
         // Add extra user fields that we need for the graded user.
         $extrafields = get_extra_user_fields($this->context);
@@ -189,12 +188,7 @@ class cohort_role_assignments_table extends table_sql {
                    FROM {tool_cohortroles} uca
                    JOIN {user} u ON u.id = uca.userid
                    JOIN {cohort} c ON c.id = uca.cohortid";
-
-        // Check if any additional filtering is required.
-        [$sqlwhere, $params] = $this->get_sql_where();
-        if ($sqlwhere) {
-            $sql .= " WHERE {$sqlwhere}";
-        }
+        $params = array();
 
         // Add order by if needed.
         if (!$count && $sqlsort = $this->get_sql_sort()) {

@@ -24,4 +24,3 @@
  */
 
 $string['pluginname'] = 'Convert to InnoDB';
-$string['privacy:metadata'] = 'The Convert to InnoDB plugin does not store any personal data.';

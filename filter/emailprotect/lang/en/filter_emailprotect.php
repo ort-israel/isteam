@@ -24,4 +24,3 @@
  */
 
 $string['filtername'] = 'Email protection';
-$string['privacy:metadata'] = 'The Email protection plugin does not store any personal data.';
