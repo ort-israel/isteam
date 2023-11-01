@@ -11,7 +11,6 @@ Miriam Kunst - Icons
 
 Stuart Lamour - Javascript + Bootstrap 3 support
 
-Bob Gilmore - Tracker #17 fix - 25/75 and 75/25 templates aligned incorrectly.
 
 This plugin was based off the template for atto plugins by Justin Hunt
 https://github.com/justinhunt/moodle-atto_newtemplate

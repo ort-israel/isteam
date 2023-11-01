@@ -2,8 +2,6 @@
  * User tour control library.
  *
  * @module     tool_usertours/usertours
- * @class      usertours
- * @package    tool_usertours
  * @copyright  2016 Andrew Nicols <andrew@nicols.co.uk>
  */
 define(
@@ -14,36 +12,62 @@ function(ajax, BootstrapTour, $, templates, str, log, notification) {
 
         currentTour: null,
 
-        context: null,
-
         /**
          * Initialise the user tour for the current page.
          *
          * @method  init
-         * @param   {Number}    tourId      The ID of the tour to start.
-         * @param   {Bool}      startTour   Attempt to start the tour now.
-         * @param   {Number}    context     The context of the current page.
+         * @param   {Array}    tourDetails      The matching tours for this page.
+         * @param   {Array}    filters          The names of all client side filters.
          */
-        init: function(tourId, startTour, context) {
-            // Only one tour per page is allowed.
-            usertours.tourId = tourId;
-
-            usertours.context = context;
-
-            if (typeof startTour === 'undefined') {
-                startTour = true;
+        init: function(tourDetails, filters) {
+            let requirements = [];
+            for (var req = 0; req < filters.length; req++) {
+                requirements[req] = 'tool_usertours/filter_' + filters[req];
             }
+            require(requirements, function() {
+                // Run the client side filters to find the first matching tour.
+                let matchingTour = null;
+                for (let key in tourDetails) {
+                    let tour = tourDetails[key];
+                    for (let i = 0; i < filters.length; i++) {
+                        let filter = arguments[i];
+                        if (filter.filterMatches(tour)) {
+                            matchingTour = tour;
+                        } else {
+                            // If any filter doesn't match, move on to the next tour.
+                            matchingTour = null;
+                            break;
+                        }
+                    }
+                    // If all filters matched then use this tour.
+                    if (matchingTour) {
+                        break;
+                    }
+                }
 
-            if (startTour) {
-                // Fetch the tour configuration.
-                usertours.fetchTour(tourId);
-            }
+                if (matchingTour === null) {
+                    return;
+                }
 
-            usertours.addResetLink();
-            // Watch for the reset link.
-            $('body').on('click', '[data-action="tool_usertours/resetpagetour"]', function(e) {
-                e.preventDefault();
-                usertours.resetTourState(usertours.tourId);
+                // Only one tour per page is allowed.
+                usertours.tourId = matchingTour.tourId;
+
+                let startTour = matchingTour.startTour;
+                if (typeof startTour === 'undefined') {
+                    startTour = true;
+                }
+
+                if (startTour) {
+                    // Fetch the tour configuration.
+                    usertours.fetchTour(usertours.tourId);
+                }
+
+                usertours.addResetLink();
+                // Watch for the reset link.
+                $('body').on('click', '[data-action="tool_usertours/resetpagetour"]', function(e) {
+                    e.preventDefault();
+                    usertours.resetTourState(usertours.tourId);
+                });
             });
         },
 
@@ -54,21 +78,34 @@ function(ajax, BootstrapTour, $, templates, str, log, notification) {
          * @param   {Number}    tourId      The ID of the tour to start.
          */
         fetchTour: function(tourId) {
+            M.util.js_pending('admin_usertour_fetchTour' + tourId);
             $.when(
                 ajax.call([
                     {
                         methodname: 'tool_usertours_fetch_and_start_tour',
                         args: {
                             tourid:     tourId,
-                            context:    usertours.context,
+                            context:    M.cfg.contextid,
                             pageurl:    window.location.href,
                         }
                     }
                 ])[0],
                 templates.render('tool_usertours/tourstep', {})
-            ).then(function(response, template) {
-                usertours.startBootstrapTour(tourId, template[0], response.tourconfig);
-            }).fail(notification.exception);
+            )
+            .then(function(response, template) {
+                // If we don't have any tour config (because it doesn't need showing for the current user), return early.
+                if (!response.hasOwnProperty('tourconfig')) {
+                    return;
+                }
+
+                return usertours.startBootstrapTour(tourId, template[0], response.tourconfig);
+            })
+            .always(function() {
+                M.util.js_complete('admin_usertour_fetchTour' + tourId);
+
+                return;
+            })
+            .fail(notification.exception);
         },
 
         /**
@@ -77,19 +114,33 @@ function(ajax, BootstrapTour, $, templates, str, log, notification) {
          * @method  addResetLink
          */
         addResetLink: function() {
-            str.get_string('resettouronpage', 'tool_usertours')
-                .done(function(s) {
-                    // Grab the last item in the page of these.
-                    $('footer, .logininfo')
-                    .last()
-                    .append(
-                        '<div class="usertour">' +
-                            '<a href="#" data-action="tool_usertours/resetpagetour">' +
-                                s +
-                            '</a>' +
-                        '</div>'
-                    );
-                });
+            var ele;
+            M.util.js_pending('admin_usertour_addResetLink');
+
+            // Append the link to the most suitable place on the page
+            // with fallback to legacy selectors and finally the body
+            // if there is no better place.
+            if ($('.tool_usertours-resettourcontainer').length) {
+                ele = $('.tool_usertours-resettourcontainer');
+            } else if ($('.logininfo').length) {
+                ele = $('.logininfo');
+            } else if ($('footer').length) {
+                ele = $('footer');
+            } else {
+                ele = $('body');
+            }
+            templates.render('tool_usertours/resettour', {})
+            .then(function(html, js) {
+                templates.appendNodeContents(ele, html, js);
+
+                return;
+            })
+            .always(function() {
+                M.util.js_complete('admin_usertour_addResetLink');
+
+                return;
+            })
+            .fail();
         },
 
         /**
@@ -99,6 +150,7 @@ function(ajax, BootstrapTour, $, templates, str, log, notification) {
          * @param   {Number}    tourId      The ID of the tour to start.
          * @param   {String}    template    The template to use.
          * @param   {Object}    tourConfig  The tour configuration.
+         * @return  {Object}
          */
         startBootstrapTour: function(tourId, template, tourConfig) {
             if (usertours.currentTour) {
@@ -142,7 +194,7 @@ function(ajax, BootstrapTour, $, templates, str, log, notification) {
             });
 
             usertours.currentTour = new BootstrapTour(tourConfig);
-            usertours.currentTour.startTour();
+            return usertours.currentTour.startTour();
         },
 
         /**
@@ -158,7 +210,7 @@ function(ajax, BootstrapTour, $, templates, str, log, notification) {
                         methodname: 'tool_usertours_step_shown',
                         args: {
                             tourid:     usertours.tourId,
-                            context:    usertours.context,
+                            context:    M.cfg.contextid,
                             pageurl:    window.location.href,
                             stepid:     stepConfig.stepid,
                             stepindex:  this.getCurrentStepNumber(),
@@ -181,7 +233,7 @@ function(ajax, BootstrapTour, $, templates, str, log, notification) {
                         methodname: 'tool_usertours_complete_tour',
                         args: {
                             tourid:     usertours.tourId,
-                            context:    usertours.context,
+                            context:    M.cfg.contextid,
                             pageurl:    window.location.href,
                             stepid:     stepConfig.stepid,
                             stepindex:  this.getCurrentStepNumber(),
@@ -204,7 +256,7 @@ function(ajax, BootstrapTour, $, templates, str, log, notification) {
                         methodname: 'tool_usertours_reset_tour',
                         args: {
                             tourid:     tourId,
-                            context:    usertours.context,
+                            context:    M.cfg.contextid,
                             pageurl:    window.location.href,
                         }
                     }
@@ -213,6 +265,7 @@ function(ajax, BootstrapTour, $, templates, str, log, notification) {
                 if (response.startTour) {
                     usertours.fetchTour(response.startTour);
                 }
+                return;
             }).fail(notification.exception);
         }
     };

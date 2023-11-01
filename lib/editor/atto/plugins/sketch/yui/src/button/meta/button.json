@@ -1,7 +1,0 @@
-{
-    "moodle-atto_sketch-button": {
-        "requires": [
-            "moodle-editor_atto-plugin"
-        ]
-    }
-}

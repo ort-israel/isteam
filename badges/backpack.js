@@ -1,5 +1,6 @@
 /**
  * Push badges to backpack.
+ * @deprecated since 3.7
  */
 function addtobackpack(event, args) {
     var badgetable = Y.one('#issued-badge-table');
@@ -20,6 +21,7 @@ function addtobackpack(event, args) {
 
 /**
  * Check if website is externally accessible from the backpack.
+ * @deprecated since 3.7
  */
 function check_site_access() {
     var add = Y.one('#check_connection');
@@ -27,18 +29,22 @@ function check_site_access() {
     var callback = {
             method: "GET",
             on: {
-                success: function(id, o, args) {
-                            var data = Y.JSON.parse(o.responseText);
-                            if (data.code == 'http-unreachable') {
-                                add.setHTML(data.response);
-                                add.removeClass('hide');
-                            }
-                        },
-                failure: function(o) { }
+                success: function(id, o) {
+                    var data = Y.JSON.parse(o.responseText);
+                    if (data.code == 'http-unreachable') {
+                        add.setHTML(data.response);
+                        add.removeClass('hide');
+                    }
+                    M.util.js_complete('badge/backpack::check_site_access');
+                },
+                failure: function() {
+                    M.util.js_complete('badge/backpack::check_site_access');
+                }
             }
         };
 
     Y.use('io-base', function(Y) {
+        M.util.js_pending('badge/backpack::check_site_access');
         Y.io('ajax.php', callback);
     });
 

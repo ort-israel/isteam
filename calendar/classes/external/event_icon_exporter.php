@@ -45,7 +45,10 @@ class event_icon_exporter extends exporter {
      * @param array $related The related data.
      */
     public function __construct(event_interface $event, $related = []) {
+        global $PAGE;
         $coursemodule = $event->get_course_module();
+        $category = $event->get_category();
+        $categoryid = $category ? $category->get('id') : null;
         $course = $event->get_course();
         $courseid = $course ? $course->get('id') : null;
         $group = $event->get_group();
@@ -53,7 +56,8 @@ class event_icon_exporter extends exporter {
         $user = $event->get_user();
         $userid = $user ? $user->get('id') : null;
         $isactivityevent = !empty($coursemodule);
-        $isglobalevent = ($course && $courseid == SITEID);
+        $issiteevent = ($course && $courseid == SITEID);
+        $iscategoryevent = ($category && !empty($categoryid));
         $iscourseevent = ($course && !empty($courseid) && $courseid != SITEID && empty($groupid));
         $isgroupevent = ($group && !empty($groupid));
         $isuserevent = ($user && !empty($userid));
@@ -67,27 +71,47 @@ class event_icon_exporter extends exporter {
             } else {
                 $alttext = get_string('activityevent', 'calendar');
             }
-        } else if ($isglobalevent) {
+        } else if ($event->get_component()) {
+            // Guess the icon and the title for the component event. By default display calendar icon and the
+            // plugin name as the alttext.
+            if ($PAGE->theme->resolve_image_location($event->get_type(), $event->get_component())) {
+                $key = $event->get_type();
+                $component = $event->get_component();
+            } else {
+                $key = 'i/otherevent';
+                $component = 'core';
+            }
+
+            if (get_string_manager()->string_exists($event->get_type(), $event->get_component())) {
+                $alttext = get_string($event->get_type(), $event->get_component());
+            } else {
+                $alttext = get_string('pluginname', $event->get_component());
+            }
+        } else if ($issiteevent) {
             $key = 'i/siteevent';
             $component = 'core';
-            $alttext = get_string('globalevent', 'calendar');
+            $alttext = get_string('typesite', 'calendar');
+        } else if ($iscategoryevent) {
+            $key = 'i/categoryevent';
+            $component = 'core';
+            $alttext = get_string('typecategory', 'calendar');
         } else if ($iscourseevent) {
             $key = 'i/courseevent';
             $component = 'core';
-            $alttext = get_string('courseevent', 'calendar');
+            $alttext = get_string('typecourse', 'calendar');
         } else if ($isgroupevent) {
             $key = 'i/groupevent';
             $component = 'core';
-            $alttext = get_string('groupevent', 'calendar');
+            $alttext = get_string('typegroup', 'calendar');
         } else if ($isuserevent) {
             $key = 'i/userevent';
             $component = 'core';
-            $alttext = get_string('userevent', 'calendar');
+            $alttext = get_string('typeuser', 'calendar');
         } else {
             // Default to site event icon?
             $key = 'i/siteevent';
             $component = 'core';
-            $alttext = get_string('globalevent', 'calendar');
+            $alttext = get_string('typesite', 'calendar');
         }
 
         $data = new \stdClass();

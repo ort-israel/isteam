@@ -166,8 +166,6 @@ class core_competency_api_testcase extends advanced_testcase {
 
     /**
      * Test updating a template.
-     *
-     * @expectedException coding_exception
      */
     public function test_update_template() {
         $cat = $this->getDataGenerator()->create_category();
@@ -186,6 +184,7 @@ class core_competency_api_testcase extends advanced_testcase {
         $this->assertEquals('success', $template->get('shortname'));
 
         // Trying to change the context.
+        $this->expectException(coding_exception::class);
         api::update_template((object) array('id' => $template->get('id'), 'contextid' => context_coursecat::instance($cat->id)));
     }
 
@@ -511,9 +510,6 @@ class core_competency_api_testcase extends advanced_testcase {
         }
     }
 
-    /**
-     * @expectedException coding_exception
-     */
     public function test_create_plan_from_template() {
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -536,6 +532,7 @@ class core_competency_api_testcase extends advanced_testcase {
 
         // Check that api::create_plan cannot be used.
         unset($record->id);
+        $this->expectException(coding_exception::class);
         $plan = api::create_plan($record);
     }
 
@@ -756,8 +753,6 @@ class core_competency_api_testcase extends advanced_testcase {
 
     /**
      * Test that the method to complete a plan.
-     *
-     * @expectedException coding_exception
      */
     public function test_complete_plan() {
         global $DB;
@@ -838,6 +833,7 @@ class core_competency_api_testcase extends advanced_testcase {
         }
 
         // Completing a plan that is completed throws an exception.
+        $this->expectException(coding_exception::class);
         api::complete_plan($plan);
     }
 
@@ -2501,6 +2497,10 @@ class core_competency_api_testcase extends advanced_testcase {
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
 
+        // Create and assign a current user.
+        $currentuser = $dg->create_user();
+        $this->setUser($currentuser);
+
         // Create a course.
         $course = $dg->create_course();
         $record = array('courseid' => $course->id, 'pushratingstouserplans' => false);
@@ -2753,6 +2753,16 @@ class core_competency_api_testcase extends advanced_testcase {
         $result = api::list_course_module_competencies_in_course_module($cm->id);
         $this->assertEquals($result[0]->get('competencyid'), $c->get('id'));
         $this->assertEquals($result[1]->get('competencyid'), $c2->get('id'));
+
+        // Now get the course competency and coursemodule competency together.
+        $result = api::list_course_module_competencies($cm->id);
+        // Now we should have an array and each element of the array should have a competency and
+        // a coursemodulecompetency.
+        foreach ($result as $instance) {
+            $cmc = $instance['coursemodulecompetency'];
+            $c = $instance['competency'];
+            $this->assertEquals($cmc->get('competencyid'), $c->get('id'));
+        }
     }
 
     /**
@@ -4499,9 +4509,6 @@ class core_competency_api_testcase extends advanced_testcase {
         $this->assertTrue(evidence::record_exists($ev2->get('id')));
     }
 
-    /**
-     * @expectedException required_capability_exception
-     */
     public function test_delete_evidence_without_permissions() {
         $this->resetAfterTest();
         $dg = $this->getDataGenerator();
@@ -4515,6 +4522,7 @@ class core_competency_api_testcase extends advanced_testcase {
 
         $this->setUser($u1);
 
+        $this->expectException(required_capability_exception::class);
         api::delete_evidence($ev1);
     }
 
@@ -4627,4 +4635,38 @@ class core_competency_api_testcase extends advanced_testcase {
         $this->assertEquals($uc1b->get('id'), $result['competencies'][0]->usercompetency->get('id'));
         $this->assertEquals($uc1c->get('id'), $result['competencies'][1]->usercompetency->get('id'));
     }
+
+    /**
+     * Test we can get all of a users plans with a competency.
+     */
+    public function test_list_plans_with_competency() {
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+        $lpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
+
+        $u1 = $this->getDataGenerator()->create_user();
+        $tpl = $this->getDataGenerator()->get_plugin_generator('core_competency')->create_template();
+
+        // Create a framework and assign competencies.
+        $framework = $lpg->create_framework();
+        $c1 = $lpg->create_competency(array('competencyframeworkid' => $framework->get('id')));
+
+        // Create two plans and assign the competency to each.
+        $plan1 = $lpg->create_plan(array('userid' => $u1->id));
+        $plan2 = $lpg->create_plan(array('userid' => $u1->id));
+
+        $lpg->create_plan_competency(array('planid' => $plan1->get('id'), 'competencyid' => $c1->get('id')));
+        $lpg->create_plan_competency(array('planid' => $plan2->get('id'), 'competencyid' => $c1->get('id')));
+
+        // Create one more plan without the competency.
+        $plan3 = $lpg->create_plan(array('userid' => $u1->id));
+
+        $plans = api::list_plans_with_competency($u1->id, $c1);
+
+        $this->assertEquals(2, count($plans));
+
+        $this->assertEquals(reset($plans)->get('id'), $plan1->get('id'));
+        $this->assertEquals(end($plans)->get('id'), $plan2->get('id'));
+    }
+
 }

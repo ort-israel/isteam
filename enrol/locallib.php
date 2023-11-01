@@ -38,7 +38,7 @@ class course_enrolment_manager {
 
     /**
      * The course context
-     * @var stdClass
+     * @var context
      */
     protected $context;
     /**
@@ -117,6 +117,7 @@ class course_enrolment_manager {
     private $_plugins = null;
     private $_allplugins = null;
     private $_roles = null;
+    private $_visibleroles = null;
     private $_assignableroles = null;
     private $_assignablerolesothers = null;
     private $_groups = null;
@@ -379,8 +380,9 @@ class course_enrolment_manager {
         $params = array('guestid' => $CFG->siteguest);
         if (!empty($search)) {
             $conditions = get_extra_user_fields($this->get_context());
-            $conditions[] = 'u.firstname';
-            $conditions[] = 'u.lastname';
+            foreach (get_all_user_name_fields() as $field) {
+                $conditions[] = 'u.'.$field;
+            }
             $conditions[] = $DB->sql_fullname('u.firstname', 'u.lastname');
             if ($searchanywhere) {
                 $searchparam = '%' . $search . '%';
@@ -400,6 +402,7 @@ class course_enrolment_manager {
         $extrafields = get_extra_user_fields($this->get_context(), array('username', 'lastaccess'));
         $extrafields[] = 'username';
         $extrafields[] = 'lastaccess';
+        $extrafields[] = 'maildisplay';
         $ufields = user_picture::fields('u', $extrafields);
 
         return array($ufields, $params, $wherecondition);
@@ -416,21 +419,50 @@ class course_enrolment_manager {
      * @param int $page which page number of the results to show.
      * @param int $perpage number of users per page.
      * @param int $addedenrollment number of users added to enrollment.
-     * @return array with two elememts:
-     *      int total number of users matching the search.
-     *      array of user objects returned by the query.
+     * @param bool $returnexactcount Return the exact total users using count_record or not.
+     * @return array with two or three elements:
+     *      int totalusers Number users matching the search. (This element only exist if $returnexactcount was set to true)
+     *      array users List of user objects returned by the query.
+     *      boolean moreusers True if there are still more users, otherwise is False.
+     * @throws dml_exception
      */
-    protected function execute_search_queries($search, $fields, $countfields, $sql, array $params, $page, $perpage, $addedenrollment=0) {
+    protected function execute_search_queries($search, $fields, $countfields, $sql, array $params, $page, $perpage,
+            $addedenrollment = 0, $returnexactcount = false) {
         global $DB, $CFG;
 
         list($sort, $sortparams) = users_order_by_sql('u', $search, $this->get_context());
         $order = ' ORDER BY ' . $sort;
 
-        $totalusers = $DB->count_records_sql($countfields . $sql, $params);
-        $availableusers = $DB->get_records_sql($fields . $sql . $order,
-                array_merge($params, $sortparams), ($page*$perpage) - $addedenrollment, $perpage);
+        $totalusers = 0;
+        $moreusers = false;
+        $results = [];
 
-        return array('totalusers' => $totalusers, 'users' => $availableusers);
+        $availableusers = $DB->get_records_sql($fields . $sql . $order,
+                array_merge($params, $sortparams), ($page * $perpage) - $addedenrollment, $perpage + 1);
+        if ($availableusers) {
+            $totalusers = count($availableusers);
+            $moreusers = $totalusers > $perpage;
+
+            if ($moreusers) {
+                // We need to discard the last record.
+                array_pop($availableusers);
+            }
+
+            if ($returnexactcount && $moreusers) {
+                // There is more data. We need to do the exact count.
+                $totalusers = $DB->count_records_sql($countfields . $sql, $params);
+            }
+        }
+
+        $results['users'] = $availableusers;
+        $results['moreusers'] = $moreusers;
+
+        if ($returnexactcount) {
+            // Include totalusers in result if $returnexactcount flag is true.
+            $results['totalusers'] = $totalusers;
+        }
+
+        return $results;
     }
 
     /**
@@ -443,9 +475,15 @@ class course_enrolment_manager {
      * @param int $page Defaults to 0
      * @param int $perpage Defaults to 25
      * @param int $addedenrollment Defaults to 0
-     * @return array Array(totalusers => int, users => array)
+     * @param bool $returnexactcount Return the exact total users using count_record or not.
+     * @return array with two or three elements:
+     *      int totalusers Number users matching the search. (This element only exist if $returnexactcount was set to true)
+     *      array users List of user objects returned by the query.
+     *      boolean moreusers True if there are still more users, otherwise is False.
+     * @throws dml_exception
      */
-    public function get_potential_users($enrolid, $search='', $searchanywhere=false, $page=0, $perpage=25, $addedenrollment=0) {
+    public function get_potential_users($enrolid, $search = '', $searchanywhere = false, $page = 0, $perpage = 25,
+            $addedenrollment = 0, $returnexactcount = false) {
         global $DB;
 
         list($ufields, $params, $wherecondition) = $this->get_basic_search_conditions($search, $searchanywhere);
@@ -458,7 +496,8 @@ class course_enrolment_manager {
                       AND ue.id IS NULL";
         $params['enrolid'] = $enrolid;
 
-        return $this->execute_search_queries($search, $fields, $countfields, $sql, $params, $page, $perpage, $addedenrollment);
+        return $this->execute_search_queries($search, $fields, $countfields, $sql, $params, $page, $perpage, $addedenrollment,
+                $returnexactcount);
     }
 
     /**
@@ -469,9 +508,14 @@ class course_enrolment_manager {
      * @param bool $searchanywhere
      * @param int $page Starting at 0
      * @param int $perpage
-     * @return array
+     * @param bool $returnexactcount Return the exact total users using count_record or not.
+     * @return array with two or three elements:
+     *      int totalusers Number users matching the search. (This element only exist if $returnexactcount was set to true)
+     *      array users List of user objects returned by the query.
+     *      boolean moreusers True if there are still more users, otherwise is False.
+     * @throws dml_exception
      */
-    public function search_other_users($search='', $searchanywhere=false, $page=0, $perpage=25) {
+    public function search_other_users($search = '', $searchanywhere = false, $page = 0, $perpage = 25, $returnexactcount = false) {
         global $DB, $CFG;
 
         list($ufields, $params, $wherecondition) = $this->get_basic_search_conditions($search, $searchanywhere);
@@ -484,7 +528,36 @@ class course_enrolment_manager {
                     AND ra.id IS NULL";
         $params['contextid'] = $this->context->id;
 
-        return $this->execute_search_queries($search, $fields, $countfields, $sql, $params, $page, $perpage);
+        return $this->execute_search_queries($search, $fields, $countfields, $sql, $params, $page, $perpage, 0, $returnexactcount);
+    }
+
+    /**
+     * Searches through the enrolled users in this course.
+     *
+     * @param string $search The search term.
+     * @param bool $searchanywhere Can the search term be anywhere, or must it be at the start.
+     * @param int $page Starting at 0.
+     * @param int $perpage Number of users returned per page.
+     * @param bool $returnexactcount Return the exact total users using count_record or not.
+     * @return array with two or three elements:
+     *      int totalusers Number users matching the search. (This element only exist if $returnexactcount was set to true)
+     *      array users List of user objects returned by the query.
+     *      boolean moreusers True if there are still more users, otherwise is False.
+     */
+    public function search_users(string $search = '', bool $searchanywhere = false, int $page = 0, int $perpage = 25,
+            bool $returnexactcount = false) {
+        list($ufields, $params, $wherecondition) = $this->get_basic_search_conditions($search, $searchanywhere);
+
+        $fields      = 'SELECT ' . $ufields;
+        $countfields = 'SELECT COUNT(u.id)';
+        $sql = " FROM {user} u
+                 JOIN {user_enrolments} ue ON ue.userid = u.id
+                 JOIN {enrol} e ON ue.enrolid = e.id
+                WHERE $wherecondition
+                  AND e.courseid = :courseid";
+        $params['courseid'] = $this->course->id;
+
+        return $this->execute_search_queries($search, $fields, $countfields, $sql, $params, $page, $perpage, 0, $returnexactcount);
     }
 
     /**
@@ -521,13 +594,12 @@ class course_enrolment_manager {
     /**
      * Returns all of the enrolment instances for this course.
      *
-     * NOTE: since 2.4 it includes instances of disabled plugins too.
-     *
+     * @param bool $onlyenabled Whether to return data from enabled enrolment instance names only.
      * @return array
      */
-    public function get_enrolment_instances() {
+    public function get_enrolment_instances($onlyenabled = false) {
         if ($this->_instances === null) {
-            $this->_instances = enrol_get_instances($this->course->id, false);
+            $this->_instances = enrol_get_instances($this->course->id, $onlyenabled);
         }
         return $this->_instances;
     }
@@ -535,13 +607,12 @@ class course_enrolment_manager {
     /**
      * Returns the names for all of the enrolment instances for this course.
      *
-     * NOTE: since 2.4 it includes instances of disabled plugins too.
-     *
+     * @param bool $onlyenabled Whether to return data from enabled enrolment instance names only.
      * @return array
      */
-    public function get_enrolment_instance_names() {
+    public function get_enrolment_instance_names($onlyenabled = false) {
         if ($this->_inames === null) {
-            $instances = $this->get_enrolment_instances();
+            $instances = $this->get_enrolment_instances($onlyenabled);
             $plugins = $this->get_enrolment_plugins(false);
             foreach ($instances as $key=>$instance) {
                 if (!isset($plugins[$instance->enrol])) {
@@ -556,7 +627,7 @@ class course_enrolment_manager {
     }
 
     /**
-     * Gets all of the enrolment plugins that are active for this course.
+     * Gets all of the enrolment plugins that are available for this course.
      *
      * @param bool $onlyenabled return only enabled enrol plugins
      * @return array
@@ -593,6 +664,18 @@ class course_enrolment_manager {
             $this->_roles = role_fix_names(get_all_roles($this->context), $this->context);
         }
         return $this->_roles;
+    }
+
+    /**
+     * Gets all of the roles this course can contain.
+     *
+     * @return array
+     */
+    public function get_viewable_roles() {
+        if ($this->_visibleroles === null) {
+            $this->_visibleroles = get_viewable_roles($this->context);
+        }
+        return $this->_visibleroles;
     }
 
     /**
@@ -805,7 +888,7 @@ class course_enrolment_manager {
      */
     public function edit_enrolment($userenrolment, $data) {
         //Only allow editing if the user has the appropriate capability
-        //Already checked in /enrol/users.php but checking again in case this function is called from elsewhere
+        //Already checked in /user/index.php but checking again in case this function is called from elsewhere
         list($instance, $plugin) = $this->get_user_enrolment_components($userenrolment);
         if ($instance && $plugin && $plugin->allow_manage($instance) && has_capability("enrol/$instance->enrol:manage", $this->context)) {
             if (!isset($data->status)) {
@@ -935,7 +1018,7 @@ class course_enrolment_manager {
     /**
      * Returns the course context
      *
-     * @return stdClass
+     * @return context
      */
     public function get_context() {
         return $this->context;
@@ -1034,7 +1117,7 @@ class course_enrolment_manager {
         $strunenrol = get_string('unenrol', 'enrol');
         $stredit = get_string('edit');
 
-        $allroles   = $this->get_all_roles();
+        $visibleroles   = $this->get_viewable_roles();
         $assignable = $this->get_assignable_roles();
         $allgroups  = $this->get_all_groups();
         $context    = $this->get_context();
@@ -1056,7 +1139,15 @@ class course_enrolment_manager {
                 if (!is_siteadmin() and !isset($assignable[$rid])) {
                     $unchangeable = true;
                 }
-                $details['roles'][$rid] = array('text'=>$allroles[$rid]->localname, 'unchangeable'=>$unchangeable);
+
+                if (isset($visibleroles[$rid])) {
+                    $label = $visibleroles[$rid];
+                } else {
+                    $label = get_string('novisibleroles', 'role');
+                    $unchangeable = true;
+                }
+
+                $details['roles'][$rid] = array('text' => $label, 'unchangeable' => $unchangeable);
             }
 
             // Users
@@ -1129,7 +1220,7 @@ class course_enrolment_manager {
         );
 
         foreach ($extrafields as $field) {
-            $details[$field] = $user->{$field};
+            $details[$field] = s($user->{$field});
         }
 
         // Last time user has accessed the site.

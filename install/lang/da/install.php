@@ -1,6 +1,5 @@
 <?php
-
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * Automatically generated strings for Moodle installer
@@ -37,11 +36,12 @@ $string['chooselanguagesub'] = 'Vælg et sprog til brug under installationen. De
 $string['clialreadyconfigured'] = 'Konfigurationsfilen config.php eksisterer allerede. Benyt venigst admin/cli/install_database.php til at installere Moodle for dette site.';
 $string['clialreadyinstalled'] = 'Filen config.php eksisterer allerede, brug admin/cli/install_database.php hvis du ønsker at opgradere dette websted.';
 $string['cliinstallheader'] = 'Moodle {$a} kommandolinje-installationsprogram';
+$string['clitablesexist'] = 'Databasetabeller er allerede oprettet, CLI-installationen kan ikke fortsætte.';
 $string['databasehost'] = 'Databasevært';
 $string['databasename'] = 'Databasenavn';
 $string['databasetypehead'] = 'Vælg databasedriver';
 $string['dataroot'] = 'Datamappe';
-$string['datarootpermission'] = 'Rettighed til datamapper';
+$string['datarootpermission'] = 'Rettighed til data mapper';
 $string['dbprefix'] = 'Præfiks for tabeller';
 $string['dirroot'] = 'Moodle-mappe';
 $string['environmenthead'] = 'Kontrollerer din serveropsætning...';
@@ -49,7 +49,7 @@ $string['environmentsub2'] = 'Hver version af Moodle har nogle minimumskrav til 
 Installationsprogrammet udfører et tjek før hver installation og opgradering. Kontakt din serveradministrator hvis ikke du ved hvordan du installerer en ny version eller aktiverer PHP-extensions.';
 $string['errorsinenvironment'] = 'Systemtjekket mislykkedes!';
 $string['installation'] = 'Installation';
-$string['langdownloaderror'] = 'Sproget "{$a}" blev desværre ikke installeret. Installationen vil fortsætte på engelsk.';
+$string['langdownloaderror'] = 'Sproget "{$a}" blev desværre ikke downloadet. Installationen vil fortsætte på engelsk.';
 $string['memorylimithelp'] = '<p>Den mængde hukommelse PHP kan bruge, er sat til {$a}.</p>
 
 <p>Det kan forårsage at der opstår problemer senere, især hvis du har mange moduler aktiveret eller mange brugere.</p>
@@ -88,7 +88,7 @@ $string['welcomep20'] = 'Du ser denne side fordi du har installeret og åbnet pa
 Tillykke med det!';
 $string['welcomep30'] = 'Denne version af <strong>{$a->installername}</strong> indeholder programmerne til at oprette et miljø, hvori <strong>Moodle</strong> vil operere, nemlig:';
 $string['welcomep40'] = 'Pakken indeholder også <strong>Moodle {$a->moodlerelease} ({$a->moodleversion})</strong>.';
-$string['welcomep50'] = 'Brugen af programmerne i denne pakke reguleres af deres respektive licenser. Hele <strong>{$a->installername}</strong>-pakken er <a href="http://www.opensource.org/docs/definition_plain.html">open source</a> og distribueret under <a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>-licensen.';
+$string['welcomep50'] = 'Brugen af programmerne i denne pakke reguleres af deres respektive licenser. Hele <strong>{$a->installername}</strong>-pakken er <a href="https://www.opensource.org/docs/definition_plain.html">open source</a> og distribueret under <a href="https://www.gnu.org/copyleft/gpl.html">GPL</a>-licensen.';
 $string['welcomep60'] = 'De følgende sider vil hjælpe dig gennem nogle nemme trin til konfiguration og opsætning af <strong>Moodle</strong> på din computer. Du kan acceptere standardindstillingerne, eller vælge at ændre dem så de bedre svarer til dine egne behov.';
 $string['welcomep70'] = 'Klik på "Næste" herunder for at forsætte opsætningen af <strong>Moodle</strong>.';
 $string['wwwroot'] = 'Webadresse';

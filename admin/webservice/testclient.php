@@ -54,14 +54,14 @@ foreach ($allfunctions as $f) {
         //some plugins may want to have own test client forms
         include_once($CFG->dirroot.'/'.$finfo->testclientpath);
     }
-    $class = $f->name.'_form';
+    $class = $f->name.'_testclient_form';
     if (class_exists($class)) {
         $functions[$f->name] = $f->name;
         continue;
     }
 }
 
-// whitelisting security
+// Allow only functions available for testing.
 if (!isset($functions[$function])) {
     $function = '';
 }
@@ -81,7 +81,9 @@ foreach ($active_protocols as $p) {
     }
     $protocols[$p] = get_string('pluginname', 'webservice_'.$p);
 }
-if (!isset($protocols[$protocol])) { // whitelisting security
+
+// Allow only protocols supporting the test client.
+if (!isset($protocols[$protocol])) {
     $protocol = '';
 }
 
@@ -103,7 +105,7 @@ if (!$function or !$protocol) {
     die;
 }
 
-$class = $function.'_form';
+$class = $function.'_testclient_form';
 
 $mform = new $class(null, array('authmethod' => $authmethod));
 $mform->set_data(array('function'=>$function, 'protocol'=>$protocol));

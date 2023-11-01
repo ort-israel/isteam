@@ -4,7 +4,7 @@ Feature: Upload users to a cohort
   As an admin
   I need to upload a file with users data containing cohort assigns
 
-  @javascript
+  @javascript @skip_chrome_zerosize
   Scenario: Upload users and assign them to a course with cohort enrolment method enabled
     Given the following "cohorts" exist:
       | name | idnumber |
@@ -18,10 +18,12 @@ Feature: Upload users to a cohort
     And I am on "Course 1" course homepage
     And I add "Cohort sync" enrolment method with:
       | Cohort | Cohort 1 |
+    And I should see "Cohort sync (Cohort 1 - Student)"
     And I am on "Course 2" course homepage
     And I add "Cohort sync" enrolment method with:
       | Cohort | Cohort 2 |
-    When I navigate to "Upload users" node in "Site administration > Users > Accounts"
+    And I should see "Cohort sync (Cohort 2 - Student)"
+    When I navigate to "Users > Accounts > Upload users" in site administration
     And I upload "lib/tests/fixtures/upload_users_cohorts.csv" file to "File" filemanager
     And I press "Upload users"
     And I press "Upload users"

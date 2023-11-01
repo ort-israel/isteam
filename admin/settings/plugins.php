@@ -59,6 +59,18 @@ if ($hassiteconfig) {
         $plugin->load_settings($ADMIN, 'formatsettings', $hassiteconfig);
     }
 
+    // Custom fields.
+    $ADMIN->add('modules', new admin_category('customfieldsettings', new lang_string('customfields', 'core_customfield')));
+    $temp = new admin_settingpage('managecustomfields', new lang_string('managecustomfields', 'core_admin'));
+    $temp->add(new admin_setting_managecustomfields());
+    $ADMIN->add('customfieldsettings', $temp);
+    $plugins = core_plugin_manager::instance()->get_plugins_of_type('customfield');
+    core_collator::asort_objects_by_property($plugins, 'displayname');
+    foreach ($plugins as $plugin) {
+        /** @var \core\plugininfo\customfield $plugin */
+        $plugin->load_settings($ADMIN, 'customfieldsettings', $hassiteconfig);
+    }
+
     // blocks
     $ADMIN->add('modules', new admin_category('blocksettings', new lang_string('blocks')));
     $ADMIN->add('blocksettings', new admin_page_manageblocks());
@@ -67,17 +79,6 @@ if ($hassiteconfig) {
     foreach ($plugins as $plugin) {
         /** @var \core\plugininfo\block $plugin */
         $plugin->load_settings($ADMIN, 'blocksettings', $hassiteconfig);
-    }
-
-    // message outputs
-    $ADMIN->add('modules', new admin_category('messageoutputs', new lang_string('messageoutputs', 'message')));
-    $ADMIN->add('messageoutputs', new admin_page_managemessageoutputs());
-    $ADMIN->add('messageoutputs', new admin_page_defaultmessageoutputs());
-    $plugins = core_plugin_manager::instance()->get_plugins_of_type('message');
-    core_collator::asort_objects_by_property($plugins, 'displayname');
-    foreach ($plugins as $plugin) {
-        /** @var \core\plugininfo\message $plugin */
-        $plugin->load_settings($ADMIN, 'messageoutputs', $hassiteconfig);
     }
 
     // authentication plugins
@@ -102,7 +103,7 @@ if ($hassiteconfig) {
     $temp->add(new admin_setting_configtext('alternateloginurl', new lang_string('alternateloginurl', 'auth'),
                                             new lang_string('alternatelogin', 'auth', htmlspecialchars(get_login_url())), ''));
     $temp->add(new admin_setting_configtext('forgottenpasswordurl', new lang_string('forgottenpasswordurl', 'auth'),
-                                            new lang_string('forgottenpassword', 'auth'), ''));
+                                            new lang_string('forgottenpassword', 'auth'), '', PARAM_URL));
     $temp->add(new admin_setting_confightmleditor('auth_instructions', new lang_string('instructions', 'auth'),
                                                 new lang_string('authinstructions', 'auth'), ''));
     $setting = new admin_setting_configtext('allowemailaddresses', new lang_string('allowemailaddresses', 'admin'),
@@ -166,6 +167,42 @@ if ($hassiteconfig) {
     $ADMIN->add('modules', new admin_category('antivirussettings', new lang_string('antiviruses', 'antivirus')));
     $temp = new admin_settingpage('manageantiviruses', new lang_string('antivirussettings', 'antivirus'));
     $temp->add(new admin_setting_manageantiviruses());
+
+    // Common settings.
+    $temp->add(new admin_setting_heading('antiviruscommonsettings', new lang_string('antiviruscommonsettings', 'antivirus'), ''));
+
+    // Alert email.
+    $temp->add(
+        new admin_setting_configtext(
+            'antivirus/notifyemail',
+            new lang_string('notifyemail', 'antivirus'),
+            new lang_string('notifyemail_help', 'antivirus'),
+            '',
+            PARAM_EMAIL
+        )
+    );
+
+    // Enable quarantine.
+    $temp->add(
+        new admin_setting_configcheckbox(
+            'antivirus/enablequarantine',
+            new lang_string('enablequarantine', 'antivirus'),
+            new lang_string('enablequarantine_help', 'antivirus',
+            \core\antivirus\quarantine::DEFAULT_QUARANTINE_FOLDER),
+            0
+        )
+    );
+
+    // Quarantine time.
+    $temp->add(
+        new admin_setting_configduration(
+            'antivirus/quarantinetime',
+            new lang_string('quarantinetime', 'antivirus'),
+            new lang_string('quarantinetime_desc', 'antivirus'),
+            \core\antivirus\quarantine::DEFAULT_QUARANTINE_TIME
+        )
+    );
+
     $ADMIN->add('antivirussettings', $temp);
     $plugins = core_plugin_manager::instance()->get_plugins_of_type('antivirus');
     core_collator::asort_objects_by_property($plugins, 'displayname');
@@ -174,19 +211,12 @@ if ($hassiteconfig) {
         $plugin->load_settings($ADMIN, 'antivirussettings', $hassiteconfig);
     }
 
-/// License types
-    $ADMIN->add('modules', new admin_category('licensesettings', new lang_string('licenses')));
-    $temp = new admin_settingpage('managelicenses', new lang_string('managelicenses', 'admin'));
-
-    require_once($CFG->libdir . '/licenselib.php');
-    $licenses = array();
-    $array = explode(',', $CFG->licenses);
-    foreach ($array as $value) {
-        $licenses[$value] = new lang_string($value, 'license');
+    // Machine learning backend plugins.
+    $ADMIN->add('modules', new admin_category('mlbackendsettings', new lang_string('mlbackendsettings', 'admin')));
+    $plugins = core_plugin_manager::instance()->get_plugins_of_type('mlbackend');
+    foreach ($plugins as $plugin) {
+        $plugin->load_settings($ADMIN, 'mlbackendsettings', $hassiteconfig);
     }
-    $temp->add(new admin_setting_configselect('sitedefaultlicense', new lang_string('configsitedefaultlicense','admin'), new lang_string('configsitedefaultlicensehelp','admin'), 'allrightsreserved', $licenses));
-    $temp->add(new admin_setting_managelicenses());
-    $ADMIN->add('licensesettings', $temp);
 
 /// Filter plugins
     $ADMIN->add('modules', new admin_category('filtersettings', new lang_string('managefilters')));
@@ -248,6 +278,25 @@ if ($hassiteconfig) {
     foreach ($plugins as $plugin) {
         /** @var \core\plugininfo\media $plugin */
         $plugin->load_settings($ADMIN, 'mediaplayers', $hassiteconfig);
+    }
+
+    // Payment gateway plugins.
+    $ADMIN->add('modules', new admin_category('paymentgateways', new lang_string('type_paygw_plural', 'plugin')));
+    $temp = new admin_settingpage('managepaymentgateways', new lang_string('type_paygwmanage', 'plugin'));
+    $temp->add(new \core_admin\local\settings\manage_payment_gateway_plugins());
+    $temp->add(new admin_setting_description(
+        'managepaymentgatewayspostfix',
+        '',
+        new lang_string('gotopaymentaccounts', 'payment',
+            html_writer::link(new moodle_url('/payment/accounts.php'), get_string('paymentaccounts', 'payment')))
+    ));
+    $ADMIN->add('paymentgateways', $temp);
+
+    $plugins = core_plugin_manager::instance()->get_plugins_of_type('paygw');
+    core_collator::asort_objects_by_property($plugins, 'displayname');
+    foreach ($plugins as $plugin) {
+        /** @var \core\plugininfo\paygw $plugin */
+        $plugin->load_settings($ADMIN, 'paymentgateways', $hassiteconfig);
     }
 
     // Data format settings.
@@ -555,8 +604,94 @@ if ($hassiteconfig) {
 
     // Search engine selection.
     $temp->add(new admin_setting_heading('searchengineheading', new lang_string('searchengine', 'admin'), ''));
-    $temp->add(new admin_setting_configselect('searchengine',
-                                new lang_string('selectsearchengine', 'admin'), '', 'solr', $engines));
+    $searchengineselect = new admin_setting_configselect('searchengine',
+            new lang_string('selectsearchengine', 'admin'), '', 'simpledb', $engines);
+    $searchengineselect->set_validate_function(function(string $value): string {
+        global $CFG;
+
+        // Check nobody's setting the indexing and query-only server to the same one.
+        if (isset($CFG->searchenginequeryonly) && $CFG->searchenginequeryonly === $value) {
+            return get_string('searchenginequeryonlysame', 'admin');
+        } else {
+            return '';
+        }
+    });
+    $temp->add($searchengineselect);
+    $temp->add(new admin_setting_heading('searchoptionsheading', new lang_string('searchoptions', 'admin'), ''));
+    $temp->add(new admin_setting_configcheckbox('searchindexwhendisabled',
+            new lang_string('searchindexwhendisabled', 'admin'), new lang_string('searchindexwhendisabled_desc', 'admin'),
+            0));
+    $temp->add(new admin_setting_configduration('searchindextime',
+            new lang_string('searchindextime', 'admin'), new lang_string('searchindextime_desc', 'admin'),
+            600));
+    $temp->add(new admin_setting_heading('searchcoursesheading', new lang_string('searchablecourses', 'admin'), ''));
+    $options = [
+        0 => new lang_string('searchallavailablecourses_off', 'admin'),
+        1 => new lang_string('searchallavailablecourses_on', 'admin')
+    ];
+    $temp->add(new admin_setting_configselect('searchallavailablecourses',
+            new lang_string('searchallavailablecourses', 'admin'),
+            new lang_string('searchallavailablecoursesdesc', 'admin'),
+            0, $options));
+    $temp->add(new admin_setting_configcheckbox('searchincludeallcourses',
+        new lang_string('searchincludeallcourses', 'admin'), new lang_string('searchincludeallcourses_desc', 'admin'),
+        0));
+
+    // Search display options.
+    $temp->add(new admin_setting_heading('searchdisplay', new lang_string('searchdisplay', 'admin'), ''));
+    $temp->add(new admin_setting_configcheckbox('searchenablecategories',
+        new lang_string('searchenablecategories', 'admin'),
+        new lang_string('searchenablecategories_desc', 'admin'),
+        0));
+    $options = [];
+    foreach (\core_search\manager::get_search_area_categories() as $category) {
+        $options[$category->get_name()] = $category->get_visiblename();
+    }
+    $temp->add(new admin_setting_configselect('searchdefaultcategory',
+        new lang_string('searchdefaultcategory', 'admin'),
+        new lang_string('searchdefaultcategory_desc', 'admin'),
+        \core_search\manager::SEARCH_AREA_CATEGORY_ALL, $options));
+    $temp->add(new admin_setting_configcheckbox('searchhideallcategory',
+        new lang_string('searchhideallcategory', 'admin'),
+        new lang_string('searchhideallcategory_desc', 'admin'),
+        0));
+
+    $temp->add(new admin_setting_heading('searchmanagement', new lang_string('searchmanagement', 'admin'),
+            new lang_string('searchmanagement_desc', 'admin')));
+
+    // Get list of search engines including those with alternate settings.
+    $searchenginequeryonlyselect = new admin_setting_configselect('searchenginequeryonly',
+            new lang_string('searchenginequeryonly', 'admin'),
+            new lang_string('searchenginequeryonly_desc', 'admin'), '', function() use($engines) {
+                $options = ['' => new lang_string('searchenginequeryonly_none', 'admin')];
+                foreach ($engines as $name => $display) {
+                    $options[$name] = $display;
+
+                    $classname = '\search_' . $name . '\engine';
+                    $engine = new $classname;
+                    if ($engine->has_alternate_configuration()) {
+                        $options[$name . '-alternate'] =
+                                new lang_string('searchenginealternatesettings', 'admin', $display);
+                    }
+                }
+                return $options;
+            });
+    $searchenginequeryonlyselect->set_validate_function(function(string $value): string {
+        global $CFG;
+
+        // Check nobody's setting the indexing and query-only server to the same one.
+        if (isset($CFG->searchengine) && $CFG->searchengine === $value) {
+            return get_string('searchenginequeryonlysame', 'admin');
+        } else {
+            return '';
+        }
+    });
+    $temp->add($searchenginequeryonlyselect);
+    $temp->add(new admin_setting_configcheckbox('searchbannerenable',
+            new lang_string('searchbannerenable', 'admin'), new lang_string('searchbannerenable_desc', 'admin'),
+            0));
+    $temp->add(new admin_setting_confightmleditor('searchbanner',
+            new lang_string('searchbanner', 'admin'), '', ''));
 
     $ADMIN->add('searchplugins', $temp);
     $ADMIN->add('searchplugins', new admin_externalpage('searchareas', new lang_string('searchareas', 'admin'),
@@ -608,6 +743,19 @@ if ($hassiteconfig) {
     foreach ($plugins as $plugin) {
         /** @var \core\plugininfo\calendartype $plugin */
         $plugin->load_settings($ADMIN, 'calendartype', $hassiteconfig);
+    }
+}
+
+// Content bank content types.
+if ($hassiteconfig) {
+    $ADMIN->add('modules', new admin_category('contentbanksettings', new lang_string('contentbank')));
+    $temp = new admin_settingpage('managecontentbanktypes', new lang_string('managecontentbanktypes'));
+    $temp->add(new admin_setting_managecontentbankcontenttypes());
+    $ADMIN->add('contentbanksettings', $temp);
+    $plugins = core_plugin_manager::instance()->get_plugins_of_type('contenttype');
+    foreach ($plugins as $plugin) {
+        /** @var \core\plugininfo\contentbank $plugin */
+        $plugin->load_settings($ADMIN, 'contentbanksettings', $hassiteconfig);
     }
 }
 

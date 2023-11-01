@@ -1,9 +1,0 @@
-{
-  "moodle-mod_mediagallery-mediabox": {
-    "requires": [
-        "base",
-        "node",
-        "selector-css3"
-    ]
-  }
-}

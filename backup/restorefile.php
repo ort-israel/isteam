@@ -72,13 +72,16 @@ if (is_null($course)) {
 $browser = get_file_browser();
 
 // check if tmp dir exists
-$tmpdir = $CFG->tempdir . '/backup';
+$tmpdir = make_backup_temp_directory('', false);
 if (!check_dir_exists($tmpdir, true, true)) {
     throw new restore_controller_exception('cannot_create_backup_temp_dir');
 }
 
 // choose the backup file from backup files tree
 if ($action == 'choosebackupfile') {
+    if ($filearea == 'automated') {
+        require_capability('moodle/restore:viewautomatedfilearea', $context);
+    }
     if ($fileinfo = $browser->get_file_info($filecontext, $component, $filearea, $itemid, $filepath, $filename)) {
         if (is_a($fileinfo, 'file_info_stored')) {
             // Use the contenthash rather than copying the file where possible,
@@ -111,6 +114,7 @@ $PAGE->set_context($context);
 $PAGE->set_title(get_string('course') . ': ' . $coursefullname);
 $PAGE->set_heading($heading);
 $PAGE->set_pagelayout('admin');
+$PAGE->requires->js_call_amd('core_backup/async_backup', 'asyncBackupAllStatus', array($context->id));
 
 $form = new course_restore_form(null, array('contextid'=>$contextid));
 $data = $form->get_data();
@@ -124,8 +128,6 @@ if ($data && has_capability('moodle/restore:uploadfile', $context)) {
     redirect($restore_url);
     die;
 }
-
-
 
 echo $OUTPUT->header();
 
@@ -190,6 +192,15 @@ if (!empty($automatedbackups)) {
     $treeview_options['filearea']    = 'automated';
     $renderer = $PAGE->get_renderer('core', 'backup');
     echo $renderer->backup_files_viewer($treeview_options);
+    echo $OUTPUT->container_end();
+}
+
+// In progress course restores.
+if (async_helper::is_async_enabled()) {
+    echo $OUTPUT->heading_with_help(get_string('asyncrestoreinprogress', 'backup'), 'asyncrestoreinprogress', 'backup');
+    echo $OUTPUT->container_start();
+    $renderer = $PAGE->get_renderer('core', 'backup');
+    echo $renderer->restore_progress_viewer($USER->id, $context);
     echo $OUTPUT->container_end();
 }
 
