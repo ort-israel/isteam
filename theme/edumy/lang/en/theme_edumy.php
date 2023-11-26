@@ -694,3 +694,4 @@ $string['ccn_cf_all_matching'] = 'All matching';
 $string['no_students_yet'] = 'No students yet';
 $string['no_courses_yet'] = 'No courses yet';
 $string['interested_in'] = 'Interested in';
+$string['uncategorized'] = 'Uncategorized';

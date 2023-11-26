@@ -223,6 +223,9 @@ class block_cocoon_contact_form extends block_base
                           } elseif($this->config->recaptcha == 1) {
                             $this->content->text .= $this->getrecaptcha();
                           }
+                        $this->content->map_lat = property_exists($this->content,'map_lat') ? $this->content->map_lat : '';
+                        $this->content->map_lng = property_exists($this->content,'map_lng') ? $this->content->map_lng : '';
+                        $this->content->map_address  = property_exists($this->content,'map_address ') ? $this->content->map_address  : '';
                         $this->content->text .='
                         </div>
                         <div class="form-group ui_kit_button mb0">
@@ -331,6 +334,7 @@ class block_cocoon_contact_form extends block_base
                 ]
             }
         ];
+
           var myGent = new google.maps.LatLng('.$this->content->map_lat.','.$this->content->map_lng.');
           var Kine = new google.maps.LatLng('.$this->content->map_lat.','.$this->content->map_lng.');
           var mapOptions = {

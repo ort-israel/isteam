@@ -63,7 +63,7 @@ Feature: Bulk released grades should not be sent to gradebook while submissions 
     And I set the field "Grade out of 100" to "50"
     And I set the field "Marking workflow state" to "In review"
     And I set the field "Feedback comments" to "Great job!"
-    And I set the field "Notify students" to "0"
+    And I set the field "Notify student" to "0"
     And I press "Save changes"
     And I follow "Test assignment name"
     And I navigate to "View all submissions" in current page administration
@@ -72,7 +72,7 @@ Feature: Bulk released grades should not be sent to gradebook while submissions 
     And I set the field "Grade out of 100" to "50"
     And I set the field "Marking workflow state" to "In review"
     And I set the field "Feedback comments" to "Great job!"
-    And I set the field "Notify students" to "0"
+    And I set the field "Notify student" to "0"
     And I press "Save changes"
     And I follow "Test assignment name"
     And I navigate to "View all submissions" in current page administration
@@ -87,7 +87,7 @@ Feature: Bulk released grades should not be sent to gradebook while submissions 
     Then I should not see "Student 1 (student1@example.com)"
     And I should not see "Student 2 (student2@example.com)"
     And I set the field "Marking workflow state" to "Released"
-    And I set the field "Notify students" to "No"
+    And I set the field "Notify student" to "No"
     And I press "Save changes"
     And I follow "Test assignment name"
     And I navigate to "View all submissions" in current page administration
@@ -137,7 +137,7 @@ Feature: Bulk released grades should not be sent to gradebook while submissions 
     Then I should see "Student 1 (student1@example.com)"
     And I should see "Student 2 (student2@example.com)"
     And I set the field "Marking workflow state" to "Released"
-    And I set the field "Notify students" to "No"
+    And I set the field "Notify student" to "No"
     And I press "Save changes"
     And I follow "Test assignment name"
     And I navigate to "View all submissions" in current page administration

@@ -205,7 +205,7 @@ $this->content->text .= '
 				<div class="col-lg-12">
 					<div class="read_more_home text-center">';
           if(!empty($this->content->footer_text)){
-						$this->content->text .='<h4>'.format_text($this->content->footer_text, FORMAT_HTML, array('filter' => true)).' <a href="'.format_text($this->content->button_link, FORMAT_HTML, array('filter' => true)).'">'.format_text($this->content->button_text, FORMAT_HTML, array('filter' => true)).'<span class="flaticon-right-arrow pl10"></span></a></h4>';
+						$this->content->text .='<h4>'.format_text($this->content->footer_text, FORMAT_HTML, array('filter' => true)).' <a href="'.format_text($this->content->button_link, FORMAT_PLAIN, array('filter' => true)).'">'.format_text($this->content->button_text, FORMAT_HTML, array('filter' => true)).'<span class="flaticon-right-arrow pl10"></span></a></h4>';
           }
           $this->content->text .='
 					</div>

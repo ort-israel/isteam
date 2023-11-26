@@ -1,7 +1,7 @@
 <?php
 global $CFG;
 require_once($CFG->dirroot. '/theme/edumy/ccn/block_handler/ccn_block_handler.php');
-use DateTime;
+
 class block_cocoon_event_body extends block_base
 {
     // Declare first

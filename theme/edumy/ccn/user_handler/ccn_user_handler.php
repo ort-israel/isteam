@@ -34,11 +34,11 @@ class ccnUserHandler {
         $userFirst = $userData->firstname;
         $userLast = $userData->lastname;
         $fieldDepartment = $userData->department;
-        $userIcq = $userData->icq;
-        $userSkype = $userData->skype;
-        $userYahoo = $userData->yahoo;
-        $userAim = $userData->aim;
-        $userMsn = $userData->msn;
+        $userIcq = property_exists($userData, 'icq') ? $userData->icq : '';
+        $userSkype = property_exists($userData, 'skype') ? $userData->skype : '';
+        $userYahoo = property_exists($userData, 'yahoo') ? $userData->yahoo : '';
+        $userAim = property_exists($userData, 'aim') ? $userData->aim : '';
+        $userMsn = property_exists($userData, 'msn') ? $userData->msn : '';
         $userPhone1 = $userData->phone1;
         $userPhone2 = $userData->phone2;
         /* ccnTkt: 2962

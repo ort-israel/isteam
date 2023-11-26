@@ -455,7 +455,7 @@ if(get_config('theme_edumy', 'custom_js_dashboard')){
   $custom_js_dashboard = '';
 }
 
-$ccnProfileIconUsername = $USER->username;
+$ccnProfileIconUsername = property_exists($USER, 'username') ? $USER->username : "";
 if(get_config('theme_edumy', 'profile_icon_username') == '1'){
   $ccnProfileIconUsername = $USER->firstname . ' '. $USER->lastname;
 }

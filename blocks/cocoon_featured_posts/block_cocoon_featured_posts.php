@@ -112,7 +112,7 @@ class block_cocoon_featured_posts extends block_base {
                           <div class="blog_post">
                             <div class="thumb">
                               <img class="img-fluid w100" src="'.$ccnGetPostDetails->image.'" alt="">';
-                              if($PAGE->theme->settings->blog_post_date != 1){
+                              if(($PAGE->theme->settings->blog_post_date != 1) && property_exists($ccnGetPostDetails,'blogPostCreated')){
                                 $text .='<span class="post_date">'.$ccnGetPostDetails->blogPostCreated.'</span>';
                               }
                               $text .='

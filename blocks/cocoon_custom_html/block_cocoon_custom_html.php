@@ -43,7 +43,7 @@ class block_cocoon_custom_html extends block_base
         if(!empty($this->config->body)){$this->content->body = $this->config->body['text'];}
         if(!empty($this->config->style)){$this->content->style = $this->config->style;}
         $this->content->text = '';
-        if($this->content->style == 2) { //Box shadow
+        if(property_exists($this->content, 'style') && ($this->content->style == 2)) { //Box shadow
           $this->content->text .= '
           <div class="cs_row_two">
             <div class="cs_overview ccn-csv2">
@@ -51,7 +51,7 @@ class block_cocoon_custom_html extends block_base
               '. format_text($this->content->body, FORMAT_HTML, array('filter' => true, 'noclean' => true)) .'
             </div>
           </div>';
-        } elseif($this->content->style == 1) { //Border
+        } elseif(property_exists($this->content, 'style') && ($this->content->style == 1)) { //Border
           $this->content->text .= '
           <div class="cs_row_two">
             <div class="cs_overview">
@@ -60,11 +60,13 @@ class block_cocoon_custom_html extends block_base
             </div>
           </div>';
         } else { //No Style
-          $this->content->text .= '
-          <div class="ccn_custom_html_default">
-            '.$this->content->title.'
-            '. format_text($this->content->body, FORMAT_HTML, array('filter' => true, 'noclean' => true)) .'
-          </div>';
+            if (property_exists($this->content, 'title')) {
+                $this->content->text .= '
+                  <div class="ccn_custom_html_default">
+                    ' . $this->content->title . '
+                    ' . format_text($this->content->body, FORMAT_HTML, array('filter' => true, 'noclean' => true)) . '
+                  </div>';
+            }
         }
         return $this->content;
     }

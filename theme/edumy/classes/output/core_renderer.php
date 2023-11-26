@@ -1051,6 +1051,7 @@ return $output;
    * @return string HTML for the header bar.
    */
  protected function render_context_header(context_header $contextheader) {
+     $html = '';
 
      // Generate the heading first and before everything else as we might have to do an early return.
      if (!isset($contextheader->heading)) {

@@ -44,11 +44,11 @@ class block_cocoon_course_features extends block_base
 
         if(!empty($this->config->title)){$this->content->title = $this->config->title;}
         if(!empty($this->config->lectures)){$this->content->lectures = $this->config->lectures;}
-        if(!empty($this->config->quizzes)){$this->content->quizzes = $this->config->quizzes;}
+        $this->content->quizzes = $this->config->quizzes ?? '';
         if(!empty($this->config->duration)){$this->content->duration = $this->config->duration;}
         if(!empty($this->config->skill_level)){$this->content->skill_level = $this->config->skill_level;}
         if(!empty($this->config->language)){$this->content->language = $this->config->language;}
-        if(!empty($this->config->assessments)){$this->content->assessments = $this->config->assessments;}
+        $this->content->assessments = $this->config->assessments ?? '';
 
         $this->content->text = '
         <div class="feature_course_widget">

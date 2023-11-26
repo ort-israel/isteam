@@ -55,6 +55,7 @@ class block_cocoon_course_intro extends block_base {
         }
 
         // map data
+        $white = 'white';
         if(!empty($this->config->teacher)){
           $renderName = '<li class="list-inline-item"><a class="'.$white.'">'. $this->content->teacher .'</a></li>';
         } elseif(!empty($this->config->user)){
@@ -86,7 +87,7 @@ class block_cocoon_course_intro extends block_base {
               <div class="ccn-identify-course-intro">
                 <div class="cs_instructor">
                   <ul class="cs_instrct_list float-left mb0">';
-                  if($this->content->show_teacher == '1'){
+                  if(property_exists($this->content, 'show_teacher') && ($this->content->show_teacher == '1')){
                     $this->content->text .= $renderImage;
                     $this->content->text .= $renderName;
                   }

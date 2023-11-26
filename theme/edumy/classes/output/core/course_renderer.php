@@ -981,6 +981,7 @@ class course_renderer extends \core_course_renderer {
    * @return string
    */
   public function _ccnActivityNav_course_section_cm($course, &$completioninfo, cm_info $mod, $sectionreturn, $displayoptions = array()) {
+      global $COURSE, $USER, $CFG;
       $output = '';
       // We return empty string (because course module will not be displayed at all)
       // if:
@@ -1050,14 +1051,45 @@ class course_renderer extends \core_course_renderer {
       //     $modicons .= $mod->afterediticons;
       // }
 
-      $modicons .= $this->course_section_cm_completion($course, $completioninfo, $mod, $displayoptions);
+      // Support for older versions.
+      if ($CFG->branch == '310' || $CFG->branch == '39') {
+          $modicons .= $this->course_section_cm_completion($course, $completioninfo, $mod, $displayoptions);
+      }
 
       if (!empty($modicons)) {
           $output .= html_writer::span($modicons, 'actions');
       }
 
-      // Show availability info (if module is not available).
-      $output .= $this->course_section_cm_availability($mod, $displayoptions);
+      if ($CFG->branch == '311') {
+
+          // Fetch completion details.
+          $showcompletionconditions = $course->showcompletionconditions == COMPLETION_SHOW_CONDITIONS;
+          $completiondetails = \core_completion\cm_completion_details::get_instance($mod, $USER->id, $showcompletionconditions);
+          $ismanualcompletion = $completiondetails->has_completion() && !$completiondetails->is_automatic();
+
+          // Fetch activity dates.
+          $activitydates = [];
+          if ($course->showactivitydates) {
+              $activitydates = \core\activity_dates::get_dates_for_module($mod, $USER->id);
+          }
+
+          // Show the activity information if:
+          // - The course's showcompletionconditions setting is enabled; or
+          // - The activity tracks completion manually; or
+          // - There are activity dates to be shown.
+          if ($showcompletionconditions || $ismanualcompletion || $activitydates) {
+              $output .= $this->output->activity_information($mod, $completiondetails, $activitydates);
+          }
+
+          // Show availability info (if module is not available).
+          $output .= $this->course_section_cm_availability($mod, $displayoptions);
+
+      } else {
+
+          // Show availability info (if module is not available).
+          $output .= $this->course_section_cm_availability($mod, $displayoptions);
+
+      }
 
       // If there is content AND a link, then display the content here
       // (AFTER any icons). Otherwise it was displayed before

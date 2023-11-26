@@ -195,7 +195,7 @@ class block_cocoon_course_grid_5 extends block_base {
                 <div class="emply-text-sec">';
               }
               $this->content->text .='
-                  <div class="row '.$ccnClassMasonry_grid.' id="'.$coursesContainerClass.'">';
+                  <div class="row '.$ccnClassMasonry_grid.' id="'.$ccnClassMasonry_grid.'">';
 
         // $courses = self::get_featured_courses();
         // print_object($courses);
@@ -315,7 +315,7 @@ $this->content->text .='
       <div class="row">
       <div class="col-lg-6 offset-lg-3">
         <div class="courses_all_btn text-center">
-          <a class="btn btn-transparent" data-ccn="button_text" href="'.format_text($this->content->button_link, FORMAT_HTML, array('filter' => true)).'">'.format_text($this->content->button_text, FORMAT_HTML, array('filter' => true)).'</a>
+          <a class="btn btn-transparent" data-ccn="button_text" href="'.format_text($this->content->button_link, FORMAT_PLAIN, array('filter' => true)).'">'.format_text($this->content->button_text, FORMAT_HTML, array('filter' => true)).'</a>
         </div>
       </div></div>'  ;
       }

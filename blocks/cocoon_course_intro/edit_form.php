@@ -13,7 +13,7 @@ class block_cocoon_course_intro_edit_form extends block_edit_form
       $ids = $this->block->config->user;
 
       list($uids, $params) = $DB->get_in_or_equal($ids);
-      $rs = $DB->get_recordset_select('user', 'id ' . $uids, $params, '', 'id,firstname,lastname,email');
+      $rs = $DB->get_recordset_select('user', 'id ' . $uids, $params, '', 'id,firstname,lastname,email,firstnamephonetic,lastnamephonetic,middlename,alternatename');
 
       foreach ($rs as $record)
       {
@@ -65,6 +65,10 @@ class block_cocoon_course_intro_edit_form extends block_edit_form
         $mform->setType('config_teacher', PARAM_RAW);
 
         // Image
+        $maxbytes = 0;
+        if (!empty($CFG->maxbytes)) {
+            $maxbytes = $CFG->maxbytes;
+        }
         $mform->addElement('filemanager', 'config_image', get_string('config_image', 'block_cocoon_course_intro'), null,
                 array('subdirs' => 0, 'maxbytes' => $maxbytes, 'areamaxbytes' => 10485760, 'maxfiles' => 1,
                 'accepted_types' => array('.png', '.jpg', '.gif') ));
